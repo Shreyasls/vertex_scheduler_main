@@ -19,38 +19,20 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 
 from dataproc_jupyter_plugin import credentials
-from dataproc_jupyter_plugin.services import vertex
+from dataproc_jupyter_plugin.services import iam
 
 
-class UIConfigController(APIHandler):
+class ServiceAccountController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
-        """Returns available ui config"""
+        """Returns service accounts"""
         try:
-            region_id = self.get_argument("region_id")
             async with aiohttp.ClientSession() as client_session:
-                client = vertex.Client(
+                client = iam.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-
-                configs = await client.list_uiconfig(region_id)
-                self.finish(json.dumps(configs))
+                service_account = await client.list_service_account()
+                self.finish(json.dumps(service_account))
         except Exception as e:
-            self.log.exception(f"Error fetching ui config: {str(e)}")
-            self.finish({"error": str(e)})
-
-
-class CreateController(APIHandler):
-    @tornado.web.authenticated
-    async def post(self):
-        try:
-            input_data = self.get_json_body()
-            async with aiohttp.ClientSession() as client_session:
-                client = vertex.Client(
-                    await credentials.get_cached(), self.log, client_session
-                )
-                result = await client.create(input_data)
-                self.finish(json.dumps(result))
-        except Exception as e:
-            self.log.exception(f"Error creating job schedule: {str(e)}")
+            self.log.exception(f"Error fetching service accounts: {str(e)}")
             self.finish({"error": str(e)})

@@ -38,6 +38,7 @@ from dataproc_jupyter_plugin.controllers import (
     compute,
     dataproc,
     executor,
+    iam,
     storage,
     vertex,
 )
@@ -218,6 +219,8 @@ def setup_handlers(web_app):
         "api/compute/subNetwork": compute.SubNetworkController,
         "api/compute/sharedNetwork": compute.SharedNetworkController,
         "api/storage/listBucket": storage.CloudStorageController,
+        "api/iam/listServiceAccount": iam.ServiceAccountController,
+        "api/vertex/createJobScheduler": vertex.CreateController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)
