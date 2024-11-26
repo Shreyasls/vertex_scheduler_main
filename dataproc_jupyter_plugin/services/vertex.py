@@ -17,9 +17,10 @@ import aiohttp
 from google.cloud import storage
 from dataproc_jupyter_plugin.commons.constants import (
     CONTENT_TYPE,
-    VERTEX_STORAGE_BUCKET
+    VERTEX_STORAGE_BUCKET,
 )
 from dataproc_jupyter_plugin.models.models import DescribeVertexJob
+
 
 class Client:
     client_session = aiohttp.ClientSession()
@@ -81,7 +82,6 @@ class Client:
             self.log.exception(f"Error fetching ui config: {str(e)}")
             return {"Error fetching ui config": str(e)}
 
-
     async def check_bucket_exists(self, bucket_name):
         try:
             if not bucket_name:
@@ -104,10 +104,10 @@ class Client:
             raise IOError(f"Error in creating Bucket: {error}")
 
     async def upload_to_gcs(self, bucket_name, file_path):
-        input_notebook = file_path.split('/')[-1]
+        input_notebook = file_path.split("/")[-1]
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
-        folder_name = input_notebook.split('.')[0]
+        folder_name = input_notebook.split(".")[0]
 
         # uploading the input file
         blob_name = f"gs://{bucket_name}/{folder_name}/{input_notebook}"
@@ -124,7 +124,9 @@ class Client:
 
     async def create_schedule(self, job, file_path):
         try:
-            schedule_value = "* * * * *" if job.schedule_value == "" else job.schedule_value
+            schedule_value = (
+                "* * * * *" if job.schedule_value == "" else job.schedule_value
+            )
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             headers = self.create_headers()
             payload = {
@@ -140,7 +142,7 @@ class Client:
                             "machineSpec": {
                                 "machineType": job.machine_type,
                                 "acceleratorType": job.accelerator_type,
-                                "acceleratorCount": job.accelerator_count
+                                "acceleratorCount": job.accelerator_count,
                             },
                             "networkSpec": {
                                 "enableInternetAccess": True,
@@ -148,14 +150,12 @@ class Client:
                                 "subnetwork": job.subnetwork,
                             },
                         },
-                        "gcsNotebookSource": {
-                            "uri": file_path
-                        },
+                        "gcsNotebookSource": {"uri": file_path},
                         "gcsOutputUri": job.cloud_storage_bucket,
                         "serviceAccount": job.service_account,
-                        "kernelName": job.kernel_name
-                    }
-                }
+                        "kernelName": job.kernel_name,
+                    },
+                },
             }
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
@@ -164,13 +164,11 @@ class Client:
                     resp = await response.json()
                     return resp
                 else:
-                    raise Exception(
-                        f"Error creating schedule"
-                    )
+                    raise Exception(f"Error creating schedule")
         except Exception as e:
             self.log.exception(f"Error creating schedule: {str(e)}")
             raise Exception(f"Error creating schedule: {str(e)}")
-    
+
     async def create(self, input_data):
         try:
             job = DescribeVertexJob(**input_data)
@@ -179,8 +177,10 @@ class Client:
             else:
                 await self.create_bucket(VERTEX_STORAGE_BUCKET)
                 print("The bucket is created")
-            
-            file_path = await self.upload_to_gcs(VERTEX_STORAGE_BUCKET, job.input_filename)
+
+            file_path = await self.upload_to_gcs(
+                VERTEX_STORAGE_BUCKET, job.input_filename
+            )
             res = await self.create_schedule(job, file_path)
             return res
         except Exception as e:
