@@ -115,7 +115,7 @@ class ResumeScheduleController(APIHandler):
 
 class DeleteScheduleController(APIHandler):
     @tornado.web.authenticated
-    async def get(self):
+    async def delete(self):
         """Deletes the schedule"""
         try:
             region_id = self.get_argument("region_id")
@@ -132,23 +132,23 @@ class DeleteScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-# class TriggerScheduleController(APIHandler):
-#     @tornado.web.authenticated
-#     async def post(self):
-#         """Trigger the schedule"""
-#         try:
-#             region_id = self.get_argument("region_id")
-#             input_data = self.get_json_body()
-#             async with aiohttp.ClientSession() as client_session:
-#                 client = vertex.Client(
-#                     await credentials.get_cached(), self.log, client_session
-#                 )
+class TriggerScheduleController(APIHandler):
+    @tornado.web.authenticated
+    async def get(self):
+        """Trigger the schedule"""
+        try:
+            region_id = self.get_argument("region_id")
+            schedule_id = self.get_argument("schedule_id")
+            async with aiohttp.ClientSession() as client_session:
+                client = vertex.Client(
+                    await credentials.get_cached(), self.log, client_session
+                )
 
-#                 resp = await client.trigger_schedule(region_id, schedule_id, input_data)
-#                 self.finish(json.dumps(resp))
-#         except Exception as e:
-#             self.log.exception(f"Error triggering the schedule: {str(e)}")
-#             self.finish({"error": str(e)})
+                resp = await client.trigger_schedule(region_id, schedule_id)
+                self.finish(json.dumps(resp))
+        except Exception as e:
+            self.log.exception(f"Error triggering the schedule: {str(e)}")
+            self.finish({"error": str(e)})
 
 
 # class UpdateScheduleController(APIHandler):
