@@ -23,8 +23,8 @@ import { ICellProps } from '../../utils/utils';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import {
   CircularProgress,
-//   Autocomplete,
-//   TextField
+  //   Autocomplete,
+  //   TextField
 } from '@mui/material';
 import deleteIcon from '../../../style/icons/scheduler_delete.svg';
 import { LabIcon } from '@jupyterlab/ui-components';
@@ -78,7 +78,7 @@ function listNotebookScheduler({
   settingRegistry,
   handleDagIdSelection,
   backButtonComposerName,
-  composerSelectedFromCreate,
+  // composerSelectedFromCreate,
   setCreateCompleted,
   setJobNameSelected,
   setComposerSelected,
@@ -112,7 +112,7 @@ function listNotebookScheduler({
   settingRegistry: ISettingRegistry;
   handleDagIdSelection: (composerName: string, dagId: string) => void;
   backButtonComposerName: string;
-  composerSelectedFromCreate: string;
+  // composerSelectedFromCreate: string;
   setCreateCompleted?: (value: boolean) => void;
   setJobNameSelected?: (value: string) => void;
   setComposerSelected?: (value: string) => void;
@@ -141,23 +141,23 @@ function listNotebookScheduler({
   setIsLoadingKernelDetail?: (value: boolean) => void;
   bucketName: string;
   setBucketName: (value: string) => void;
-}){
+}) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
   const [composerSelectedList, setComposerSelectedList] = useState('');
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const backselectedEnvironment = backButtonComposerName;
-  const createSelectedEnvironment = composerSelectedFromCreate;
+  // const createSelectedEnvironment = composerSelectedFromCreate;
   const [deletePopupOpen, setDeletePopupOpen] = useState(false);
-//   const [importErrorPopupOpen, setImportErrorPopupOpen] = useState(false);
+  //   const [importErrorPopupOpen, setImportErrorPopupOpen] = useState(false);
   const [selectedDagId, setSelectedDagId] = useState('');
   const [editDagLoading, setEditDagLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState('');
   const [editNotebookLoading, setEditNotebookLoading] = useState('');
   const [deletingNotebook, setDeletingNotebook] = useState(false);
-//   const [importErrorData, setImportErrorData] = useState<string[]>([]);
-//   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
+  //   const [importErrorData, setImportErrorData] = useState<string[]>([]);
+  //   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
   const columns = React.useMemo(
     () => [
@@ -192,23 +192,23 @@ function listNotebookScheduler({
     );
   };
 
-//   const timerImportError = useRef<NodeJS.Timeout | undefined>(undefined);
-//   const pollingImportError = async (
-//     pollingFunction: () => void,
-//     pollingDisable: boolean
-//   ) => {
-//     timerImportError.current = PollingImportErrorTimer(
-//       pollingFunction,
-//       pollingDisable,
-//       timerImportError.current
-//     );
-//   };
-//   const handleComposerSelected = (data: string | null) => {
-//     if (data) {
-//       const selectedComposer = data.toString();
-//       setComposerSelectedList(selectedComposer);
-//     }
-//   };
+  //   const timerImportError = useRef<NodeJS.Timeout | undefined>(undefined);
+  //   const pollingImportError = async (
+  //     pollingFunction: () => void,
+  //     pollingDisable: boolean
+  //   ) => {
+  //     timerImportError.current = PollingImportErrorTimer(
+  //       pollingFunction,
+  //       pollingDisable,
+  //       timerImportError.current
+  //     );
+  //   };
+  //   const handleComposerSelected = (data: string | null) => {
+  //     if (data) {
+  //       const selectedComposer = data.toString();
+  //       setComposerSelectedList(selectedComposer);
+  //     }
+  //   };
   const handleUpdateScheduler = async (
     dag_id: string,
     is_status_paused: boolean
@@ -298,17 +298,17 @@ function listNotebookScheduler({
     setDeletingNotebook(false);
   };
 
-//   const handleDeleteImportError = async (dagId: string) => {
-//     const fromPage = 'importErrorPage';
-//     await SchedulerService.handleDeleteSchedulerAPIService(
-//       composerSelectedList,
-//       dagId,
-//       setDagList,
-//       setIsLoading,
-//       setBucketName,
-//       fromPage
-//     );
-//   };
+  //   const handleDeleteImportError = async (dagId: string) => {
+  //     const fromPage = 'importErrorPage';
+  //     await SchedulerService.handleDeleteSchedulerAPIService(
+  //       composerSelectedList,
+  //       dagId,
+  //       setDagList,
+  //       setIsLoading,
+  //       setBucketName,
+  //       fromPage
+  //     );
+  //   };
 
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
@@ -326,19 +326,19 @@ function listNotebookScheduler({
     );
   };
 
-//   const handleImportErrorPopup = async () => {
-//     setImportErrorPopupOpen(true);
-//   };
-//   const handleImportErrorClosed = async () => {
-//     setImportErrorPopupOpen(false);
-//   };
-//   const handleImportErrordata = async () => {
-//     await SchedulerService.handleImportErrordataService(
-//       composerSelectedList,
-//       setImportErrorData,
-//       setImportErrorEntries
-//     );
-//   };
+  //   const handleImportErrorPopup = async () => {
+  //     setImportErrorPopupOpen(true);
+  //   };
+  //   const handleImportErrorClosed = async () => {
+  //     setImportErrorPopupOpen(false);
+  //   };
+  //   const handleImportErrordata = async () => {
+  //     await SchedulerService.handleImportErrordataService(
+  //       composerSelectedList,
+  //       setImportErrorData,
+  //       setImportErrorEntries
+  //     );
+  //   };
 
   const {
     getTableProps,
@@ -523,18 +523,19 @@ function listNotebookScheduler({
   useEffect(() => {
     if (
       composerList.length > 0 &&
-      backselectedEnvironment === '' &&
-      createSelectedEnvironment === ''
+      backselectedEnvironment === ''
+      // &&
+      // createSelectedEnvironment === ''
     ) {
       setComposerSelectedList(composerList[0]);
     }
-    if (
-      composerList.length > 0 &&
-      backselectedEnvironment === '' &&
-      createSelectedEnvironment !== ''
-    ) {
-      setComposerSelectedList(createSelectedEnvironment);
-    }
+    // if (
+    //   composerList.length > 0 &&
+    //   backselectedEnvironment === '' &&
+    //   createSelectedEnvironment !== ''
+    // ) {
+    //   setComposerSelectedList(createSelectedEnvironment);
+    // }
     if (composerList.length > 0 && backselectedEnvironment !== '') {
       setComposerSelectedList(backselectedEnvironment);
     }
@@ -544,7 +545,7 @@ function listNotebookScheduler({
     if (composerSelectedList !== '') {
       setIsLoading(true);
       listDagInfoAPI();
-    //   handleImportErrordata();
+      //   handleImportErrordata();
     }
   }, [composerSelectedList]);
 
@@ -557,14 +558,14 @@ function listNotebookScheduler({
     };
   }, [composerSelectedList]);
 
-//   useEffect(() => {
-//     if (composerSelectedList !== '') {
-//       pollingImportError(handleImportErrordata, false);
-//     }
-//     return () => {
-//       pollingImportError(handleImportErrordata, true);
-//     };
-//   }, [composerSelectedList]);
+  //   useEffect(() => {
+  //     if (composerSelectedList !== '') {
+  //       pollingImportError(handleImportErrordata, false);
+  //     }
+  //     return () => {
+  //       pollingImportError(handleImportErrordata, true);
+  //     };
+  //   }, [composerSelectedList]);
 
   return (
     <div>
@@ -604,7 +605,7 @@ function listNotebookScheduler({
           </div>
         )}
       </div> */}
-
+      <div>Vertex table list</div>
       {dagList.length > 0 ? (
         <div className="notebook-templates-list-table-parent">
           <TableData

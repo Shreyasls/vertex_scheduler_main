@@ -237,7 +237,7 @@ const CreateVertexScheduler = ({
     };
 
     const subNetworkAPI = async () => {
-        await VertexServices.subNetworkAPIService(setSubNetworkList);
+        await VertexServices.subNetworkAPIService(region, setSubNetworkList);
     };
 
     const sharedNetworkAPI = async () => {
@@ -254,13 +254,15 @@ const CreateVertexScheduler = ({
     };
 
     useEffect(() => {
-        if (region !== '') {
-            machineTypeAPI()
+        if (!createCompleted) {
+            if (region !== '') {
+                machineTypeAPI()
+                subNetworkAPI()
+            }
+            cloudStorageAPI()
+            primaryNetworkAPI()
+            sharedNetworkAPI()
         }
-        cloudStorageAPI()
-        primaryNetworkAPI()
-        subNetworkAPI()
-        sharedNetworkAPI()
         authApi()
             .then((credentials) => {
                 if (credentials && credentials?.region_id && credentials.project_id) {
@@ -299,7 +301,7 @@ const CreateVertexScheduler = ({
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
-                        composerSelectedFromCreate='vertex'
+                        // composerSelectedFromCreate='vertex'
                         setCreateCompleted={setCreateCompleted}
                         setJobNameSelected={setJobNameSelected}
                     // setComposerSelected={setComposerSelected}

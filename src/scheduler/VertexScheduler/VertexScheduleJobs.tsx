@@ -26,7 +26,7 @@ import { JupyterLab } from '@jupyterlab/application';
 //     Typography
 // } from '@mui/material';
 import { IThemeManager } from '@jupyterlab/apputils';
-import ListNotebookScheduler from '../listNotebookScheduler';
+// import ListNotebookScheduler from '../listNotebookScheduler';
 import ListVertexScheduler from '../VertexScheduler/ListVertexScheduler';
 import ExecutionHistory from '../executionHistory';
 import { scheduleMode } from '../../utils/const';
@@ -36,7 +36,7 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 const NotebookJobComponent = ({
     app,
     settingRegistry,
-    composerSelectedFromCreate,
+    // composerSelectedFromCreate,
     setCreateCompleted,
     setJobNameSelected,
     setComposerSelected,
@@ -67,7 +67,7 @@ const NotebookJobComponent = ({
     app: JupyterLab;
     themeManager: IThemeManager;
     settingRegistry: ISettingRegistry;
-    composerSelectedFromCreate: string;
+    // composerSelectedFromCreate: string;
     setCreateCompleted?: (value: boolean) => void;
     setJobNameSelected?: (value: string) => void;
     setComposerSelected?: (value: string) => void;
@@ -100,7 +100,7 @@ const NotebookJobComponent = ({
     const [bucketName, setBucketName] = useState('');
     const [dagId, setDagId] = useState('');
     const [backComposerName, setBackComposerName] = useState('');
-    const [schedulerSelector] = useState<string>('vertex');
+    // const [schedulerSelector] = useState<string>('vertex');
 
     const handleDagIdSelection = (composerName: string, dagId: string) => {
         setShowExecutionHistory(true);
@@ -133,47 +133,48 @@ const NotebookJobComponent = ({
             ) : (
                 <div>
                     {
-                        schedulerSelector === 'composer' ?
-                            <ListNotebookScheduler
-                                app={app}
-                                settingRegistry={settingRegistry}
-                                handleDagIdSelection={handleDagIdSelection}
-                                backButtonComposerName={backComposerName}
-                                composerSelectedFromCreate={composerSelectedFromCreate}
-                                setCreateCompleted={setCreateCompleted}
-                                setJobNameSelected={setJobNameSelected}
-                                setComposerSelected={setComposerSelected}
-                                setScheduleMode={setScheduleMode}
-                                setScheduleValue={setScheduleValue}
-                                setInputFileSelected={setInputFileSelected}
-                                setParameterDetail={setParameterDetail}
-                                setParameterDetailUpdated={setParameterDetailUpdated}
-                                setSelectedMode={setSelectedMode}
-                                setClusterSelected={setClusterSelected}
-                                setServerlessSelected={setServerlessSelected}
-                                setServerlessDataSelected={setServerlessDataSelected}
-                                serverlessDataList={serverlessDataList}
-                                setServerlessDataList={setServerlessDataList}
-                                setServerlessList={setServerlessList}
-                                setRetryCount={setRetryCount}
-                                setRetryDelay={setRetryDelay}
-                                setEmailOnFailure={setEmailOnFailure}
-                                setEmailonRetry={setEmailonRetry}
-                                setEmailOnSuccess={setEmailOnSuccess}
-                                setEmailList={setEmailList}
-                                setStopCluster={setStopCluster}
-                                setTimeZoneSelected={setTimeZoneSelected}
-                                setEditMode={setEditMode}
-                                bucketName={bucketName}
-                                setBucketName={setBucketName}
-                                setIsLoadingKernelDetail={setIsLoadingKernelDetail}
-                            /> :
+                        // schedulerSelector === 'composer' 
+                        // ?
+                        //     <ListNotebookScheduler
+                        //         app={app}
+                        //         settingRegistry={settingRegistry}
+                        //         handleDagIdSelection={handleDagIdSelection}
+                        //         backButtonComposerName={backComposerName}
+                        //         composerSelectedFromCreate={composerSelectedFromCreate}
+                        //         setCreateCompleted={setCreateCompleted}
+                        //         setJobNameSelected={setJobNameSelected}
+                        //         setComposerSelected={setComposerSelected}
+                        //         setScheduleMode={setScheduleMode}
+                        //         setScheduleValue={setScheduleValue}
+                        //         setInputFileSelected={setInputFileSelected}
+                        //         setParameterDetail={setParameterDetail}
+                        //         setParameterDetailUpdated={setParameterDetailUpdated}
+                        //         setSelectedMode={setSelectedMode}
+                        //         setClusterSelected={setClusterSelected}
+                        //         setServerlessSelected={setServerlessSelected}
+                        //         setServerlessDataSelected={setServerlessDataSelected}
+                        //         serverlessDataList={serverlessDataList}
+                        //         setServerlessDataList={setServerlessDataList}
+                        //         setServerlessList={setServerlessList}
+                        //         setRetryCount={setRetryCount}
+                        //         setRetryDelay={setRetryDelay}
+                        //         setEmailOnFailure={setEmailOnFailure}
+                        //         setEmailonRetry={setEmailonRetry}
+                        //         setEmailOnSuccess={setEmailOnSuccess}
+                        //         setEmailList={setEmailList}
+                        //         setStopCluster={setStopCluster}
+                        //         setTimeZoneSelected={setTimeZoneSelected}
+                        //         setEditMode={setEditMode}
+                        //         bucketName={bucketName}
+                        //         setBucketName={setBucketName}
+                        //         setIsLoadingKernelDetail={setIsLoadingKernelDetail}
+                        //     /> :
                             <ListVertexScheduler
                                 app={app}
                                 settingRegistry={settingRegistry}
                                 handleDagIdSelection={handleDagIdSelection}
                                 backButtonComposerName={backComposerName}
-                                composerSelectedFromCreate={composerSelectedFromCreate}
+                                // composerSelectedFromCreate={composerSelectedFromCreate}
                                 setCreateCompleted={setCreateCompleted}
                                 setJobNameSelected={setJobNameSelected}
                                 setComposerSelected={setComposerSelected}
@@ -213,18 +214,18 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends DataprocWidget {
     app: JupyterLab;
     settingRegistry: ISettingRegistry;
-    composerSelectedFromCreate: string;
+    // composerSelectedFromCreate: string;
 
     constructor(
         app: JupyterLab,
         settingRegistry: ISettingRegistry,
         themeManager: IThemeManager,
-        composerSelectedFromCreate: string
+        // composerSelectedFromCreate: string
     ) {
         super(themeManager);
         this.app = app;
         this.settingRegistry = settingRegistry;
-        this.composerSelectedFromCreate = composerSelectedFromCreate;
+        // this.composerSelectedFromCreate = composerSelectedFromCreate;
     }
     renderInternal(): React.JSX.Element {
         return (
@@ -232,7 +233,7 @@ export class NotebookJobs extends DataprocWidget {
                 app={this.app}
                 settingRegistry={this.settingRegistry}
                 themeManager={this.themeManager}
-                composerSelectedFromCreate={this.composerSelectedFromCreate}
+                // composerSelectedFromCreate={this.composerSelectedFromCreate}
             />
         );
     }
