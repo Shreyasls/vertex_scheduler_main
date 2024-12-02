@@ -457,7 +457,6 @@ const CreateVertexScheduler = ({
                                 setValueValidation={setValueValidation}
                                 duplicateKeyError={duplicateKeyError}
                                 setDuplicateKeyError={setDuplicateKeyError}
-                                fromPage="scheduler"
                             />
                         </>
 
