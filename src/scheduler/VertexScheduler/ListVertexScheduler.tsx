@@ -23,6 +23,7 @@ import { ICellProps } from '../../utils/utils';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import {
   CircularProgress,
+  Button,
   //   Autocomplete,
   //   TextField
 } from '@mui/material';
@@ -40,6 +41,7 @@ import PollingTimer from '../../utils/pollingTimer';
 import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID, scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { VertexServices } from './VertexServices';
 
 const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
@@ -67,15 +69,15 @@ const iconTrigger = new LabIcon({
   svgstr: triggerIcon
 });
 interface IDagList {
-  jobid: string;
-  notebookname: string;
+  displayName: string;
   schedule: string;
-  scheduleInterval: string;
+  status: string;
 }
 
-function listNotebookScheduler({
+function listVertexScheduler({
   app,
   settingRegistry,
+  region,
   handleDagIdSelection,
   backButtonComposerName,
   // composerSelectedFromCreate,
@@ -111,6 +113,7 @@ function listNotebookScheduler({
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
   handleDagIdSelection: (composerName: string, dagId: string) => void;
+  region: string;
   backButtonComposerName: string;
   // composerSelectedFromCreate: string;
   setCreateCompleted?: (value: boolean) => void;
@@ -155,15 +158,18 @@ function listNotebookScheduler({
   const [editDagLoading, setEditDagLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState('');
   const [editNotebookLoading, setEditNotebookLoading] = useState('');
-  const [deletingNotebook, setDeletingNotebook] = useState(false);
+  const [deletingNotebook
+    //, setDeletingNotebook
+  ] = useState(false);
   //   const [importErrorData, setImportErrorData] = useState<string[]>([]);
   //   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
+  const [nextPageFlag, setNextPageFlag] = useState('');
   const columns = React.useMemo(
     () => [
       {
         Header: 'Job Name',
-        accessor: 'jobid'
+        accessor: 'displayName'
       },
       {
         Header: 'Schedule',
@@ -180,6 +186,7 @@ function listNotebookScheduler({
     ],
     []
   );
+
   const timer = useRef<NodeJS.Timeout | undefined>(undefined);
   const pollingDagList = async (
     pollingFunction: () => void,
@@ -209,19 +216,19 @@ function listNotebookScheduler({
   //       setComposerSelectedList(selectedComposer);
   //     }
   //   };
-  const handleUpdateScheduler = async (
-    dag_id: string,
-    is_status_paused: boolean
-  ) => {
-    await SchedulerService.handleUpdateSchedulerAPIService(
-      composerSelectedList,
-      dag_id,
-      is_status_paused,
-      setDagList,
-      setIsLoading,
-      setBucketName
-    );
-  };
+  // const handleUpdateScheduler = async (
+  //   dag_id: string,
+  //   is_status_paused: boolean
+  // ) => {
+  //   await SchedulerService.handleUpdateSchedulerAPIService(
+  //     composerSelectedList,
+  //     dag_id,
+  //     is_status_paused,
+  //     //setDagList,
+  //     setIsLoading,
+  //     setBucketName
+  //   );
+  // };
   const handleDeletePopUp = (dag_id: string) => {
     setSelectedDagId(dag_id);
     setDeletePopupOpen(true);
@@ -285,18 +292,18 @@ function listNotebookScheduler({
     setDeletePopupOpen(false);
   };
 
-  const handleDeleteScheduler = async () => {
-    setDeletingNotebook(true);
-    await SchedulerService.handleDeleteSchedulerAPIService(
-      composerSelectedList,
-      selectedDagId,
-      setDagList,
-      setIsLoading,
-      setBucketName
-    );
-    setDeletePopupOpen(false);
-    setDeletingNotebook(false);
-  };
+  // const handleDeleteScheduler = async () => {
+  //   setDeletingNotebook(true);
+  //   await SchedulerService.handleDeleteSchedulerAPIService(
+  //     composerSelectedList,
+  //     selectedDagId,
+  //     setDagList,
+  //     setIsLoading,
+  //     setBucketName
+  //   );
+  //   setDeletePopupOpen(false);
+  //   setDeletingNotebook(false);
+  // };
 
   //   const handleDeleteImportError = async (dagId: string) => {
   //     const fromPage = 'importErrorPage';
@@ -318,11 +325,12 @@ function listNotebookScheduler({
   };
 
   const listDagInfoAPI = async () => {
-    await SchedulerService.listDagInfoAPIService(
+    console.log('running function');
+    await VertexServices.listVertexSchedules(
       setDagList,
+      region,
       setIsLoading,
-      setBucketName,
-      composerSelectedList
+      setNextPageFlag
     );
   };
 
@@ -367,7 +375,7 @@ function listNotebookScheduler({
           role="button"
           className="icon-buttons-style"
           title={is_status_paused ? 'Unpause' : 'Pause'}
-          onClick={e => handleUpdateScheduler(data.jobid, is_status_paused)}
+        // onClick={e => handleUpdateScheduler(data.jobid, is_status_paused)}
         >
           {is_status_paused ? (
             <iconPlay.react
@@ -542,12 +550,15 @@ function listNotebookScheduler({
   }, [composerList]);
 
   useEffect(() => {
-    if (composerSelectedList !== '') {
+    ///if (composerSelectedList !== '') {
+    if (region !== '') {
       setIsLoading(true);
       listDagInfoAPI();
-      //   handleImportErrordata();
     }
-  }, [composerSelectedList]);
+
+    //   handleImportErrordata();
+    //}
+  }, []);
 
   useEffect(() => {
     if (composerSelectedList !== '') {
@@ -568,6 +579,7 @@ function listNotebookScheduler({
   //   }, [composerSelectedList]);
 
   return (
+    console.log('dagaList item', dagList, isLoading),
     <div>
       {/* <div className="select-text-overlay-scheduler">
         <div className="create-scheduler-form-element">
@@ -605,42 +617,86 @@ function listNotebookScheduler({
           </div>
         )}
       </div> */}
-      <div>Vertex table list</div>
+      {/* <div>Vertex table list</div> */}
       {dagList.length > 0 ? (
-        <div className="notebook-templates-list-table-parent">
-          <TableData
-            getTableProps={getTableProps}
-            headerGroups={headerGroups}
-            getTableBodyProps={getTableBodyProps}
-            isLoading={isLoading}
-            rows={rows}
-            page={page}
-            prepareRow={prepareRow}
-            tableDataCondition={tableDataCondition}
-            fromPage="Notebook Schedulers"
-          />
-          {dagList.length > 50 && (
-            <PaginationView
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              pageIndex={pageIndex}
-              allData={dagList}
-              previousPage={previousPage}
-              nextPage={nextPage}
-              canPreviousPage={canPreviousPage}
-              canNextPage={canNextPage}
+        <>
+          <div className="notebook-templates-list-table-parent">
+            <TableData
+              getTableProps={getTableProps}
+              headerGroups={headerGroups}
+              getTableBodyProps={getTableBodyProps}
+              isLoading={isLoading}
+              rows={rows}
+              page={page}
+              prepareRow={prepareRow}
+              tableDataCondition={tableDataCondition}
+              fromPage="Notebook Schedulers"
             />
-          )}
-          {deletePopupOpen && (
-            <DeletePopup
-              onCancel={() => handleCancelDelete()}
-              onDelete={() => handleDeleteScheduler()}
-              deletePopupOpen={deletePopupOpen}
-              DeleteMsg={`This will delete ${selectedDagId} and cannot be undone.`}
-              deletingNotebook={deletingNotebook}
-            />
-          )}
-        </div>
+            {dagList.length > 50 && (
+              <PaginationView
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                pageIndex={pageIndex}
+                allData={[]}
+                //allData={dagList}
+                previousPage={previousPage}
+                nextPage={nextPage}
+                canPreviousPage={canPreviousPage}
+                canNextPage={canNextPage}
+              />
+            )}
+            {deletePopupOpen && (
+              <DeletePopup
+                onCancel={() => handleCancelDelete()}
+                onDelete={() => { }}
+                //onDelete={() => handleDeleteScheduler()}
+                deletePopupOpen={deletePopupOpen}
+                DeleteMsg={`This will delete ${selectedDagId} and cannot be undone.`}
+                deletingNotebook={deletingNotebook}
+              />
+            )}
+          </div>
+
+          {
+            nextPageFlag ?
+              <div className='pagination-button'>
+                <Button
+                  className='page-move-button'
+                  //onClick={
+                  //() => {
+                  //   if (!isSaveDisabled()) {
+                  // handleCreateJobScheduler()}
+                  //   }
+                  // }}
+                  variant="contained"
+                  //disabled={isSaveDisabled()}
+                  aria-label='Create Schedule'
+                >
+                  <div>
+                    Prev
+                  </div>
+                </Button>
+
+                <Button
+                  className='page-move-button'
+                  //onClick={
+                  //() => {
+                  //   if (!isSaveDisabled()) {
+                  // handleCreateJobScheduler()}
+                  //   }
+                  // }}
+                  variant="contained"
+                  //disabled={isSaveDisabled()}
+                  aria-label='Create Schedule'
+                >
+                  <div>
+                    Next
+                  </div>
+                </Button>
+              </div> : null
+          }
+
+        </>
       ) : (
         <div>
           {isLoading && (
@@ -651,7 +707,7 @@ function listNotebookScheduler({
                 aria-label="Loading Spinner"
                 data-testid="loader"
               />
-              Loading Notebook Schedulers
+              Loading Vertex Schedulers
             </div>
           )}
           {!isLoading && (
@@ -662,4 +718,4 @@ function listNotebookScheduler({
     </div>
   );
 }
-export default listNotebookScheduler;
+export default listVertexScheduler;

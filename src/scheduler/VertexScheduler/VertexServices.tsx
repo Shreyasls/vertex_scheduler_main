@@ -19,6 +19,12 @@ import { toast } from 'react-toastify';
 import { requestAPI } from '../../handler/handler';
 import { DataprocLoggingService, LOG_LEVEL } from '../../utils/loggingService';
 import { toastifyCustomStyle } from '../../utils/utils';
+ 
+interface IDagList {
+    displayName: string;
+    schedule: string;
+    status: string;
+}
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -182,4 +188,36 @@ export class VertexServices {
             );
         }
     };
+
+    static listVertexSchedules = async (
+        setDagList: (value: IDagList[]) => void,
+        region: string,
+        setIsLoading: (value: boolean) => void,
+        setNextPageFlag: (value: string) => void,
+    ) => {
+        try {
+            const serviceURL = 'api/vertex/listSchedules';
+            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}`);
+            console.log('formatted response', formattedResponse);
+            if (formattedResponse.schedules.length > 0) {
+                console.log('inside api if');
+                setDagList(formattedResponse.schedules);
+                setIsLoading(false);
+                setNextPageFlag(formattedResponse?.nextPageToken)
+            }
+        } catch (error) {
+            DataprocLoggingService.log(
+                'Error listing vertex schedules',
+                LOG_LEVEL.ERROR
+            );
+            // setTimeout(() => {
+            //     toast.error(
+            //         `Failed to fetch vertex schedules list`,
+            //         toastifyCustomStyle
+            //     );
+            // }, 10000);
+            
+        }
+    }
+
 }

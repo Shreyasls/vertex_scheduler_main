@@ -23,6 +23,9 @@ import { authApi } from '../../utils/utils';
 import VertexScheduleJobs from './VertexScheduleJobs';
 import { scheduleMode, scheduleValueExpression } from '../../utils/const';
 import { VertexServices } from './VertexServices';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 const CreateVertexScheduler = ({
     themeManager,
@@ -96,6 +99,8 @@ const CreateVertexScheduler = ({
     );
 
     const timezones = Object.keys(tzdata.zones).sort();
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
 
     // const [composerSelected, setComposerSelected] = useState('');
 
@@ -195,6 +200,15 @@ const CreateVertexScheduler = ({
         setNetworkSelected(eventValue.target.value);
     }
 
+    const handleStartDate = (val: any) => {
+        console.log('startDate', val)
+        setStartDate(val.$d)
+    }
+    const handleEndDate = (val: any) => {
+        console.log('endDate', val)
+        setEndDate(val.$d)
+    }
+
     /**
     * Create a job schedule
     */
@@ -291,8 +305,9 @@ const CreateVertexScheduler = ({
             setTimeZoneSelected(selectedTimeZone);
         }
     };
+    console.log({ 'startDate': startDate, 'endDate': endDate });
 
-    return (
+    return (     
         <>
             {
                 createCompleted ?
@@ -301,6 +316,7 @@ const CreateVertexScheduler = ({
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
+                        region={region}
                         // composerSelectedFromCreate='vertex'
                         setCreateCompleted={setCreateCompleted}
                         setJobNameSelected={setJobNameSelected}
@@ -611,6 +627,27 @@ const CreateVertexScheduler = ({
                             <>
                                 <div className="create-scheduler-form-element">
                                     <Cron value={scheduleValue} setValue={setScheduleValue} />
+                                </div>
+                                <div className="execution-history-main-wrapper">
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                                            <DateTimePicker
+                                                className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                                label="Start Date"
+                                                // value={startDate}
+                                                onChange={(newValue) => handleStartDate(newValue)}
+                                            />
+                                        </div>
+                                        <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                                            <DateTimePicker
+                                                className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                                label="End Date"
+                                                // value={endDate}
+                                                onChange={(newValue) => handleEndDate(newValue)}
+                                                slotProps={{ field: { clearable: true } }}
+                                            />
+                                        </div>
+                                    </LocalizationProvider>
                                 </div>
                                 <div className="create-scheduler-form-element">
                                     <Autocomplete

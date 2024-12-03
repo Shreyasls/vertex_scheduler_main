@@ -36,6 +36,7 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 const NotebookJobComponent = ({
     app,
     settingRegistry,
+    region,
     // composerSelectedFromCreate,
     setCreateCompleted,
     setJobNameSelected,
@@ -67,6 +68,7 @@ const NotebookJobComponent = ({
     app: JupyterLab;
     themeManager: IThemeManager;
     settingRegistry: ISettingRegistry;
+    region: string;
     // composerSelectedFromCreate: string;
     setCreateCompleted?: (value: boolean) => void;
     setJobNameSelected?: (value: string) => void;
@@ -172,6 +174,7 @@ const NotebookJobComponent = ({
                             <ListVertexScheduler
                                 app={app}
                                 settingRegistry={settingRegistry}
+                                region={region}
                                 handleDagIdSelection={handleDagIdSelection}
                                 backButtonComposerName={backComposerName}
                                 // composerSelectedFromCreate={composerSelectedFromCreate}
@@ -214,17 +217,20 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends DataprocWidget {
     app: JupyterLab;
     settingRegistry: ISettingRegistry;
+    region: string;
     // composerSelectedFromCreate: string;
 
     constructor(
         app: JupyterLab,
         settingRegistry: ISettingRegistry,
         themeManager: IThemeManager,
+        region: string
         // composerSelectedFromCreate: string
     ) {
         super(themeManager);
         this.app = app;
         this.settingRegistry = settingRegistry;
+        this.region = region;
         // this.composerSelectedFromCreate = composerSelectedFromCreate;
     }
     renderInternal(): React.JSX.Element {
@@ -233,6 +239,7 @@ export class NotebookJobs extends DataprocWidget {
                 app={this.app}
                 settingRegistry={this.settingRegistry}
                 themeManager={this.themeManager}
+                region={this.region}
                 // composerSelectedFromCreate={this.composerSelectedFromCreate}
             />
         );
