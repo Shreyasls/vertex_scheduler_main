@@ -14,7 +14,9 @@
 
 import aiohttp
 
+from cron_descriptor import get_description
 from google.cloud import storage
+
 from dataproc_jupyter_plugin.commons.constants import (
     CONTENT_TYPE,
     VERTEX_STORAGE_BUCKET,
@@ -215,7 +217,7 @@ class Client:
                         for schedule in schedules:
                             formatted_schedule = {
                                 "displayName": schedule.get("displayName"),
-                                "schedule": schedule.get("cron"),
+                                "schedule": get_description(schedule.get("cron")),
                                 "status": schedule.get("state"),
                             }
                             schedule_list.append(formatted_schedule)
