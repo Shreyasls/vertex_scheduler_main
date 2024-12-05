@@ -33,6 +33,7 @@ dependencies = [
     "google-cloud-storage~=2.18.2",
     "aiofiles>=22.1.0,<23",
     "google-cloud-compute>=1.22.0",
+    "cron-descriptor>=1.4.5",
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 

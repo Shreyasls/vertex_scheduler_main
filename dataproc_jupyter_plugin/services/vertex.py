@@ -15,6 +15,8 @@
 import aiohttp
 
 from google.cloud import storage
+from cron_descriptor import get_description
+
 from dataproc_jupyter_plugin.commons.constants import (
     CONTENT_TYPE,
     VERTEX_STORAGE_BUCKET,
@@ -214,8 +216,9 @@ class Client:
                         schedules = resp.get("schedules")
                         for schedule in schedules:
                             formatted_schedule = {
+                                "name": schedule.get("name"),
                                 "displayName": schedule.get("displayName"),
-                                "schedule": schedule.get("cron"),
+                                "schedule": get_description(schedule.get("cron")),
                                 "status": schedule.get("state"),
                             }
                             schedule_list.append(formatted_schedule)
@@ -233,7 +236,7 @@ class Client:
 
     async def pause_schedule(self, region_id, schedule_id):
         try:
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules/{schedule_id}:pause"
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/{schedule_id}:pause"
 
             headers = self.create_headers()
             async with self.client_session.post(
@@ -254,7 +257,7 @@ class Client:
 
     async def resume_schedule(self, region_id, schedule_id):
         try:
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules/{schedule_id}:resume"
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/{schedule_id}:resume"
 
             headers = self.create_headers()
             async with self.client_session.post(
@@ -275,7 +278,7 @@ class Client:
 
     async def delete_schedule(self, region_id, schedule_id):
         try:
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules/{schedule_id}"
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/{schedule_id}"
 
             headers = self.create_headers()
             async with self.client_session.delete(
@@ -296,7 +299,7 @@ class Client:
 
     async def get_schedule(self, region_id, schedule_id):
         try:
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules/{schedule_id}"
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/{schedule_id}"
 
             headers = self.create_headers()
             async with self.client_session.get(
@@ -401,7 +404,7 @@ class Client:
             keys = get_keys(payload)
             filtered_keys = [item for item in keys if "displayName" not in item]
             update_mask = ", ".join(filtered_keys)
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules/{schedule_id}?updateMask={update_mask}"
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/{schedule_id}?updateMask={update_mask}"
 
             headers = self.create_headers()
             async with self.client_session.patch(
