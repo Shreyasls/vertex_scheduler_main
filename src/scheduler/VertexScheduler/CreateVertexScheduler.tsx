@@ -21,11 +21,21 @@ import tzdata from 'tzdata';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/utils';
 import VertexScheduleJobs from './VertexScheduleJobs';
-import { scheduleMode, scheduleValueExpression } from '../../utils/const';
+import { internalScheduleMode, scheduleMode, scheduleValueExpression } from '../../utils/const';
 import { VertexServices } from './VertexServices';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
+import dayjs from 'dayjs';
+import { LabIcon } from '@jupyterlab/ui-components';
+import errorIcon from '../../../style/icons/error_icon.svg';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+
+const iconError = new LabIcon({
+    name: 'launcher:error-icon',
+    svgstr: errorIcon
+});
 
 const CreateVertexScheduler = ({
     themeManager,
@@ -64,7 +74,6 @@ const CreateVertexScheduler = ({
     setJobNameUniqueValidation: React.Dispatch<React.SetStateAction<boolean>>;
     notebookSelector: string;
 }) => {
-
     const [vertexScheduler] = useState(false);
     const [dummyList] = useState(['1', '2', '3']);
 
@@ -92,24 +101,45 @@ const CreateVertexScheduler = ({
     const [region, setRegion] = useState('');
     const [projectId, setProjectId] = useState('');
     const [maxRuns, setMaxRuns] = useState('');
+    const [scheduleField, setScheduleField] = useState('');
     const [scheduleMode, setScheduleMode] = useState<scheduleMode>('runNow');
+    const [internalScheduleMode, setInternalScheduleMode] = useState<internalScheduleMode>('cronFormat');
     const [scheduleValue, setScheduleValue] = useState(scheduleValueExpression);
     const [timeZoneSelected, setTimeZoneSelected] = useState(
         Intl.DateTimeFormat().resolvedOptions().timeZone
     );
 
     const timezones = Object.keys(tzdata.zones).sort();
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [endDateError, setEndDateError] = useState(false)
 
+    const minDateStart = dayjs();
+    const minDateEnd = startDate ? dayjs(startDate) : minDateStart;
     // const [composerSelected, setComposerSelected] = useState('');
 
+    const handleRegionChange = (value: React.SetStateAction<string>) => {
+        setRegion(value)
+        setMachineTypeSelected('')
+        setAcceleratedCount(null)
+        setAcceleratorType('')
+    }
     /**
    * Kernel selection
    * @param {string} kernelSelected seleted kernel
    */
     const handleKernel = (kernelValue: any) => {
         setKernelSelected(kernelValue)
+    }
+
+    const handleSchedule = (e: any | React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+
+    // Prevent space as the first character
+    if (newValue === '' || newValue[0] !== ' ' || scheduleField !== '') {
+        setScheduleField(newValue);
+    }
+        // setScheduleField(e.target.value)
     }
 
     /**
@@ -150,6 +180,8 @@ const CreateVertexScheduler = ({
     */
     const handleMachineType = (machineType: any) => {
         setMachineTypeSelected(machineType);
+        setAcceleratedCount(null)
+        setAcceleratorType('')
     }
 
     /**
@@ -157,7 +189,7 @@ const CreateVertexScheduler = ({
     * @param {string} maxRuns seleted machine type
     */
     const handleMaxRuns = (e: any | React.ChangeEvent<HTMLInputElement>) => {
-        const re = /^[0-9\b]+$/;
+        const re = /^[1-9][0-9]*$/;
         if (e.target.value === '' || re.test(e.target.value)) {
             setMaxRuns(e.target.value);
         }
@@ -201,12 +233,26 @@ const CreateVertexScheduler = ({
     }
 
     const handleStartDate = (val: any) => {
-        console.log('startDate', val)
-        setStartDate(val.$d)
+        // console.log('startDate', val)
+        // setStartDate(val.$d)
+        setStartDate(val);
+
+        if (val && endDate && dayjs(endDate).isBefore(dayjs(val))) {
+            setEndDateError(true);
+        } else {
+            setEndDateError(false);
+        }
     }
+
     const handleEndDate = (val: any) => {
-        console.log('endDate', val)
-        setEndDate(val.$d)
+        if (startDate && (dayjs(val).isBefore(dayjs(startDate)) || dayjs(val).isSame(dayjs(startDate), 'minute'))) {
+            setEndDateError(true);
+        } else {
+            setEndDateError(false);
+        }
+        setEndDate(val);
+        // console.log('endDate', val)
+        // setEndDate(val.$d)
     }
 
     /**
@@ -297,6 +343,21 @@ const CreateVertexScheduler = ({
         if (newValue === 'runSchedule' && scheduleValue === '') {
             setScheduleValue(scheduleValueExpression);
         }
+        if (newValue === 'runSchedule') {
+            setInternalScheduleMode("cronFormat");
+        }
+    };
+
+    const handleInternalSchedulerModeChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const newValue = (event.target as HTMLInputElement).value;
+        setInternalScheduleMode(newValue as internalScheduleMode);
+        setStartDate(null)
+        setEndDate(null)
+        // if (newValue === 'cronFormat' && scheduleValue === '') {
+        //     setScheduleValue(scheduleValueExpression);
+        // }
     };
 
     const handleTimeZoneSelected = (data: string | null) => {
@@ -307,19 +368,17 @@ const CreateVertexScheduler = ({
     };
     console.log({ 'startDate': startDate, 'endDate': endDate });
 
-    return (     
+    return (
         <>
             {
                 createCompleted ?
-                    // <></>
                     <VertexScheduleJobs
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
-                        region={region}
-                        // composerSelectedFromCreate='vertex'
-                        setCreateCompleted={setCreateCompleted}
-                        setJobNameSelected={setJobNameSelected}
+                    // composerSelectedFromCreate='vertex'
+                    // setCreateCompleted={setCreateCompleted}
+                    // setJobNameSelected={setJobNameSelected}
                     // setComposerSelected={setComposerSelected}
                     // setScheduleMode={setScheduleMode}
                     // setScheduleValue={setScheduleValue}
@@ -351,7 +410,7 @@ const CreateVertexScheduler = ({
                             <RegionDropdown
                                 projectId={projectId}
                                 region={region}
-                                onRegionChange={region => setRegion(region)}
+                                onRegionChange={region => handleRegionChange(region)}
                             />
                         </div>
 
@@ -445,17 +504,6 @@ const CreateVertexScheduler = ({
                             />
                         </div>
                         <span className="tab-description tab-text-sub-cl">Where results are stored. Select an existing bucket or create a new one.</span>
-                        <div className="create-scheduler-form-element">
-                            <Input
-                                className="create-scheduler-style"
-                                value={maxRuns}
-                                onChange={e => handleMaxRuns(e)}
-                                type="number"
-                                placeholder=""
-                                Label="Max runs"
-                                disabled={editMode}
-                            />
-                        </div>
 
                         <>
                             <div className="create-job-scheduler-title sub-title-heading ">
@@ -623,46 +671,142 @@ const CreateVertexScheduler = ({
                                 </RadioGroup>
                             </FormControl>
                         </div>
-                        {scheduleMode === 'runSchedule' && (
-                            <>
-                                <div className="create-scheduler-form-element">
-                                    <Cron value={scheduleValue} setValue={setScheduleValue} />
-                                </div>
-                                <div className="execution-history-main-wrapper">
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                                            <DateTimePicker
-                                                className="create-scheduler-style create-scheduler-form-element-input-fl"
-                                                label="Start Date"
-                                                // value={startDate}
-                                                onChange={(newValue) => handleStartDate(newValue)}
+                        <div className="schedule-child-section">
+                            {
+                                scheduleMode === 'runSchedule' &&
+                                <div className="create-scheduler-radio-element">
+                                    <FormControl>
+                                        <RadioGroup
+                                            aria-labelledby="demo-controlled-radio-buttons-group"
+                                            name="controlled-radio-buttons-group"
+                                            value={internalScheduleMode}
+                                            onChange={handleInternalSchedulerModeChange}
+                                        >
+                                            <FormControlLabel
+                                                value="cronFormat"
+                                                className="create-scheduler-label-style"
+                                                control={<Radio size="small" />}
+                                                label={
+                                                    <Typography sx={{ fontSize: 13 }}>Use UNIX cron format</Typography>
+                                                }
                                             />
-                                        </div>
-                                        <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                                            <DateTimePicker
-                                                className="create-scheduler-style create-scheduler-form-element-input-fl"
-                                                label="End Date"
-                                                // value={endDate}
-                                                onChange={(newValue) => handleEndDate(newValue)}
-                                                slotProps={{ field: { clearable: true } }}
+                                            <FormControlLabel
+                                                value="userFriendly"
+                                                className="create-scheduler-label-style"
+                                                control={<Radio size="small" />}
+                                                label={
+                                                    <Typography sx={{ fontSize: 13 }}>
+                                                        Use user-friendly scheduler
+                                                    </Typography>
+                                                }
                                             />
-                                        </div>
-                                    </LocalizationProvider>
+                                        </RadioGroup>
+                                    </FormControl>
                                 </div>
-                                <div className="create-scheduler-form-element">
-                                    <Autocomplete
+                            }
+                            {
+                                scheduleMode === 'runSchedule' && internalScheduleMode === 'cronFormat' &&
+                                <div className="create-scheduler-form-element schedule-input-field">
+                                    <Input
                                         className="create-scheduler-style"
-                                        options={timezones}
-                                        value={timeZoneSelected}
-                                        onChange={(_event, val) => handleTimeZoneSelected(val)}
-                                        renderInput={params => (
-                                            <TextField {...params} label="Time Zone" />
-                                        )}
+                                        value={scheduleField}
+                                        onChange={e => handleSchedule(e)}
+                                        type="text"
+                                        placeholder=""
+                                        Label="Schedule"
                                     />
+                                    <span className="tab-description tab-text-sub-cl">Schedule is specified using unix-cron format. You can define a schedule so that your execution runs multiple times a day, or runs on specific days and months.</span>
                                 </div>
-                            </>
-                        )}
+                            }
+                            {scheduleMode === 'runSchedule' && internalScheduleMode === 'userFriendly' && (
+                                <>
+                                    <div className="execution-history-main-wrapper">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                                                <DateTimePicker
+                                                    className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                                    label="Start Date"
+                                                    value={startDate}
+                                                    onChange={(newValue) => handleStartDate(newValue)}
+                                                    slots={{
+                                                        openPickerIcon: CalendarMonthIcon
+                                                    }}
+                                                    slotProps={{
+                                                        actionBar: {
+                                                            actions: ['clear']
+                                                        },
+                                                        tabs: {
+                                                            hidden: true,
+                                                        },
+                                                    }}
+                                                    minDate={minDateStart}
+                                                    closeOnSelect={true}
+                                                />
+                                            </div>
+                                            <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                                                <DateTimePicker
+                                                    className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                                    label="End Date"
+                                                    value={endDate}
+                                                    onChange={(newValue) => handleEndDate(newValue)}
+                                                    slots={{
+                                                        openPickerIcon: CalendarMonthIcon
+                                                    }}
+                                                    slotProps={{
+                                                        actionBar: {
+                                                            actions: ['clear']
+                                                        },
+                                                        field: { clearable: true },
+                                                        tabs: {
+                                                            hidden: true,
+                                                        },
+                                                    }}
+                                                    minDate={minDateEnd}
+                                                />
+                                            </div>
+                                        </LocalizationProvider>
+                                    </div>
+                                    {
+                                        endDateError &&
+                                        <div className="error-key-time">
+                                            <iconError.react tag="div" className="logo-alignment-style" />
+                                            <div className="error-key-missing">End date should be greater than Start date</div>
+                                        </div>
+                                    }
+                                    <div className="create-scheduler-form-element">
+                                        <Cron value={scheduleValue} setValue={setScheduleValue} />
+                                    </div>
+                                </>
+                            )}
+                            {
+                                scheduleMode === 'runSchedule' &&
+                                <>
+                                    <div className="create-scheduler-form-element">
+                                        <Autocomplete
+                                            className="create-scheduler-style"
+                                            options={timezones}
+                                            value={timeZoneSelected}
+                                            onChange={(_event, val) => handleTimeZoneSelected(val)}
+                                            renderInput={params => (
+                                                <TextField {...params} label="Time Zone" />
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="create-scheduler-form-element">
+                                        <Input
+                                            className="create-scheduler-style"
+                                            value={maxRuns}
+                                            onChange={e => handleMaxRuns(e)}
+                                            type="number"
+                                            placeholder=""
+                                            Label="Max runs"
+                                        // disabled={scheduleMode === 'runNow'}
+                                        />
+                                    </div>
+                                </>
 
+                            }
+                        </div>
                         <div className="save-overlay">
                             <Button
                                 //onClick={
@@ -696,11 +840,7 @@ const CreateVertexScheduler = ({
                         </div>
 
                     </div>
-
-
             }
-
-
 
         </>
 

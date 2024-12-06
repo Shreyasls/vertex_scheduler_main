@@ -19,12 +19,17 @@ import { toast } from 'react-toastify';
 import { requestAPI } from '../../handler/handler';
 import { DataprocLoggingService, LOG_LEVEL } from '../../utils/loggingService';
 import { toastifyCustomStyle } from '../../utils/utils';
- 
+
 interface IDagList {
     displayName: string;
     schedule: string;
     status: string;
 }
+
+// interface IUpdateSchedulerAPIResponse {
+//     status: number;
+//     error: string;
+// }
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -104,7 +109,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('primary netwwork', formattedResponse)
                 let primaryList: string[] = [];
                 formattedResponse.forEach((data: { name: string; }) => {
                     primaryList.push(data.name);
@@ -137,7 +141,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('sub netwwork', formattedResponse)
                 let subNetworkList: string[] = [];
                 formattedResponse.forEach((data: { name: string }) => {
                     subNetworkList.push(data.name);
@@ -169,7 +172,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('shared netwwork', formattedResponse)
                 let sharedNetworkList: string[] = [];
                 formattedResponse.forEach((data: { subnetwork: string }) => {
                     sharedNetworkList.push(data.subnetwork);
@@ -198,12 +200,15 @@ export class VertexServices {
         try {
             const serviceURL = 'api/vertex/listSchedules';
             const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}`);
-            console.log('formatted response', formattedResponse);
-            if (formattedResponse.schedules.length > 0) {
-                console.log('inside api if');
-                setDagList(formattedResponse.schedules);
+            if (Object.keys(formattedResponse).length !== 0) {
+                if (formattedResponse.schedules.length > 0) {
+                    setDagList(formattedResponse.schedules);
+                    setIsLoading(false);
+                    setNextPageFlag(formattedResponse?.nextPageToken)
+                }
+            } else {
+                setDagList([]);
                 setIsLoading(false);
-                setNextPageFlag(formattedResponse?.nextPageToken)
             }
         } catch (error) {
             DataprocLoggingService.log(
@@ -216,8 +221,59 @@ export class VertexServices {
             //         toastifyCustomStyle
             //     );
             // }, 10000);
-            
+
         }
     }
+
+    // static handleUpdateSchedulerPauseAPIService = async (
+    //     scheduleId: string,
+    //     region: string,
+    //     setDagList: (value: IDagList[]) => void,
+    //     setIsLoading: (value: boolean) => void,
+    //     setNextPageFlag: (value: string) => void,
+    // ) => {
+    //     try {
+    //         const serviceURL = 'api/vertex/pauseSchedule';
+    //         const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+    //             serviceURL + `?region_id=${region}&&schedule_id=${scheduleId}`,
+    //         );
+    //         console.log('formattedResponse.status', formattedResponse.status);
+    //         if (formattedResponse && formattedResponse.status === 0) {
+    //             toast.success(
+    //                 `scheduler ${scheduleId} updated successfully`,
+    //                 toastifyCustomStyle
+    //             );
+    //             await VertexServices.listVertexSchedules(
+    //                 setDagList,
+    //                 region,
+    //                 setIsLoading,
+    //                 setNextPageFlag
+    //             );
+    //         }
+    //     } catch (error) {
+    //         DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+    //         toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+    //     }
+    // };
+
+    // static triggerDagService = async (
+    //     region: string,
+    //     scheduleId: string
+    //   ) => {
+    //     try {
+    //         const serviceURL = 'api/vertex/triggerSchedule';
+    //       const data: any = await requestAPI(
+    //         serviceURL + `region_id=${region}&&schedule_id=${scheduleId}`
+    //       );
+    //       if (data) {
+    //         toast.success(`${scheduleId} triggered successfully `, toastifyCustomStyle);
+    //       }
+    //     } catch (reason) {
+    //       toast.error(
+    //         `Failed to Trigger ${scheduleId} : ${reason}`,
+    //         toastifyCustomStyle
+    //       );
+    //     }
+    //   };
 
 }
