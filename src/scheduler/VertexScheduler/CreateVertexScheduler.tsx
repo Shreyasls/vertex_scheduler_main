@@ -307,19 +307,17 @@ const CreateVertexScheduler = ({
     };
     console.log({ 'startDate': startDate, 'endDate': endDate });
 
-    return (     
+    return (
         <>
             {
                 createCompleted ?
-                    // <></>
                     <VertexScheduleJobs
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
-                        region={region}
-                        // composerSelectedFromCreate='vertex'
-                        setCreateCompleted={setCreateCompleted}
-                        setJobNameSelected={setJobNameSelected}
+                    // composerSelectedFromCreate='vertex'
+                    // setCreateCompleted={setCreateCompleted}
+                    // setJobNameSelected={setJobNameSelected}
                     // setComposerSelected={setComposerSelected}
                     // setScheduleMode={setScheduleMode}
                     // setScheduleValue={setScheduleValue}
