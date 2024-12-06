@@ -109,7 +109,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('primary netwwork', formattedResponse)
                 let primaryList: string[] = [];
                 formattedResponse.forEach((data: { name: string; }) => {
                     primaryList.push(data.name);
@@ -142,7 +141,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('sub netwwork', formattedResponse)
                 let subNetworkList: string[] = [];
                 formattedResponse.forEach((data: { name: string }) => {
                     subNetworkList.push(data.name);
@@ -174,7 +172,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('shared netwwork', formattedResponse)
                 let sharedNetworkList: string[] = [];
                 formattedResponse.forEach((data: { subnetwork: string }) => {
                     sharedNetworkList.push(data.subnetwork);
@@ -205,7 +202,6 @@ export class VertexServices {
             const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}`);
             if (Object.keys(formattedResponse).length !== 0) {
                 if (formattedResponse.schedules.length > 0) {
-                    console.log('inside api if');
                     setDagList(formattedResponse.schedules);
                     setIsLoading(false);
                     setNextPageFlag(formattedResponse?.nextPageToken)
