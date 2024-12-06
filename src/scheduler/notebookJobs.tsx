@@ -36,7 +36,6 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 const NotebookJobComponent = ({
   app,
   settingRegistry,
-  // composerSelectedFromCreate,
   setCreateCompleted,
   setJobNameSelected,
   setComposerSelected,
@@ -68,7 +67,6 @@ const NotebookJobComponent = ({
   app: JupyterLab;
   themeManager: IThemeManager;
   settingRegistry: ISettingRegistry;
-  // composerSelectedFromCreate: string;
   setCreateCompleted?: (value: boolean) => void;
   setJobNameSelected?: (value: string) => void;
   setComposerSelected?: (value: string) => void;
@@ -102,7 +100,6 @@ const NotebookJobComponent = ({
   const [bucketName, setBucketName] = useState('');
   const [dagId, setDagId] = useState('');
   const [backComposerName, setBackComposerName] = useState('');
-  // const [schedulerSelector, setSchedulerSelector] = useState<string>('vertex');
 
   const handleDagIdSelection = (composerName: string, dagId: string) => {
     setShowExecutionHistory(true);
@@ -134,47 +131,13 @@ const NotebookJobComponent = ({
         />
       ) : (
         <div>
-          {/* <div className="clusters-list-overlay" role="tab">
-            <div className="cluster-details-title">Scheduled Jobs</div>
-          </div> */}
-          {/* <div className="create-scheduler-form-element sub-para">
-            <FormControl>
-              <RadioGroup
-                className='schedule-radio-btn'
-                aria-labelledby="demo-controlled-radio-buttons-group"
-                name="controlled-radio-buttons-group"
-                value={schedulerSelector}
-                onChange={handleSchedulerSelector}
-              >
-                <FormControlLabel
-                  value="vertex"
-                  className="create-scheduler-label-style"
-                  control={<Radio size="small" />}
-                  label={
-                    <Typography sx={{ fontSize: 13 }}>Vertex</Typography>
-                  }
-                />
-                <FormControlLabel
-                  value="composer"
-                  className="create-scheduler-label-style"
-                  control={<Radio size="small" />}
-                  label={
-                    <Typography sx={{ fontSize: 13 }}>Composer</Typography>
-                  }
-                />
-              </RadioGroup>
-            </FormControl>
-          </div> */}
           <div>
             {
-              // notebookSelector === 'composer' 
-              // &&
                 <ListNotebookScheduler
                   app={app}
                   settingRegistry={settingRegistry}
                   handleDagIdSelection={handleDagIdSelection}
                   backButtonComposerName={backComposerName}
-                  // composerSelectedFromCreate={composerSelectedFromCreate}
                   setCreateCompleted={setCreateCompleted}
                   setJobNameSelected={setJobNameSelected}
                   setComposerSelected={setComposerSelected}
@@ -203,41 +166,6 @@ const NotebookJobComponent = ({
                   setBucketName={setBucketName}
                   setIsLoadingKernelDetail={setIsLoadingKernelDetail}
                 /> 
-                // :
-                // <ListVertexScheduler
-                //   app={app}
-                //   settingRegistry={settingRegistry}
-                //   handleDagIdSelection={handleDagIdSelection}
-                //   backButtonComposerName={backComposerName}
-                //   composerSelectedFromCreate={composerSelectedFromCreate}
-                //   setCreateCompleted={setCreateCompleted}
-                //   setJobNameSelected={setJobNameSelected}
-                //   setComposerSelected={setComposerSelected}
-                //   setScheduleMode={setScheduleMode}
-                //   setScheduleValue={setScheduleValue}
-                //   setInputFileSelected={setInputFileSelected}
-                //   setParameterDetail={setParameterDetail}
-                //   setParameterDetailUpdated={setParameterDetailUpdated}
-                //   setSelectedMode={setSelectedMode}
-                //   setClusterSelected={setClusterSelected}
-                //   setServerlessSelected={setServerlessSelected}
-                //   setServerlessDataSelected={setServerlessDataSelected}
-                //   serverlessDataList={serverlessDataList}
-                //   setServerlessDataList={setServerlessDataList}
-                //   setServerlessList={setServerlessList}
-                //   setRetryCount={setRetryCount}
-                //   setRetryDelay={setRetryDelay}
-                //   setEmailOnFailure={setEmailOnFailure}
-                //   setEmailonRetry={setEmailonRetry}
-                //   setEmailOnSuccess={setEmailOnSuccess}
-                //   setEmailList={setEmailList}
-                //   setStopCluster={setStopCluster}
-                //   setTimeZoneSelected={setTimeZoneSelected}
-                //   setEditMode={setEditMode}
-                //   bucketName={bucketName}
-                //   setBucketName={setBucketName}
-                //   setIsLoadingKernelDetail={setIsLoadingKernelDetail}
-                // />
             }
 
           </div>
@@ -250,20 +178,17 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends DataprocWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
-  // composerSelectedFromCreate: string;
   notebookSelector: string;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
     themeManager: IThemeManager,
-    // composerSelectedFromCreate: string,
     notebookSelector: string
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
-    // this.composerSelectedFromCreate = composerSelectedFromCreate;
     this.notebookSelector = notebookSelector;
   }
   renderInternal(): React.JSX.Element {
@@ -272,7 +197,6 @@ export class NotebookJobs extends DataprocWidget {
         app={this.app}
         settingRegistry={this.settingRegistry}
         themeManager={this.themeManager}
-        // composerSelectedFromCreate={this.composerSelectedFromCreate}
         notebookSelector={this.notebookSelector}
       />
     );
