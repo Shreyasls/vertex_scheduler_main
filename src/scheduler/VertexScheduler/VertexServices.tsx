@@ -54,10 +54,10 @@ export class VertexServices {
                 'Error listing machine type',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch machine type list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch machine type list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -90,10 +90,41 @@ export class VertexServices {
                 'Error listing cloud storage bucket',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch cloud storage bucket`,
-                toastifyCustomStyle
+            // toast.error(
+            //     `Failed to fetch cloud storage bucket`,
+            //     toastifyCustomStyle
+            // );
+        }
+    };
+
+    static serviceAccountAPIService = async (
+        setServiceAccountList: (value: string[]) => void,
+    ) => {
+        try {
+            const formattedResponse: any = await requestAPI(`api/iam/listServiceAccount`);
+            if (formattedResponse.length === 0) {
+                // Handle the case where the list is empty
+                toast.error(
+                    'No service accounts',
+                    toastifyCustomStyle
+                );
+            } else {
+                let serviceAccountList: string[] = [];
+                formattedResponse.forEach((data: { name: string; }) => {
+                    serviceAccountList.push(data.name);
+                });
+                serviceAccountList.sort();
+                setServiceAccountList(serviceAccountList);
+            }
+        } catch (error) {
+            DataprocLoggingService.log(
+                'Error listing service accounts',
+                LOG_LEVEL.ERROR
             );
+            // toast.error(
+            //     `Failed to fetch service accounts list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -121,10 +152,10 @@ export class VertexServices {
                 'Error listing primary network',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch primary network list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch primary network list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -153,10 +184,10 @@ export class VertexServices {
                 'Error listing sub networks',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch sub networks list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch sub networks list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -184,10 +215,10 @@ export class VertexServices {
                 'Error listing shared networks',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch shared networks list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch shared networks list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 

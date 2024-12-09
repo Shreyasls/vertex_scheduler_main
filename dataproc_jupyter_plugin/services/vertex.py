@@ -16,6 +16,7 @@ import aiohttp
 
 from google.cloud import storage
 from cron_descriptor import get_description
+from google.cloud import storage
 
 from dataproc_jupyter_plugin.commons.constants import (
     CONTENT_TYPE,
