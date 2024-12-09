@@ -26,10 +26,10 @@ interface IDagList {
     status: string;
 }
 
-// interface IUpdateSchedulerAPIResponse {
-//     status: number;
-//     error: string;
-// }
+interface IUpdateSchedulerAPIResponse {
+    status: number;
+    error: string;
+}
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -225,36 +225,67 @@ export class VertexServices {
         }
     }
 
-    // static handleUpdateSchedulerPauseAPIService = async (
-    //     scheduleId: string,
-    //     region: string,
-    //     setDagList: (value: IDagList[]) => void,
-    //     setIsLoading: (value: boolean) => void,
-    //     setNextPageFlag: (value: string) => void,
-    // ) => {
-    //     try {
-    //         const serviceURL = 'api/vertex/pauseSchedule';
-    //         const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
-    //             serviceURL + `?region_id=${region}&&schedule_id=${scheduleId}`,
-    //         );
-    //         console.log('formattedResponse.status', formattedResponse.status);
-    //         if (formattedResponse && formattedResponse.status === 0) {
-    //             toast.success(
-    //                 `scheduler ${scheduleId} updated successfully`,
-    //                 toastifyCustomStyle
-    //             );
-    //             await VertexServices.listVertexSchedules(
-    //                 setDagList,
-    //                 region,
-    //                 setIsLoading,
-    //                 setNextPageFlag
-    //             );
-    //         }
-    //     } catch (error) {
-    //         DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-    //         toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
-    //     }
-    // };
+    static handleUpdateSchedulerPauseAPIService = async (
+        scheduleId: string,
+        region: string,
+        setDagList: (value: IDagList[]) => void,
+        setIsLoading: (value: boolean) => void,
+        setNextPageFlag: (value: string) => void,
+        displayName: string
+    ) => {
+        try {
+            const serviceURL = 'api/vertex/pauseSchedule';
+            const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+                serviceURL + `?region_id=${region}&&schedule_id=${scheduleId}`,
+            );
+            if (Object.keys(formattedResponse).length === 0) {
+                toast.success(
+                    `Schedule ${displayName} updated successfully`,
+                    toastifyCustomStyle
+                );
+                await VertexServices.listVertexSchedules(
+                    setDagList,
+                    region,
+                    setIsLoading,
+                    setNextPageFlag
+                );
+            }
+        } catch (error) {
+            DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+            toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+        }
+    };
+
+    static handleUpdateSchedulerResumeAPIService = async (
+        scheduleId: string,
+        region: string,
+        setDagList: (value: IDagList[]) => void,
+        setIsLoading: (value: boolean) => void,
+        setNextPageFlag: (value: string) => void,
+        displayName: string
+    ) => {
+        try {
+            const serviceURL = 'api/vertex/resumeSchedule';
+            const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+                serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`,
+            );
+            if (Object.keys(formattedResponse).length === 0) {
+                toast.success(
+                    `Schedule ${displayName} updated successfully`,
+                    toastifyCustomStyle
+                );
+                await VertexServices.listVertexSchedules(
+                    setDagList,
+                    region,
+                    setIsLoading,
+                    setNextPageFlag
+                );
+            }
+        } catch (error) {
+            DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+            toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+        }
+    };
 
     // static triggerDagService = async (
     //     region: string,
