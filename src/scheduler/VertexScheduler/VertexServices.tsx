@@ -47,10 +47,10 @@ interface IDagList {
     status: string;
 }
 
-// interface IUpdateSchedulerAPIResponse {
-//     status: number;
-//     error: string;
-// }
+interface IUpdateSchedulerAPIResponse {
+    status: number;
+    error: string;
+}
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -317,55 +317,124 @@ export class VertexServices {
         }
     }
 
-    // static handleUpdateSchedulerPauseAPIService = async (
-    //     scheduleId: string,
+    static handleUpdateSchedulerPauseAPIService = async (
+        scheduleId: string,
+        region: string,
+        setDagList: (value: IDagList[]) => void,
+        setIsLoading: (value: boolean) => void,
+        setNextPageFlag: (value: string) => void,
+        displayName: string
+    ) => {
+        try {
+            const serviceURL = 'api/vertex/pauseSchedule';
+            const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+                serviceURL + `?region_id=${region}&&schedule_id=${scheduleId}`,
+            );
+            if (Object.keys(formattedResponse).length === 0) {
+                toast.success(
+                    `Schedule ${displayName} updated successfully`,
+                    toastifyCustomStyle
+                );
+                await VertexServices.listVertexSchedules(
+                    setDagList,
+                    region,
+                    setIsLoading,
+                    setNextPageFlag
+                );
+            }
+        } catch (error) {
+            DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+            toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+        }
+    };
+
+    static handleUpdateSchedulerResumeAPIService = async (
+        scheduleId: string,
+        region: string,
+        setDagList: (value: IDagList[]) => void,
+        setIsLoading: (value: boolean) => void,
+        setNextPageFlag: (value: string) => void,
+        displayName: string
+    ) => {
+        try {
+            const serviceURL = 'api/vertex/resumeSchedule';
+            const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+                serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`,
+            );
+            if (Object.keys(formattedResponse).length === 0) {
+                toast.success(
+                    `Schedule ${displayName} updated successfully`,
+                    toastifyCustomStyle
+                );
+                await VertexServices.listVertexSchedules(
+                    setDagList,
+                    region,
+                    setIsLoading,
+                    setNextPageFlag
+                );
+            }
+        } catch (error) {
+            DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+            toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+        }
+    };
+
+    static triggerSchedule = async (
+        region: string,
+        scheduleId: string,
+        displayName: string
+      ) => {
+        try {
+            const serviceURL = 'api/vertex/triggerSchedule';
+          const data: any = await requestAPI(
+            serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
+          );
+          if (data) {
+           toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
+          }
+        } catch (reason) {
+          toast.error(
+           `Failed to Trigger ${displayName} : ${reason}`,
+            toastifyCustomStyle
+          );
+        }
+      };
+
+    //   static handleDeleteSchedulerAPIService = async (
     //     region: string,
+    //     scheduleId: string,
+    //     displayName: string,
     //     setDagList: (value: IDagList[]) => void,
     //     setIsLoading: (value: boolean) => void,
     //     setNextPageFlag: (value: string) => void,
-    // ) => {
-    //     try {
-    //         const serviceURL = 'api/vertex/pauseSchedule';
-    //         const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
-    //             serviceURL + `?region_id=${region}&&schedule_id=${scheduleId}`,
-    //         );
-    //         console.log('formattedResponse.status', formattedResponse.status);
-    //         if (formattedResponse && formattedResponse.status === 0) {
-    //             toast.success(
-    //                 `scheduler ${scheduleId} updated successfully`,
-    //                 toastifyCustomStyle
-    //             );
-    //             await VertexServices.listVertexSchedules(
-    //                 setDagList,
-    //                 region,
-    //                 setIsLoading,
-    //                 setNextPageFlag
-    //             );
-    //         }
-    //     } catch (error) {
-    //         DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-    //         toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
-    //     }
-    // };
-
-    // static triggerDagService = async (
-    //     region: string,
-    //     scheduleId: string
     //   ) => {
     //     try {
-    //         const serviceURL = 'api/vertex/triggerSchedule';
-    //       const data: any = await requestAPI(
-    //         serviceURL + `region_id=${region}&&schedule_id=${scheduleId}`
+    //       const serviceURL = `api/vertex/deleteSchedule`;
+    //       const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+    //         serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
     //       );
-    //       if (data) {
-    //         toast.success(`${scheduleId} triggered successfully `, toastifyCustomStyle);
+    //       if (deleteResponse.status === 0) {
+    //         await VertexServices.listVertexSchedules(
+    //             setDagList,
+    //             region,
+    //             setIsLoading,
+    //             setNextPageFlag
+    //         );
+    //         toast.success(
+    //           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
+    //           toastifyCustomStyle
+    //         );
+    //       } else {
+    //         toast.error(`Failed to delete the ${displayName}`, toastifyCustomStyle);
     //       }
-    //     } catch (reason) {
+    //     } catch (error) {
+    //       DataprocLoggingService.log('Error in Delete api', LOG_LEVEL.ERROR);
     //       toast.error(
-    //         `Failed to Trigger ${scheduleId} : ${reason}`,
+    //         `Failed to delete the ${displayName} : ${error}`,
     //         toastifyCustomStyle
     //       );
     //     }
     //   };
+
 
 }
