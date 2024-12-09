@@ -162,6 +162,13 @@ function listVertexScheduler({
     }
   };
 
+  const handleTriggerSchedule = async (event: React.MouseEvent, displayName: string) => {
+    const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
+    if (scheduleId !== null) {
+      await VertexServices.triggerSchedule(region, scheduleId, displayName);
+    }
+  };
+
 
   const {
     getTableProps,
@@ -178,7 +185,7 @@ function listVertexScheduler({
     state: { pageIndex, pageSize }
   } = useTable(
     //@ts-ignore react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
-    { columns, data, autoResetPage: false, initialState: { pageSize: 50 } },
+    { columns, data, autoResetPage: false, initialState: { pageSize: 2 } },
     usePagination
   );
 
@@ -198,7 +205,7 @@ function listVertexScheduler({
             tag="div"
             className="icon-buttons-style-disable disable-complete-btn"
           /> : (
-            is_status_paused === 'ACTIVE' ?
+            is_status_paused === 'PAUSED' ?
               (<iconPlay.react
                 tag="div"
                 className="icon-white logo-alignment-style"
@@ -212,18 +219,10 @@ function listVertexScheduler({
         </div>
         <div
           role="button"
-          className={
-            !is_status_paused
-              ? 'icon-buttons-style'
-              : 'icon-buttons-style-disable '
-          }
-          title={
-            !is_status_paused ? 'Trigger the job' : " Can't Trigger Paused job"
-          }
-          data-jobid={data.jobid}
-        // //onClick={e => {
-        //   !is_status_paused ? handleTriggerDag(e) : null;
-        // }}
+          className='icon-buttons-style'
+          title='Trigger the job'
+          data-scheduleId={data.name}
+          onClick={e => handleTriggerSchedule(e, data.displayName)}
         >
           <iconTrigger.react
             tag="div"
@@ -454,7 +453,7 @@ function listVertexScheduler({
               tableDataCondition={tableDataCondition}
               fromPage="Vertex schedulers"
             />
-            {dagList.length > 100 && (
+            {dagList.length > 1 && (
               <PaginationView
                 pageSize={pageSize}
                 setPageSize={setPageSize}

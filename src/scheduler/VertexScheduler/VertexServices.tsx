@@ -318,24 +318,62 @@ export class VertexServices {
         }
     };
 
-    // static triggerDagService = async (
+    static triggerSchedule = async (
+        region: string,
+        scheduleId: string,
+        displayName: string
+      ) => {
+        try {
+            const serviceURL = 'api/vertex/triggerSchedule';
+          const data: any = await requestAPI(
+            serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
+          );
+          if (data) {
+           toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
+          }
+        } catch (reason) {
+          toast.error(
+           `Failed to Trigger ${displayName} : ${reason}`,
+            toastifyCustomStyle
+          );
+        }
+      };
+
+    //   static handleDeleteSchedulerAPIService = async (
     //     region: string,
-    //     scheduleId: string
+    //     scheduleId: string,
+    //     displayName: string,
+    //     setDagList: (value: IDagList[]) => void,
+    //     setIsLoading: (value: boolean) => void,
+    //     setNextPageFlag: (value: string) => void,
     //   ) => {
     //     try {
-    //         const serviceURL = 'api/vertex/triggerSchedule';
-    //       const data: any = await requestAPI(
-    //         serviceURL + `region_id=${region}&&schedule_id=${scheduleId}`
+    //       const serviceURL = `api/vertex/deleteSchedule`;
+    //       const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+    //         serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
     //       );
-    //       if (data) {
-    //         toast.success(`${scheduleId} triggered successfully `, toastifyCustomStyle);
+    //       if (deleteResponse.status === 0) {
+    //         await VertexServices.listVertexSchedules(
+    //             setDagList,
+    //             region,
+    //             setIsLoading,
+    //             setNextPageFlag
+    //         );
+    //         toast.success(
+    //           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
+    //           toastifyCustomStyle
+    //         );
+    //       } else {
+    //         toast.error(`Failed to delete the ${displayName}`, toastifyCustomStyle);
     //       }
-    //     } catch (reason) {
+    //     } catch (error) {
+    //       DataprocLoggingService.log('Error in Delete api', LOG_LEVEL.ERROR);
     //       toast.error(
-    //         `Failed to Trigger ${scheduleId} : ${reason}`,
+    //         `Failed to delete the ${displayName} : ${error}`,
     //         toastifyCustomStyle
     //       );
     //     }
     //   };
+
 
 }
