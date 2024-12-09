@@ -19,12 +19,17 @@ import { toast } from 'react-toastify';
 import { requestAPI } from '../../handler/handler';
 import { DataprocLoggingService, LOG_LEVEL } from '../../utils/loggingService';
 import { toastifyCustomStyle } from '../../utils/utils';
- 
+
 interface IDagList {
     displayName: string;
     schedule: string;
     status: string;
 }
+
+// interface IUpdateSchedulerAPIResponse {
+//     status: number;
+//     error: string;
+// }
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -49,10 +54,10 @@ export class VertexServices {
                 'Error listing machine type',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch machine type list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch machine type list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -78,17 +83,48 @@ export class VertexServices {
                 //   cloudStorageList.push(data.name);
                 // });
                 // cloudStorageList.sort();
-                // setCloudStorageList(cloudStorageList);
+                setCloudStorageList(formattedResponse);
             }
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing cloud storage bucket',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch cloud storage bucket`,
-                toastifyCustomStyle
+            // toast.error(
+            //     `Failed to fetch cloud storage bucket`,
+            //     toastifyCustomStyle
+            // );
+        }
+    };
+
+    static serviceAccountAPIService = async (
+        setServiceAccountList: (value: string[]) => void,
+    ) => {
+        try {
+            const formattedResponse: any = await requestAPI(`api/iam/listServiceAccount`);
+            if (formattedResponse.length === 0) {
+                // Handle the case where the list is empty
+                toast.error(
+                    'No service accounts',
+                    toastifyCustomStyle
+                );
+            } else {
+                let serviceAccountList: string[] = [];
+                formattedResponse.forEach((data: { name: string; }) => {
+                    serviceAccountList.push(data.name);
+                });
+                serviceAccountList.sort();
+                setServiceAccountList(serviceAccountList);
+            }
+        } catch (error) {
+            DataprocLoggingService.log(
+                'Error listing service accounts',
+                LOG_LEVEL.ERROR
             );
+            // toast.error(
+            //     `Failed to fetch service accounts list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -104,7 +140,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('primary netwwork', formattedResponse)
                 let primaryList: string[] = [];
                 formattedResponse.forEach((data: { name: string; }) => {
                     primaryList.push(data.name);
@@ -117,10 +152,10 @@ export class VertexServices {
                 'Error listing primary network',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch primary network list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch primary network list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -137,7 +172,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('sub netwwork', formattedResponse)
                 let subNetworkList: string[] = [];
                 formattedResponse.forEach((data: { name: string }) => {
                     subNetworkList.push(data.name);
@@ -150,10 +184,10 @@ export class VertexServices {
                 'Error listing sub networks',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch sub networks list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch sub networks list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -169,7 +203,6 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log('shared netwwork', formattedResponse)
                 let sharedNetworkList: string[] = [];
                 formattedResponse.forEach((data: { subnetwork: string }) => {
                     sharedNetworkList.push(data.subnetwork);
@@ -182,10 +215,10 @@ export class VertexServices {
                 'Error listing shared networks',
                 LOG_LEVEL.ERROR
             );
-            toast.error(
-                `Failed to fetch shared networks list`,
-                toastifyCustomStyle
-            );
+            // toast.error(
+            //     `Failed to fetch shared networks list`,
+            //     toastifyCustomStyle
+            // );
         }
     };
 
@@ -198,12 +231,15 @@ export class VertexServices {
         try {
             const serviceURL = 'api/vertex/listSchedules';
             const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}`);
-            console.log('formatted response', formattedResponse);
-            if (formattedResponse.schedules.length > 0) {
-                console.log('inside api if');
-                setDagList(formattedResponse.schedules);
+            if (Object.keys(formattedResponse).length !== 0) {
+                if (formattedResponse.schedules.length > 0) {
+                    setDagList(formattedResponse.schedules);
+                    setIsLoading(false);
+                    setNextPageFlag(formattedResponse?.nextPageToken)
+                }
+            } else {
+                setDagList([]);
                 setIsLoading(false);
-                setNextPageFlag(formattedResponse?.nextPageToken)
             }
         } catch (error) {
             DataprocLoggingService.log(
@@ -216,8 +252,59 @@ export class VertexServices {
             //         toastifyCustomStyle
             //     );
             // }, 10000);
-            
+
         }
     }
+
+    // static handleUpdateSchedulerPauseAPIService = async (
+    //     scheduleId: string,
+    //     region: string,
+    //     setDagList: (value: IDagList[]) => void,
+    //     setIsLoading: (value: boolean) => void,
+    //     setNextPageFlag: (value: string) => void,
+    // ) => {
+    //     try {
+    //         const serviceURL = 'api/vertex/pauseSchedule';
+    //         const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+    //             serviceURL + `?region_id=${region}&&schedule_id=${scheduleId}`,
+    //         );
+    //         console.log('formattedResponse.status', formattedResponse.status);
+    //         if (formattedResponse && formattedResponse.status === 0) {
+    //             toast.success(
+    //                 `scheduler ${scheduleId} updated successfully`,
+    //                 toastifyCustomStyle
+    //             );
+    //             await VertexServices.listVertexSchedules(
+    //                 setDagList,
+    //                 region,
+    //                 setIsLoading,
+    //                 setNextPageFlag
+    //             );
+    //         }
+    //     } catch (error) {
+    //         DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+    //         toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+    //     }
+    // };
+
+    // static triggerDagService = async (
+    //     region: string,
+    //     scheduleId: string
+    //   ) => {
+    //     try {
+    //         const serviceURL = 'api/vertex/triggerSchedule';
+    //       const data: any = await requestAPI(
+    //         serviceURL + `region_id=${region}&&schedule_id=${scheduleId}`
+    //       );
+    //       if (data) {
+    //         toast.success(`${scheduleId} triggered successfully `, toastifyCustomStyle);
+    //       }
+    //     } catch (reason) {
+    //       toast.error(
+    //         `Failed to Trigger ${scheduleId} : ${reason}`,
+    //         toastifyCustomStyle
+    //       );
+    //     }
+    //   };
 
 }
