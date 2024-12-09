@@ -75,7 +75,6 @@ const CreateVertexScheduler = ({
     notebookSelector: string;
 }) => {
     const [vertexScheduler] = useState(false);
-    const [dummyList] = useState(['1', '2', '3']);
 
     const [parameterDetail, setParameterDetail] = useState(['']);
     const [parameterDetailUpdated, setParameterDetailUpdated] = useState(['']);
@@ -89,6 +88,8 @@ const CreateVertexScheduler = ({
     const [cloudStorage, setCloudStorage] = useState('');
     const [machineTypeList, setMachineTypeList] = useState<string[]>([]);
     const [machineTypeSelected, setMachineTypeSelected] = useState('');
+    const [serviceAccountList, setServiceAccountList] = useState<string[]>([]);
+    const [serviceAccountSelected, setServiceAccountSelected] = useState('');
     const [primaryNetworkList, setPrimaryNetworkList] = useState<string[]>([]);
     const [primaryNetworkSelected, setPrimaryNetworkSelected] = useState('');
     const [subNetworkList, setSubNetworkList] = useState<string[]>([]);
@@ -114,10 +115,7 @@ const CreateVertexScheduler = ({
     const [endDate, setEndDate] = useState(null);
     const [endDateError, setEndDateError] = useState(false)
 
-    const minDateStart = dayjs();
-    const minDateEnd = startDate ? dayjs(startDate) : minDateStart;
     // const [composerSelected, setComposerSelected] = useState('');
-
     const handleRegionChange = (value: React.SetStateAction<string>) => {
         setRegion(value)
         setMachineTypeSelected('')
@@ -150,6 +148,9 @@ const CreateVertexScheduler = ({
         setPrimaryNetworkSelected(primaryValue)
     }
 
+    const handleServiceAccountSelected = (serviceAccountalue: any) => {
+        setServiceAccountSelected(serviceAccountalue)
+    }
     /**
    * Sub Network selection
    * @param {string} subNetworkSelected seleted kernel
@@ -296,6 +297,10 @@ const CreateVertexScheduler = ({
         await VertexServices.primaryNetworkAPIService(setPrimaryNetworkList);
     };
 
+    const serviceAccountAPI = async () => {
+        await VertexServices.primaryNetworkAPIService(setServiceAccountList);
+    };
+
     const subNetworkAPI = async () => {
         await VertexServices.subNetworkAPIService(region, setSubNetworkList);
     };
@@ -320,6 +325,7 @@ const CreateVertexScheduler = ({
                 subNetworkAPI()
             }
             cloudStorageAPI()
+            serviceAccountAPI()
             primaryNetworkAPI()
             sharedNetworkAPI()
         }
@@ -527,9 +533,9 @@ const CreateVertexScheduler = ({
                         <div className="create-scheduler-form-element panel-margin">
                             <Autocomplete
                                 className="create-scheduler-style"
-                                options={dummyList}
-                                //value={composerSelected}
-                                //onChange={(_event, val) => handleComposerSelected(val)}
+                                options={serviceAccountList}
+                                value={serviceAccountSelected}
+                                onChange={(_event, val) => handleServiceAccountSelected(val)}
                                 renderInput={params => (
                                     <TextField {...params} label="Service account" />
                                 )}
@@ -739,7 +745,7 @@ const CreateVertexScheduler = ({
                                                             hidden: true,
                                                         },
                                                     }}
-                                                    minDate={minDateStart}
+                                                    disablePast
                                                     closeOnSelect={true}
                                                 />
                                             </div>
@@ -761,7 +767,8 @@ const CreateVertexScheduler = ({
                                                             hidden: true,
                                                         },
                                                     }}
-                                                    minDate={minDateEnd}
+                                                    disablePast
+                                                    closeOnSelect={true}
                                                 />
                                             </div>
                                         </LocalizationProvider>
