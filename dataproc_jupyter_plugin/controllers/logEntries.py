@@ -32,8 +32,8 @@ class ListEntriesController(APIHandler):
                 client = logEntries.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-                regions = await client.list_entries(filter_query)
-                self.finish(json.dumps(regions))
+                response = await client.list_entries(filter_query)
+                self.finish(json.dumps(response))
         except Exception as e:
             self.log.exception(f"Error fetching entries: {str(e)}")
             self.finish({"error": str(e)})
