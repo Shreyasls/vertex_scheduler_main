@@ -83,7 +83,7 @@ export class VertexServices {
                 //   cloudStorageList.push(data.name);
                 // });
                 // cloudStorageList.sort();
-                // setCloudStorageList(cloudStorageList);
+                setCloudStorageList(formattedResponse);
             }
         } catch (error) {
             DataprocLoggingService.log(
