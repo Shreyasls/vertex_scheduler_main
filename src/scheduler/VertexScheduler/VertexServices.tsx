@@ -16,9 +16,30 @@
  */
 
 import { toast } from 'react-toastify';
+import { JupyterLab } from '@jupyterlab/application';
 import { requestAPI } from '../../handler/handler';
 import { DataprocLoggingService, LOG_LEVEL } from '../../utils/loggingService';
 import { toastifyCustomStyle } from '../../utils/utils';
+
+interface IPayload {
+    input_filename: string;
+    display_name: string;
+    machine_type: string;
+    accelerator_type?: string;
+    accelerator_count?: number | null;
+    kernel_name: string;
+    schedule_value: string;
+    time_zone?: string;
+    max_run_count: string;
+    region: string;
+    cloud_storage_bucket: string;
+    parameters: string[];
+    service_account: string;
+    network: string;
+    subnetwork: string;
+    start_time: null | undefined;
+    end_time: null | undefined;
+}
 
 interface IDagList {
     displayName: string;
@@ -109,10 +130,10 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                let serviceAccountList: string[] = [];
-                formattedResponse.forEach((data: { name: string; }) => {
-                    serviceAccountList.push(data.name);
-                });
+                const serviceAccountList = formattedResponse.map((account: any) => ({
+                    displayName: account.displayName,
+                    email: account.email
+                }));
                 serviceAccountList.sort();
                 setServiceAccountList(serviceAccountList);
             }
@@ -219,6 +240,46 @@ export class VertexServices {
             //     `Failed to fetch shared networks list`,
             //     toastifyCustomStyle
             // );
+        }
+    };
+
+    static createVertexSchedulerService = async (
+        payload: IPayload,
+        app: JupyterLab,
+        setCreateCompleted: (value: boolean) => void,
+        setCreatingVertexScheduler: (value: boolean) => void,
+        editMode: boolean
+    ) => {
+        setCreatingVertexScheduler(true);
+        try {
+            const data: any = await requestAPI('api/vertex/createJobScheduler', {
+                body: JSON.stringify(payload),
+                method: 'POST'
+            });
+            if (data.error) {
+                toast.error(data.error, toastifyCustomStyle);
+                setCreatingVertexScheduler(false);
+            } else {
+                if (editMode) {
+                    toast.success(
+                        `Job scheduler successfully updated`,
+                        toastifyCustomStyle
+                    );
+                } else {
+                    toast.success(
+                        `Job scheduler successfully created`,
+                        toastifyCustomStyle
+                    );
+                }
+                setCreatingVertexScheduler(false);
+                setCreateCompleted(true);
+            }
+        } catch (reason) {
+            setCreatingVertexScheduler(false);
+            toast.error(
+                `Error on POST {dataToSend}.\n${reason}`,
+                toastifyCustomStyle
+            );
         }
     };
 
