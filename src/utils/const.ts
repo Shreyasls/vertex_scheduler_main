@@ -16,7 +16,7 @@
  */
 
 import { requestAPI } from '../handler/handler';
-export const VERSION_DETAIL = '0.1.78';
+export const VERSION_DETAIL = '0.2.1';
 export const CREATE_CLUSTER_URL =
   'https://console.cloud.google.com/dataproc/clusters';
 export const CREATE_BATCH_URL =
@@ -186,7 +186,6 @@ export const LOGIN_ERROR_MESSAGE =
 export const NOTEBOOK_TEMPLATES_LIST_URL =
   'https://api.github.com/repos/GoogleCloudPlatform/dataproc-ml-quickstart-notebooks/contents/.ci/index.json';
 export type scheduleMode = 'runNow' | 'runSchedule';
-export type internalScheduleMode = 'cronFormat' | 'userFriendly';
 export const scheduleValueExpression = '30 17 * * 1-5'; //Expression for schedule Value in Scheduler Jobs
 export const PLUGIN_ID = 'dataproc_jupyter_plugin:plugin';
 export const SPARK_RESOURCE_ALLOCATION_INFO_URL =
