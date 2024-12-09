@@ -82,12 +82,7 @@ function listVertexScheduler({
   const [isLoading, setIsLoading] = useState(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
-  const [deletePopupOpen,
-    //setDeletePopupOpen
-  ] = useState(false);
-  const [selectedDagId,
-    //setSelectedDagId
-  ] = useState('');
+  const [deletePopupOpen,setDeletePopupOpen] = useState(false);
   const [editDagLoading,
     //setEditDagLoading
   ] = useState('');
@@ -95,9 +90,7 @@ function listVertexScheduler({
   const [editNotebookLoading,
     //setEditNotebookLoading
   ] = useState('');
-  const [deletingNotebook
-    //, setDeletingNotebook
-  ] = useState(false);
+  const [deletingSchedule, setDeletingSchedule] = useState(false);
   const [isPreviewEnabled,
     //setIsPreviewEnabled
   ] = useState(false);
@@ -105,6 +98,9 @@ function listVertexScheduler({
   console.log(nextPageFlag);
   const [region, setRegion] = useState('');
   const [projectId, setProjectId] = useState('');
+  const [uniqueScheduleId, setUniqueScheduleId] = useState('');
+  const [scheduleDisplayName, setScheduleDisplayName] = useState('');
+
   const columns = React.useMemo(
     () => [
       {
@@ -127,6 +123,10 @@ function listVertexScheduler({
     []
   );
 
+  /**
+  * Get list of schedules
+  * @param {}
+  */
   const listDagInfoAPI = async () => {
     await VertexServices.listVertexSchedules(
       setDagList,
@@ -136,6 +136,12 @@ function listVertexScheduler({
     );
   };
 
+  /**
+  * Handle resume and pause 
+  * @param {string} scheduleId unique ID for schedule
+  * @param {string} is_status_paused modfied status of schedule
+  * @param {string} displayName name of schedule
+  */
   const handleUpdateScheduler = async (
     scheduleId: string,
     is_status_paused: string,
@@ -162,6 +168,10 @@ function listVertexScheduler({
     }
   };
 
+  /**
+  * Trigger a job immediately
+  * @param {string} displayName name of schedule
+  */
   const handleTriggerSchedule = async (event: React.MouseEvent, displayName: string) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
@@ -169,6 +179,42 @@ function listVertexScheduler({
     }
   };
 
+  /**
+  * Delete pop up
+  * @param {string} schedule_id Id of schedule
+  * @param {string} displayName name of schedule
+  */
+  const handleDeletePopUp = (schedule_id: string, displayName: string) => {
+    setUniqueScheduleId(schedule_id);
+    setScheduleDisplayName(displayName)
+    setDeletePopupOpen(true);
+  };
+
+  /**
+  * Cancel delete pop up
+  * @param {}
+  */
+  const handleCancelDelete = () => {
+    setDeletePopupOpen(false);
+  };
+
+  /**
+  * Delete a schedule
+  * @param {}
+  */
+  const handleDeleteScheduler = async () => {
+    setDeletingSchedule(true);
+    await VertexServices.handleDeleteSchedulerAPIService(
+      region,
+      uniqueScheduleId,
+      scheduleDisplayName,
+      setDagList,
+      setIsLoading,
+      setNextPageFlag,
+    );
+    setDeletePopupOpen(false);
+    setDeletingSchedule(false);
+  };
 
   const {
     getTableProps,
@@ -278,7 +324,7 @@ function listVertexScheduler({
           role="button"
           className="icon-buttons-style"
           title="Delete"
-        //onClick={() => handleDeletePopUp(data.jobid)}
+          onClick={() => handleDeletePopUp(data.name, data.displayName)}
         >
           <iconDelete.react
             tag="div"
@@ -468,11 +514,11 @@ function listVertexScheduler({
             )}
             {deletePopupOpen && (
               <DeletePopup
-                onCancel={() => { }}
-                onDelete={() => { }}
+                onCancel={() => handleCancelDelete()}
+                onDelete={() => handleDeleteScheduler()}
                 deletePopupOpen={deletePopupOpen}
-                DeleteMsg={`This will delete ${selectedDagId} and cannot be undone.`}
-                deletingNotebook={deletingNotebook}
+                DeleteMsg={`This will delete ${uniqueScheduleId} and cannot be undone.`}
+                deletingSchedule={deletingSchedule}
               />
             )}
           </div>
