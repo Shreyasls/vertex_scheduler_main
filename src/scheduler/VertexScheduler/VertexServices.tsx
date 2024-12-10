@@ -100,13 +100,16 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                console.log(formattedResponse)
-                //   let cloudStorageList: string[] = [];
-                // formattedResponse.forEach((data: IComposerAPIResponse) => {
-                //   cloudStorageList.push(data.name);
+                // console.log(formattedResponse)
+                // let cloudStorageList: string[] = [];
+                // formattedResponse.forEach((data: { name: string; }) => {
+                //     cloudStorageList.push(data.name);
                 // });
-                // cloudStorageList.sort();
-                setCloudStorageList(formattedResponse);
+                const cloudStorageList = formattedResponse.map((bucket: { name: any; }) => (
+                    bucket.name
+                ));
+                cloudStorageList.sort();
+                setCloudStorageList(cloudStorageList);
             }
             setCloudStorageLoading(false)
         } catch (error) {
