@@ -34,7 +34,7 @@ interface IPayload {
     region: string;
     cloud_storage_bucket: null;
     parameters: string[];
-    service_account: null;
+    service_account: string | undefined,
     network: string;
     subnetwork: string | null;
     start_time: null | undefined;
@@ -56,8 +56,10 @@ export class VertexServices {
     static machineTypeAPIService = async (
         region: string,
         setMachineTypeList: (value: string[]) => void,
+        setMachineTypeLoading: (value: boolean) => void,
     ) => {
         try {
+            setMachineTypeLoading(true)
             const formattedResponse: any = await requestAPI(`api/vertex/uiConfig?region_id=${region}`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
@@ -70,23 +72,26 @@ export class VertexServices {
                     setMachineTypeList(formattedResponse);
                 }
             }
+            setMachineTypeLoading(false)
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing machine type',
                 LOG_LEVEL.ERROR
             );
-            // toast.error(
-            //     `Failed to fetch machine type list`,
-            //     toastifyCustomStyle
-            // );
+            setMachineTypeLoading(false)
+            toast.error(
+                `Failed to fetch machine type list`,
+                toastifyCustomStyle
+            );
         }
     };
 
     static cloudStorageAPIService = async (
         setCloudStorageList: (value: string[]) => void,
-        // setIsLoading?: (value: boolean) => void
+        setCloudStorageLoading: (value: boolean) => void
     ) => {
         try {
+            setCloudStorageLoading(true)
             const formattedResponse: any = await requestAPI(`api/storage/listBucket`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
@@ -94,9 +99,6 @@ export class VertexServices {
                     'No cloud storage buckets',
                     toastifyCustomStyle
                 );
-                // if (setIsLoading) {
-                //     setIsLoading(false);
-                // }
             } else {
                 console.log(formattedResponse)
                 //   let cloudStorageList: string[] = [];
@@ -106,22 +108,28 @@ export class VertexServices {
                 // cloudStorageList.sort();
                 setCloudStorageList(formattedResponse);
             }
+            setCloudStorageLoading(false)
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing cloud storage bucket',
                 LOG_LEVEL.ERROR
             );
-            // toast.error(
-            //     `Failed to fetch cloud storage bucket`,
-            //     toastifyCustomStyle
-            // );
+            toast.error(
+                `Failed to fetch cloud storage bucket`,
+                toastifyCustomStyle
+            );
+            setCloudStorageLoading(false)
         }
     };
 
     static serviceAccountAPIService = async (
-        setServiceAccountList: (value: string[]) => void,
+        setServiceAccountList: (
+            value: { displayName: string; email: string }[]
+        ) => void,
+        setServiceAccountLoading: (value: boolean) => void
     ) => {
         try {
+            setServiceAccountLoading(true)
             const formattedResponse: any = await requestAPI(`api/iam/listServiceAccount`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
@@ -137,22 +145,26 @@ export class VertexServices {
                 serviceAccountList.sort();
                 setServiceAccountList(serviceAccountList);
             }
+            setServiceAccountLoading(false)
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing service accounts',
                 LOG_LEVEL.ERROR
             );
-            // toast.error(
-            //     `Failed to fetch service accounts list`,
-            //     toastifyCustomStyle
-            // );
+            toast.error(
+                `Failed to fetch service accounts list`,
+                toastifyCustomStyle
+            );
+            setServiceAccountLoading(false)
         }
     };
 
     static primaryNetworkAPIService = async (
         setPrimaryNetworkList: (value: string[]) => void,
+        setPrimaryNetworkLoading: (value: boolean) => void
     ) => {
         try {
+            setPrimaryNetworkLoading(true)
             const formattedResponse: any = await requestAPI(`api/compute/network`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
@@ -168,23 +180,27 @@ export class VertexServices {
                 primaryList.sort();
                 setPrimaryNetworkList(primaryList);
             }
+            setPrimaryNetworkLoading(false)
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing primary network',
                 LOG_LEVEL.ERROR
             );
-            // toast.error(
-            //     `Failed to fetch primary network list`,
-            //     toastifyCustomStyle
-            // );
+            toast.error(
+                `Failed to fetch primary network list`,
+                toastifyCustomStyle
+            );
+            setPrimaryNetworkLoading(false)
         }
     };
 
     static subNetworkAPIService = async (
         region: string,
         setSubNetworkList: (value: string[]) => void,
+        setSubNetworkLoading: (value: boolean) => void
     ) => {
         try {
+            setSubNetworkLoading(true)
             const formattedResponse: any = await requestAPI(`api/compute/subNetwork?region_id=${region}`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
@@ -200,6 +216,7 @@ export class VertexServices {
                 subNetworkList.sort();
                 setSubNetworkList(subNetworkList);
             }
+            setSubNetworkLoading(false)
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing sub networks',
@@ -209,13 +226,16 @@ export class VertexServices {
             //     `Failed to fetch sub networks list`,
             //     toastifyCustomStyle
             // );
+            setSubNetworkLoading(false)
         }
     };
 
     static sharedNetworkAPIService = async (
         setSharedNetworkList: (value: string[]) => void,
+        setSharedNetworkLoading: (value: boolean) => void
     ) => {
         try {
+            setSharedNetworkLoading(true)
             const formattedResponse: any = await requestAPI(`api/compute/sharedNetwork`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
@@ -231,15 +251,17 @@ export class VertexServices {
                 sharedNetworkList.sort();
                 setSharedNetworkList(sharedNetworkList);
             }
+            setSharedNetworkLoading(false)
         } catch (error) {
             DataprocLoggingService.log(
                 'Error listing shared networks',
                 LOG_LEVEL.ERROR
             );
-            // toast.error(
-            //     `Failed to fetch shared networks list`,
-            //     toastifyCustomStyle
-            // );
+            toast.error(
+                `Failed to fetch shared networks list`,
+                toastifyCustomStyle
+            );
+            setSharedNetworkLoading(false)
         }
     };
 
@@ -400,41 +422,41 @@ export class VertexServices {
         }
     };
 
-      static handleDeleteSchedulerAPIService = async (
+    static handleDeleteSchedulerAPIService = async (
         region: string,
         scheduleId: string,
         displayName: string,
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
-      ) => {
+    ) => {
         try {
-          const serviceURL = `api/vertex/deleteSchedule`;
-          const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
-            serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`, { method: 'DELETE' }
-          );
-          if (Object.keys(deleteResponse).length !== 0) {
-            await VertexServices.listVertexSchedules(
-                setDagList,
-                region,
-                setIsLoading,
-                setNextPageFlag
+            const serviceURL = `api/vertex/deleteSchedule`;
+            const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+                serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`, { method: 'DELETE' }
             );
-            toast.success(
-              `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
-              toastifyCustomStyle
-            );
-          } else {
-            toast.error(`Failed to delete the ${displayName}`, toastifyCustomStyle);
-          }
+            if (Object.keys(deleteResponse).length !== 0) {
+                await VertexServices.listVertexSchedules(
+                    setDagList,
+                    region,
+                    setIsLoading,
+                    setNextPageFlag
+                );
+                toast.success(
+                    `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
+                    toastifyCustomStyle
+                );
+            } else {
+                toast.error(`Failed to delete the ${displayName}`, toastifyCustomStyle);
+            }
         } catch (error) {
-          DataprocLoggingService.log('Error in Delete api', LOG_LEVEL.ERROR);
-          toast.error(
-            `Failed to delete the ${displayName} : ${error}`,
-            toastifyCustomStyle
-          );
+            DataprocLoggingService.log('Error in Delete api', LOG_LEVEL.ERROR);
+            toast.error(
+                `Failed to delete the ${displayName} : ${error}`,
+                toastifyCustomStyle
+            );
         }
-      };
+    };
 
 
 }
