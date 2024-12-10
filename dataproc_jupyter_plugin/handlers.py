@@ -229,6 +229,7 @@ def setup_handlers(web_app):
         "api/vertex/triggerSchedule": vertex.TriggerScheduleController,
         "api/vertex/updateSchedule": vertex.UpdateScheduleController,
         "api/logEntries/listEntries": logEntries.ListEntriesController,
+        "api/vertex/createNewBucket": vertex.CreateNewBucketController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)

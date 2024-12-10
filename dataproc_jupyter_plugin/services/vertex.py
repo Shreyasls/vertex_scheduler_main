@@ -24,7 +24,8 @@ from dataproc_jupyter_plugin.commons.constants import (
 )
 from dataproc_jupyter_plugin.models.models import (
     DescribeVertexJob,
-    DescribeUpdateVertexJob
+    DescribeUpdateVertexJob,
+    DescribeBucketName
 )
 
 
@@ -92,14 +93,17 @@ class Client:
         try:
             if not bucket_name:
                 raise ValueError("Bucket name cannot be empty")
+            cloud_storage_buckets = []
             storage_client = storage.Client()
             buckets = storage_client.list_buckets()
-            return bucket_name in buckets
+            for bucket in buckets:
+                cloud_storage_buckets.append(bucket.name)
+            return bucket_name in cloud_storage_buckets
         except Exception as error:
             self.log.exception(f"Error checking Bucket: {error}")
             raise IOError(f"Error checking Bucket: {error}")
 
-    async def create_bucket(self, bucket_name):
+    async def create_gcs_bucket(self, bucket_name):
         try:
             if not bucket_name:
                 raise ValueError("Bucket name cannot be empty")
@@ -177,14 +181,14 @@ class Client:
         except Exception as e:
             self.log.exception(f"Error creating schedule: {str(e)}")
             raise Exception(f"Error creating schedule: {str(e)}")
-
-    async def create(self, input_data):
+    
+    async def create_job_schedule(self, input_data):
         try:
             job = DescribeVertexJob(**input_data)
             if await self.check_bucket_exists(VERTEX_STORAGE_BUCKET):
                 print("The bucket exists")
             else:
-                await self.create_bucket(VERTEX_STORAGE_BUCKET)
+                await self.create_gcs_bucket(VERTEX_STORAGE_BUCKET)
                 print("The bucket is created")
 
             file_path = await self.upload_to_gcs(
@@ -421,3 +425,12 @@ class Client:
         except Exception as e:
             self.log.exception(f"Error updating schedule: {str(e)}")
             return {"Error updating schedule": str(e)}
+
+
+    async def create_new_bucket(self, input_data):
+        try:
+            data = DescribeBucketName(**input_data)
+            res = await self.create_gcs_bucket(data.bucket_name)
+            return res
+        except Exception as e:
+            return {"error": str(e)}

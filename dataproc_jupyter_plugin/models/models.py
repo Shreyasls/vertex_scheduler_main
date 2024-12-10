@@ -106,3 +106,11 @@ class DescribeUpdateVertexJob(BaseModel):
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
+
+
+class DescribeBucketName(BaseModel):
+    bucket_name: str = None
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
