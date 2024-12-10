@@ -105,7 +105,7 @@ export class VertexServices {
                 // formattedResponse.forEach((data: { name: string; }) => {
                 //     cloudStorageList.push(data.name);
                 // });
-                const cloudStorageList = formattedResponse.map((bucket: { name: any; }) => (
+                const cloudStorageList = formattedResponse['items'].map((bucket: { name: any; }) => (
                     bucket.name
                 ));
                 cloudStorageList.sort();
