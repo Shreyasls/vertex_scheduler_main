@@ -35,8 +35,8 @@ interface IPayload {
     cloud_storage_bucket: null;
     parameters: string[];
     service_account: string | undefined,
-    network: string;
-    subnetwork: string | null;
+    network: string | undefined;
+    subnetwork: string | undefined;
     start_time: null | undefined;
     end_time: null | undefined;
 }
@@ -160,7 +160,7 @@ export class VertexServices {
     };
 
     static primaryNetworkAPIService = async (
-        setPrimaryNetworkList: (value: string[]) => void,
+        setPrimaryNetworkList: (value: { name: string; link: string }[]) => void,
         setPrimaryNetworkLoading: (value: boolean) => void
     ) => {
         try {
@@ -173,12 +173,16 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                let primaryList: string[] = [];
-                formattedResponse.forEach((data: { name: string; }) => {
-                    primaryList.push(data.name);
-                });
-                primaryList.sort();
-                setPrimaryNetworkList(primaryList);
+                const primaryNetworkList = formattedResponse.map((network: any) => ({
+                    name: network.name,
+                    link: network.selfLink
+                }));
+                // let primaryList: string[] = [];
+                // formattedResponse.forEach((data: { name: string; }) => {
+                //     primaryList.push(data.name);
+                // });
+                primaryNetworkList.sort();
+                setPrimaryNetworkList(primaryNetworkList);
             }
             setPrimaryNetworkLoading(false)
         } catch (error) {
@@ -196,7 +200,7 @@ export class VertexServices {
 
     static subNetworkAPIService = async (
         region: string,
-        setSubNetworkList: (value: string[]) => void,
+        setSubNetworkList: (value: { name: string; link: string }[]) => void,
         setSubNetworkLoading: (value: boolean) => void
     ) => {
         try {
@@ -209,10 +213,14 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                let subNetworkList: string[] = [];
-                formattedResponse.forEach((data: { name: string }) => {
-                    subNetworkList.push(data.name);
-                });
+                // let subNetworkList: string[] = [];
+                // formattedResponse.forEach((data: { name: string }) => {
+                //     subNetworkList.push(data.name);
+                // });
+                const subNetworkList = formattedResponse.map((network: any) => ({
+                    name: network.name,
+                    link: network.selfLink
+                }));
                 subNetworkList.sort();
                 setSubNetworkList(subNetworkList);
             }

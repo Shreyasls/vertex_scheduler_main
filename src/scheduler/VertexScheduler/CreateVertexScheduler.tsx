@@ -105,10 +105,10 @@ const CreateVertexScheduler = ({
     const [serviceAccountList, setServiceAccountList] = useState<{ displayName: string; email: string }[]>([]);
     const [serviceAccountSelected, setServiceAccountSelected] = useState<{ displayName: string; email: string }>();
     const [networkSelected, setNetworkSelected] = useState('networkInThisProject');
-    const [primaryNetworkList, setPrimaryNetworkList] = useState<string[]>([]);
-    const [primaryNetworkSelected, setPrimaryNetworkSelected] = useState(null);
-    const [subNetworkList, setSubNetworkList] = useState<string[]>([]);
-    const [subNetworkSelected, setSubNetworkSelected] = useState<string | null>(null);
+    const [primaryNetworkList, setPrimaryNetworkList] = useState<{ name: string; link: string }[]>([]);
+    const [primaryNetworkSelected, setPrimaryNetworkSelected] = useState<{ name: string; link: string } | null>(null);
+    const [subNetworkList, setSubNetworkList] = useState<{ name: string; link: string }[]>([]);
+    const [subNetworkSelected, setSubNetworkSelected] = useState<{ name: string; link: string } | null>(null);
     const [sharedNetworkList, setSharedNetworkList] = useState<string[]>([]);
     const [sharedNetworkSelected, setSharedNetworkSelected] = useState(null);
     // const [networkTags, setNetworkTags] = useState<string>('');
@@ -177,7 +177,7 @@ const CreateVertexScheduler = ({
    * @param {string} subNetworkSelected seleted kernel
    */
     const handleSubNetwork = (subNetworkValue: any) => {
-        setSubNetworkSelected(subNetworkValue)
+        setSubNetworkSelected(subNetworkValue.name)
     }
 
     /**
@@ -405,8 +405,8 @@ const CreateVertexScheduler = ({
             cloud_storage_bucket: cloudStorage,
             parameters: parameterDetailUpdated,
             service_account: serviceAccountSelected?.email,
-            network: '',
-            subnetwork: subNetworkSelected,
+            network: primaryNetworkSelected?.link,
+            subnetwork: subNetworkSelected?.link,
             start_time: startDate,
             end_time: endDate,
         }
@@ -717,7 +717,10 @@ const CreateVertexScheduler = ({
                                             <Autocomplete
                                                 className="create-scheduler-style create-scheduler-form-element-input-fl"
                                                 options={primaryNetworkList}
-                                                value={primaryNetworkSelected}
+                                                // value={primaryNetworkSelected.name}
+                                                value={primaryNetworkList.find(
+                                                    option => option.name === primaryNetworkSelected?.name
+                                                ) || null}
                                                 onChange={(_event, val) => handlePrimaryNetwork(val)}
                                                 renderInput={params => (
                                                     <TextField {...params} label="Primary network*" />
@@ -731,7 +734,10 @@ const CreateVertexScheduler = ({
                                             <Autocomplete
                                                 className="create-scheduler-style create-scheduler-form-element-input-fl"
                                                 options={subNetworkList}
-                                                value={subNetworkSelected}
+                                                // value={subNetworkSelected}
+                                                value={subNetworkList.find(
+                                                    option => option.name === subNetworkSelected?.name
+                                                ) || null}
                                                 onChange={(_event, val) => handleSubNetwork(val)}
                                                 renderInput={params => (
                                                     <TextField {...params} label="Sub network*" />
