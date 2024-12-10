@@ -24,19 +24,19 @@ import { toastifyCustomStyle } from '../../utils/utils';
 interface IPayload {
     input_filename: string;
     display_name: string;
-    machine_type: string;
-    accelerator_type?: string;
+    machine_type: null;
+    accelerator_type?: null;
     accelerator_count?: number | null;
-    kernel_name: string;
-    schedule_value: string;
+    kernel_name: null;
+    schedule_value: string | undefined;
     time_zone?: string;
-    max_run_count: string;
+    max_run_count: string | number;
     region: string;
-    cloud_storage_bucket: string;
+    cloud_storage_bucket: null;
     parameters: string[];
-    service_account: string;
+    service_account: null;
     network: string;
-    subnetwork: string;
+    subnetwork: string | null;
     start_time: null | undefined;
     end_time: null | undefined;
 }
@@ -383,22 +383,22 @@ export class VertexServices {
         region: string,
         scheduleId: string,
         displayName: string
-      ) => {
+    ) => {
         try {
             const serviceURL = 'api/vertex/triggerSchedule';
-          const data: any = await requestAPI(
-            serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
-          );
-          if (data) {
-           toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
-          }
+            const data: any = await requestAPI(
+                serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
+            );
+            if (data) {
+                toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
+            }
         } catch (reason) {
-          toast.error(
-           `Failed to Trigger ${displayName} : ${reason}`,
-            toastifyCustomStyle
-          );
+            toast.error(
+                `Failed to Trigger ${displayName} : ${reason}`,
+                toastifyCustomStyle
+            );
         }
-      };
+    };
 
     //   static handleDeleteSchedulerAPIService = async (
     //     region: string,

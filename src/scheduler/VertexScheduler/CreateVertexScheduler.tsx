@@ -82,8 +82,7 @@ const CreateVertexScheduler = ({
     const [keyValidation, setKeyValidation] = useState(-1);
     const [valueValidation, setValueValidation] = useState(-1);
     const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
-    const [creatingVertexScheduler] = useState(false);
-    // const [creatingVertexScheduler, setCreatingVertexScheduler] = useState(false);
+    const [creatingVertexScheduler, setCreatingVertexScheduler] = useState(false);
 
     const [region, setRegion] = useState('');
     const [projectId, setProjectId] = useState('');
@@ -410,13 +409,13 @@ const CreateVertexScheduler = ({
             end_time: endDate,
         }
         console.log(payload)
-        // await VertexServices.createVertexSchedulerService(
-        //   payload,
-        //   app,
-        //   setCreateCompleted,
-        //   setCreatingVertexScheduler,
-        //   editMode
-        // );
+        await VertexServices.createVertexSchedulerService(
+          payload,
+          app,
+          setCreateCompleted,
+          setCreatingVertexScheduler,
+          editMode
+        );
         // setEditMode(false);
     }
 
@@ -651,7 +650,7 @@ const CreateVertexScheduler = ({
                             /> */}
                             <Autocomplete
                                 className="create-scheduler-style"
-                                options={serviceAccountList}
+                                options={serviceAccountList && serviceAccountList.map((item: any) => item.displayName)}
                                 value={serviceAccountSelected}
                                 onChange={(_event, val) => handleServiceAccountSelected(val)}
                                 renderInput={params => (
