@@ -83,17 +83,17 @@ function listVertexScheduler({
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const [deletePopupOpen,setDeletePopupOpen] = useState(false);
-  const [editDagLoading,
-    //setEditDagLoading
-  ] = useState('');
+  // const [editDagLoading,
+  //   //setEditDagLoading
+  // ] = useState('');
   // const [inputNotebookFilePath, setInputNotebookFilePath] = useState('');
-  const [editNotebookLoading,
-    //setEditNotebookLoading
-  ] = useState('');
+  // const [editNotebookLoading,
+  //   //setEditNotebookLoading
+  // ] = useState('');
   const [deletingSchedule, setDeletingSchedule] = useState(false);
-  const [isPreviewEnabled,
-    //setIsPreviewEnabled
-  ] = useState(false);
+  // const [isPreviewEnabled,
+  //   //setIsPreviewEnabled
+  // ] = useState(false);
   const [nextPageFlag, setNextPageFlag] = useState('');
   console.log(nextPageFlag);
   const [region, setRegion] = useState('');
@@ -231,7 +231,7 @@ function listVertexScheduler({
     state: { pageIndex, pageSize }
   } = useTable(
     //@ts-ignore react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
-    { columns, data, autoResetPage: false, initialState: { pageSize: 2 } },
+    { columns, data, autoResetPage: false, initialState: { pageSize: 100 } },
     usePagination
   );
 
@@ -275,7 +275,7 @@ function listVertexScheduler({
             className="icon-white logo-alignment-style"
           />
         </div>
-        {data.jobid === editDagLoading ? (
+        {/* {data.jobid === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -283,7 +283,7 @@ function listVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) : (
+        ) : ( */}
           <div
             role="button"
             className="icon-buttons-style"
@@ -296,8 +296,8 @@ function listVertexScheduler({
               className="icon-white logo-alignment-style"
             />
           </div>
-        )}
-        {isPreviewEnabled &&
+        {/* )} */}
+        {/* {isPreviewEnabled &&
           (data.jobid === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
@@ -306,7 +306,7 @@ function listVertexScheduler({
                 data-testid="loader"
               />
             </div>
-          ) : (
+          ) : ( */}
             <div
               role="button"
               className="icon-buttons-style"
@@ -319,7 +319,7 @@ function listVertexScheduler({
                 className="icon-white logo-alignment-style"
               />
             </div>
-          ))}
+          {/* ))} */}
         <div
           role="button"
           className="icon-buttons-style"
@@ -499,7 +499,7 @@ function listVertexScheduler({
               tableDataCondition={tableDataCondition}
               fromPage="Vertex schedulers"
             />
-            {dagList.length > 1 && (
+            {dagList.length > 100 && (
               <PaginationView
                 pageSize={pageSize}
                 setPageSize={setPageSize}
