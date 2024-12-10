@@ -349,8 +349,8 @@ export class VertexServices {
     };
 
     static handleUpdateSchedulerResumeAPIService = async (
-        scheduleId: string,
         region: string,
+        scheduleId: string,
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
@@ -400,41 +400,41 @@ export class VertexServices {
         }
     };
 
-    //   static handleDeleteSchedulerAPIService = async (
-    //     region: string,
-    //     scheduleId: string,
-    //     displayName: string,
-    //     setDagList: (value: IDagList[]) => void,
-    //     setIsLoading: (value: boolean) => void,
-    //     setNextPageFlag: (value: string) => void,
-    //   ) => {
-    //     try {
-    //       const serviceURL = `api/vertex/deleteSchedule`;
-    //       const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
-    //         serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
-    //       );
-    //       if (deleteResponse.status === 0) {
-    //         await VertexServices.listVertexSchedules(
-    //             setDagList,
-    //             region,
-    //             setIsLoading,
-    //             setNextPageFlag
-    //         );
-    //         toast.success(
-    //           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
-    //           toastifyCustomStyle
-    //         );
-    //       } else {
-    //         toast.error(`Failed to delete the ${displayName}`, toastifyCustomStyle);
-    //       }
-    //     } catch (error) {
-    //       DataprocLoggingService.log('Error in Delete api', LOG_LEVEL.ERROR);
-    //       toast.error(
-    //         `Failed to delete the ${displayName} : ${error}`,
-    //         toastifyCustomStyle
-    //       );
-    //     }
-    //   };
+      static handleDeleteSchedulerAPIService = async (
+        region: string,
+        scheduleId: string,
+        displayName: string,
+        setDagList: (value: IDagList[]) => void,
+        setIsLoading: (value: boolean) => void,
+        setNextPageFlag: (value: string) => void,
+      ) => {
+        try {
+          const serviceURL = `api/vertex/deleteSchedule`;
+          const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+            serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`, { method: 'DELETE' }
+          );
+          if (Object.keys(deleteResponse).length !== 0) {
+            await VertexServices.listVertexSchedules(
+                setDagList,
+                region,
+                setIsLoading,
+                setNextPageFlag
+            );
+            toast.success(
+              `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
+              toastifyCustomStyle
+            );
+          } else {
+            toast.error(`Failed to delete the ${displayName}`, toastifyCustomStyle);
+          }
+        } catch (error) {
+          DataprocLoggingService.log('Error in Delete api', LOG_LEVEL.ERROR);
+          toast.error(
+            `Failed to delete the ${displayName} : ${error}`,
+            toastifyCustomStyle
+          );
+        }
+      };
 
 
 }
