@@ -104,7 +104,7 @@ const CreateVertexScheduler = ({
     // const [serviceAccountList, setServiceAccountList] = useState<string[]>([]);
     const [networkSelected, setNetworkSelected] = useState('networkInThisProject');
     const [serviceAccountList, setServiceAccountList] = useState<{ displayName: string; email: string }[]>([]);
-    const [serviceAccountSelected, setServiceAccountSelected] = useState<{ displayName: string; email: string }>();
+    const [serviceAccountSelected, setServiceAccountSelected] = useState<{ displayName: string; email: string } | null>(null);
     const [primaryNetworkList, setPrimaryNetworkList] = useState<{ name: string; link: string }[]>([]);
     const [primaryNetworkSelected, setPrimaryNetworkSelected] = useState<{ name: string; link: string } | null>(null);
     const [subNetworkList, setSubNetworkList] = useState<{ name: string; link: string }[]>([]);
@@ -366,6 +366,7 @@ const CreateVertexScheduler = ({
             machineTypeSelected === null ||
             kernelSelected === null ||
             cloudStorage === null ||
+            serviceAccountSelected === null ||
             (parameterDetailUpdated.some(item => item.length === 1)) ||
             (networkSelected === 'networkInThisProject' && (primaryNetworkSelected === null || subNetworkSelected === null)) ||
             (networkSelected === 'networkShared' && (sharedNetworkSelected === null)) ||
@@ -443,6 +444,9 @@ const CreateVertexScheduler = ({
             serviceAccountAPI()
             primaryNetworkAPI()
             sharedNetworkAPI()
+            if (serviceAccountList.length > 0) {
+                setServiceAccountSelected(serviceAccountList[0])
+            }
         }
         authApi()
             .then((credentials) => {
@@ -631,7 +635,7 @@ const CreateVertexScheduler = ({
                                 // onChange={handleServiceAccountChange}
                                 onChange={(_event, val) => handleServiceAccountChange(val)}
                                 renderInput={params => (
-                                    <TextField {...params} label="Service account " />
+                                    <TextField {...params} label="Service account*" />
                                 )}
                                 renderOption={(props, option) => (
                                     <Box

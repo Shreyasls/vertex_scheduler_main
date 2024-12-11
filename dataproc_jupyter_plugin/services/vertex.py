@@ -114,10 +114,9 @@ class Client:
             raise IOError(f"Error in creating Bucket: {error}")
 
     async def upload_to_gcs(self, bucket_name, file_path, job_name):
-        input_notebook = file_path.split("/")[-1]
+        input_notebook = file_path.split('/')[-1]
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
-        # folder_name = input_notebook.split(".")[0]
 
         # uploading the input file
         blob_name = f"{job_name}/{input_notebook}"
@@ -125,28 +124,27 @@ class Client:
         blob.upload_from_filename(input_notebook)
 
         # uploading json file containing the input file path
-        # json_blob_name = f"gs://{bucket_name}/{folder_name}/{folder_name}.json"
-        # json_blob = bucket.blob(json_blob_name)
-        # json_blob.upload_from_string(blob_name)
+        json_blob_name = f"{job_name}/{job_name}.json"
+        json_blob = bucket.blob(json_blob_name)
+        json_blob.upload_from_string(f"gs://{bucket_name}/{blob_name}")
 
         self.log.info(f"File {input_notebook} uploaded to gcs successfully")
         return blob_name
 
-    async def create_schedule(self, job, file_path):
+    async def create_schedule(self, job, file_path, bucket_name):
         try:
             print("1. creating schedule")
             schedule_value = (
                 "* * * * *" if job.schedule_value == "" else job.schedule_value
             )
+            cron = (schedule_value if job.time_zone == "UTC" else f"TZ={job.time_zone} {schedule_value}")
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             print(f"2. {api_endpoint}")
             headers = self.create_headers()
             print(f"3. {job}")
             payload = {
                 "displayName": job.display_name,
-                "startTime": job.start_time,
-                "endTime": job.end_time,
-                "cron": f"TZ={job.time_zone} {schedule_value}",
+                "cron": cron,
                 "maxRunCount": job.max_run_count,
                 "maxConcurrentRunCount": "1",
                 "createNotebookExecutionJobRequest": {
@@ -161,12 +159,12 @@ class Client:
                                 "acceleratorCount": job.accelerator_count,
                             },
                             "networkSpec": {
-                                "enableInternetAccess": True,
+                                "enableInternetAccess": "TRUE",
                                 "network": job.network,
                                 "subnetwork": job.subnetwork,
                             },
                         },
-                        "gcsNotebookSource": {"uri": file_path},
+                        "gcsNotebookSource": {"uri": f"gs://{bucket_name}/{file_path}"},
                         "gcsOutputUri": job.cloud_storage_bucket,
                         "serviceAccount": job.service_account,
                         "kernelName": job.kernel_name,
@@ -174,14 +172,23 @@ class Client:
                 },
             }
             print(f"4. {payload}")
+            if job.start_time:
+                payload["startTime"]: job.start_time
+            if job.end_time:
+                payload["endTime"]: job.end_time
+
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
             ) as response:
+                print(f"5. {response}")
                 if response.status == 200:
                     resp = await response.json()
                     return resp
                 else:
-                    raise Exception(f"Error creating schedule")
+                    self.log.exception("Error creating the schedule")
+                    raise Exception(
+                        f"Error creating the schedule: {response.reason} {await response.text()}"
+                    )
         except Exception as e:
             self.log.exception(f"Error creating schedule: {str(e)}")
             raise Exception(f"Error creating schedule: {str(e)}")
@@ -198,7 +205,7 @@ class Client:
             file_path = await self.upload_to_gcs(
                 VERTEX_STORAGE_BUCKET, job.input_filename, job.display_name
             )
-            res = await self.create_schedule(job, file_path)
+            res = await self.create_schedule(job, file_path, VERTEX_STORAGE_BUCKET)
             return res
         except Exception as e:
             return {"error": str(e)}
@@ -226,7 +233,7 @@ class Client:
                         for schedule in schedules:
                             max_run_count = schedule.get("maxRunCount")
                             cron = schedule.get("cron")
-                            if max_run_count == "1" and cron.split(' ', 1)[1] == "* * * * *":
+                            if max_run_count == "1" and cron.split(' ', 1)[1] == "* * * * *" or "* * * *":
                                 schedule_value = "run once"
                             else:
                                 schedule_value = get_description(cron)
