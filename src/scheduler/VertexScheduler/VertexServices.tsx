@@ -52,6 +52,18 @@ interface IUpdateSchedulerAPIResponse {
     error: string;
 }
 
+interface DeleteSchedulerAPIResponse {
+    done: boolean;
+    metadata: object;
+    name: string;
+    response: object;
+}
+
+interface TriggerSchedule {
+    metedata: object;
+    name: string;
+}
+
 export class VertexServices {
     static machineTypeAPIService = async (
         region: string,
@@ -375,6 +387,9 @@ export class VertexServices {
                     setIsLoading,
                     setNextPageFlag
                 );
+            } else {
+                DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+                toast.error('Failed to fetch Update api');
             }
         } catch (error) {
             DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
@@ -406,6 +421,9 @@ export class VertexServices {
                     setIsLoading,
                     setNextPageFlag
                 );
+            } else {
+                DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
+                toast.error('Failed to fetch Update api');
             }
         } catch (error) {
             DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
@@ -420,11 +438,17 @@ export class VertexServices {
     ) => {
         try {
             const serviceURL = 'api/vertex/triggerSchedule';
-            const data: any = await requestAPI(
+            const data: TriggerSchedule = await requestAPI(
                 serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
             );
-            if (data) {
+            if (data.name) {
                 toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
+            } 
+            else {
+                toast.error(
+                    `Failed to Trigger ${displayName}`,
+                    toastifyCustomStyle
+                );
             }
         } catch (reason) {
             toast.error(
@@ -444,10 +468,10 @@ export class VertexServices {
     ) => {
         try {
             const serviceURL = `api/vertex/deleteSchedule`;
-            const deleteResponse: IUpdateSchedulerAPIResponse = await requestAPI(
+            const deleteResponse : DeleteSchedulerAPIResponse = await requestAPI(
                 serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`, { method: 'DELETE' }
             );
-            if (Object.keys(deleteResponse).length !== 0) {
+            if (deleteResponse.done) {
                 await VertexServices.listVertexSchedules(
                     setDagList,
                     region,
@@ -470,37 +494,35 @@ export class VertexServices {
         }
     };
 
-      static editVertexSchedulerService = async (
+    static editVertexSchedulerService = async (
         scheduleId: string,
         region: string,
         setInputNotebookFilePath: (value: string) => void,
         setEditNotebookLoading: (value: string) => void,
-      ) => {
+    ) => {
         setEditNotebookLoading(scheduleId);
         try {
-          const serviceURL = `api/vertex/getSchedule`;
-          const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
-        );
-          if(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
-            setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
-          } else {
+            const serviceURL = `api/vertex/getSchedule`;
+            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
+            );
+            if (formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
+                setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
+            } else {
+                setEditNotebookLoading('');
+                toast.error(
+                    `File path not found`,
+                    toastifyCustomStyle
+                );
+            }
+
+        } catch (reason) {
             setEditNotebookLoading('');
             toast.error(
-                `File path note found`,
+                `Error on POST {dataToSend}.\n${reason}`,
                 toastifyCustomStyle
-              );
-          }
-            
-
-            // Error to display if there is not file path
-        } catch (reason) {
-          setEditNotebookLoading('');
-          toast.error(
-            `Error on POST {dataToSend}.\n${reason}`,
-            toastifyCustomStyle
-          );
+            );
         }
-      };
+    };
 
 
 }
