@@ -137,13 +137,14 @@ class Client:
             schedule_value = (
                 "* * * * *" if job.schedule_value == "" else job.schedule_value
             )
+            cron = (schedule_value if job.time_zone == "UTC" else f"TZ={job.time_zone} {schedule_value}")
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             print(f"2. {api_endpoint}")
             headers = self.create_headers()
             print(f"3. {job}")
             payload = {
                 "displayName": job.display_name,
-                "cron": f"TZ={job.time_zone} {schedule_value}",
+                "cron": cron,
                 "maxRunCount": job.max_run_count,
                 "maxConcurrentRunCount": "1",
                 "createNotebookExecutionJobRequest": {
@@ -179,6 +180,7 @@ class Client:
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
             ) as response:
+                print(f"5. {response}")
                 if response.status == 200:
                     resp = await response.json()
                     return resp
