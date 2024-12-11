@@ -154,7 +154,7 @@ const CreateVertexScheduler = ({
    * Primary Network selection
    * @param {string} primaryNetworkSelected seleted kernel
    */
-    const handlePrimaryNetwork = (primaryValue: any) => {
+    const handlePrimaryNetwork = (primaryValue: React.SetStateAction<{ name: string; link: string; } | null>) => {
         setPrimaryNetworkSelected(primaryValue)
         setSubNetworkSelected(subNetworkList[0])
     }
@@ -176,8 +176,8 @@ const CreateVertexScheduler = ({
    * Sub Network selection
    * @param {string} subNetworkSelected seleted kernel
    */
-    const handleSubNetwork = (subNetworkValue: any) => {
-        setSubNetworkSelected(subNetworkValue.name)
+    const handleSubNetwork = (subNetworkValue: React.SetStateAction<{ name: string; link: string; } | null>) => {
+        setSubNetworkSelected(subNetworkValue)
     }
 
     /**
@@ -456,8 +456,6 @@ const CreateVertexScheduler = ({
             });
     }, [projectId]);
 
-    // console.log({ 'startDate': startDate, 'endDate': endDate });
-
     return (
         <>
             {
@@ -716,7 +714,8 @@ const CreateVertexScheduler = ({
                                         <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
                                             <Autocomplete
                                                 className="create-scheduler-style create-scheduler-form-element-input-fl"
-                                                options={primaryNetworkList.map((network: any) => network.name)}
+                                                options={primaryNetworkList}
+                                                getOptionLabel={option => option.name}
                                                 // value={primaryNetworkSelected.name}
                                                 value={primaryNetworkList.find(
                                                     option => option.name === primaryNetworkSelected?.name
@@ -733,7 +732,8 @@ const CreateVertexScheduler = ({
                                         <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
                                             <Autocomplete
                                                 className="create-scheduler-style create-scheduler-form-element-input-fl"
-                                                options={subNetworkList.map((netwrok: any) => netwrok.name)}
+                                                options={subNetworkList}
+                                                getOptionLabel={option => option.name}
                                                 // value={subNetworkSelected}
                                                 value={subNetworkList.find(
                                                     option => option.name === subNetworkSelected?.name

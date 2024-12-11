@@ -105,11 +105,12 @@ export class VertexServices {
                 // formattedResponse.forEach((data: { name: string; }) => {
                 //     cloudStorageList.push(data.name);
                 // });
-                const cloudStorageList = formattedResponse['items'].map((bucket: { name: any; }) => (
-                    bucket.name
-                ));
-                cloudStorageList.sort();
-                setCloudStorageList(cloudStorageList);
+                // const cloudStorageList = formattedResponse['items'].map((bucket: { name: any; }) => (
+                //     bucket.name
+                // ));
+                // cloudStorageList.sort();
+                // setCloudStorageList(cloudStorageList);
+                setCloudStorageList(formattedResponse)
             }
             setCloudStorageLoading(false)
         } catch (error) {
@@ -233,10 +234,10 @@ export class VertexServices {
                 'Error listing sub networks',
                 LOG_LEVEL.ERROR
             );
-            // toast.error(
-            //     `Failed to fetch sub networks list`,
-            //     toastifyCustomStyle
-            // );
+            toast.error(
+                `Failed to fetch sub networks list`,
+                toastifyCustomStyle
+            );
             setSubNetworkLoading(false)
         }
     };
