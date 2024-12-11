@@ -131,7 +131,7 @@ class Client:
         self.log.info(f"File {input_notebook} uploaded to gcs successfully")
         return blob_name
 
-    async def create_schedule(self, job, file_path):
+    async def create_schedule(self, job, file_path, bucket_name):
         try:
             print("1. creating schedule")
             schedule_value = (
@@ -164,7 +164,7 @@ class Client:
                                 "subnetwork": job.subnetwork,
                             },
                         },
-                        "gcsNotebookSource": {"uri": file_path},
+                        "gcsNotebookSource": {"uri": f"gs://{bucket_name}/{file_path}"},
                         "gcsOutputUri": job.cloud_storage_bucket,
                         "serviceAccount": job.service_account,
                         "kernelName": job.kernel_name,
@@ -205,7 +205,7 @@ class Client:
             file_path = await self.upload_to_gcs(
                 VERTEX_STORAGE_BUCKET, job.input_filename, job.display_name
             )
-            res = await self.create_schedule(job, file_path)
+            res = await self.create_schedule(job, file_path, VERTEX_STORAGE_BUCKET)
             return res
         except Exception as e:
             return {"error": str(e)}
