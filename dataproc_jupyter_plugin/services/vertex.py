@@ -114,10 +114,9 @@ class Client:
             raise IOError(f"Error in creating Bucket: {error}")
 
     async def upload_to_gcs(self, bucket_name, file_path, job_name):
-        input_notebook = file_path.split("/")[-1]
+        input_notebook = file_path.split('/')[-1]
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
-        # folder_name = input_notebook.split(".")[0]
 
         # uploading the input file
         blob_name = f"{job_name}/{input_notebook}"
@@ -125,9 +124,9 @@ class Client:
         blob.upload_from_filename(input_notebook)
 
         # uploading json file containing the input file path
-        # json_blob_name = f"gs://{bucket_name}/{folder_name}/{folder_name}.json"
-        # json_blob = bucket.blob(json_blob_name)
-        # json_blob.upload_from_string(blob_name)
+        json_blob_name = f"{job_name}/{job_name}.json"
+        json_blob = bucket.blob(json_blob_name)
+        json_blob.upload_from_string(blob_name)
 
         self.log.info(f"File {input_notebook} uploaded to gcs successfully")
         return blob_name
@@ -144,8 +143,6 @@ class Client:
             print(f"3. {job}")
             payload = {
                 "displayName": job.display_name,
-                "startTime": job.start_time,
-                "endTime": job.end_time,
                 "cron": f"TZ={job.time_zone} {schedule_value}",
                 "maxRunCount": job.max_run_count,
                 "maxConcurrentRunCount": "1",
@@ -161,7 +158,7 @@ class Client:
                                 "acceleratorCount": job.accelerator_count,
                             },
                             "networkSpec": {
-                                "enableInternetAccess": True,
+                                "enableInternetAccess": "TRUE",
                                 "network": job.network,
                                 "subnetwork": job.subnetwork,
                             },
@@ -174,6 +171,11 @@ class Client:
                 },
             }
             print(f"4. {payload}")
+            if job.start_time:
+                payload["startTime"]: job.start_time
+            if job.end_time:
+                payload["endTime"]: job.end_time
+
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
             ) as response:
@@ -181,7 +183,10 @@ class Client:
                     resp = await response.json()
                     return resp
                 else:
-                    raise Exception(f"Error creating schedule")
+                    self.log.exception("Error creating the schedule")
+                    raise Exception(
+                        f"Error creating the schedule: {response.reason} {await response.text()}"
+                    )
         except Exception as e:
             self.log.exception(f"Error creating schedule: {str(e)}")
             raise Exception(f"Error creating schedule: {str(e)}")
