@@ -402,7 +402,7 @@ const CreateVertexScheduler = ({
             time_zone: timeZoneSelected,
             max_run_count: scheduleMode === 'runNow' ? 1 : maxRuns,
             region: region,
-            cloud_storage_bucket: cloudStorage,
+            cloud_storage_bucket: `gs://${cloudStorage}`,
             parameters: parameterDetailUpdated,
             service_account: serviceAccountSelected?.email,
             network: primaryNetworkSelected?.link,
