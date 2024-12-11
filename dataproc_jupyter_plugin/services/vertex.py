@@ -126,7 +126,7 @@ class Client:
         # uploading json file containing the input file path
         json_blob_name = f"{job_name}/{job_name}.json"
         json_blob = bucket.blob(json_blob_name)
-        json_blob.upload_from_string(blob_name)
+        json_blob.upload_from_string(f"gs://{bucket_name}/{blob_name}")
 
         self.log.info(f"File {input_notebook} uploaded to gcs successfully")
         return blob_name
@@ -233,7 +233,7 @@ class Client:
                         for schedule in schedules:
                             max_run_count = schedule.get("maxRunCount")
                             cron = schedule.get("cron")
-                            if max_run_count == "1" and cron.split(' ', 1)[1] == "* * * * *":
+                            if max_run_count == "1" and cron.split(' ', 1)[1] == "* * * * *" or "* * * *":
                                 schedule_value = "run once"
                             else:
                                 schedule_value = get_description(cron)
