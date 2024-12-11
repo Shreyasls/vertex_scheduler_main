@@ -113,32 +113,35 @@ class Client:
             self.log.exception(f"Error in creating Bucket: {error}")
             raise IOError(f"Error in creating Bucket: {error}")
 
-    async def upload_to_gcs(self, bucket_name, file_path):
+    async def upload_to_gcs(self, bucket_name, file_path, job_name):
         input_notebook = file_path.split("/")[-1]
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
-        folder_name = input_notebook.split(".")[0]
+        # folder_name = input_notebook.split(".")[0]
 
         # uploading the input file
-        blob_name = f"gs://{bucket_name}/{folder_name}/{input_notebook}"
+        blob_name = f"{job_name}/{input_notebook}"
         blob = bucket.blob(blob_name)
         blob.upload_from_filename(input_notebook)
 
         # uploading json file containing the input file path
-        json_blob_name = f"gs://{bucket_name}/{folder_name}/{folder_name}.json"
-        json_blob = bucket.blob(json_blob_name)
-        json_blob.upload_from_string(blob_name)
+        # json_blob_name = f"gs://{bucket_name}/{folder_name}/{folder_name}.json"
+        # json_blob = bucket.blob(json_blob_name)
+        # json_blob.upload_from_string(blob_name)
 
         self.log.info(f"File {input_notebook} uploaded to gcs successfully")
         return blob_name
 
     async def create_schedule(self, job, file_path):
         try:
+            print("1. creating schedule")
             schedule_value = (
                 "* * * * *" if job.schedule_value == "" else job.schedule_value
             )
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
+            print(f"2. {api_endpoint}")
             headers = self.create_headers()
+            print(f"3. {job}")
             payload = {
                 "displayName": job.display_name,
                 "startTime": job.start_time,
@@ -170,6 +173,7 @@ class Client:
                     },
                 },
             }
+            print(f"4. {payload}")
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
             ) as response:
@@ -192,7 +196,7 @@ class Client:
                 print("The bucket is created")
 
             file_path = await self.upload_to_gcs(
-                VERTEX_STORAGE_BUCKET, job.input_filename
+                VERTEX_STORAGE_BUCKET, job.input_filename, job.display_name
             )
             res = await self.create_schedule(job, file_path)
             return res
