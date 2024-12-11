@@ -405,8 +405,8 @@ const CreateVertexScheduler = ({
             cloud_storage_bucket: `gs://${cloudStorage}`,
             parameters: parameterDetailUpdated,
             service_account: serviceAccountSelected?.email,
-            network: primaryNetworkSelected?.link,
-            subnetwork: subNetworkSelected?.link,
+            network: primaryNetworkSelected?.link.split('/v1/')[1],
+            subnetwork: subNetworkSelected?.link.split('/v1/')[1],
             start_time: startDate,
             end_time: endDate,
         }
