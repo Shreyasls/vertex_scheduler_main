@@ -32,7 +32,7 @@ interface IPayload {
     time_zone?: string;
     max_run_count: string | number;
     region: string;
-    cloud_storage_bucket: null;
+    cloud_storage_bucket: string | null;
     parameters: string[];
     service_account: string | undefined,
     network: string | undefined;
