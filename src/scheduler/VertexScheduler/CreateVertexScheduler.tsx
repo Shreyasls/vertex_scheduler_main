@@ -159,7 +159,10 @@ const CreateVertexScheduler = ({
    */
     const handlePrimaryNetwork = (primaryValue: React.SetStateAction<{ name: string; link: string; } | null>) => {
         setPrimaryNetworkSelected(primaryValue)
-        setSubNetworkSelected(subNetworkList[0])
+        subNetworkAPI(primaryValue)
+        if (!subNetworkLoading) {
+            setSubNetworkSelected(subNetworkList[0])
+        }
     }
 
     /**
@@ -450,6 +453,16 @@ const CreateVertexScheduler = ({
         }
     };
 
+    // useEffect(() => {
+    //     subNetworkList()
+    //     subNetworkAPI(primaryNetworkSelected)
+    //     // setSubNetworkSelected(subNetworkList[0])
+    // }, [primaryNetworkSelected, primaryNetworkSelected !== null]);
+
+    useEffect(() => {
+        setServiceAccountSelected(serviceAccountList[0])
+    }, [serviceAccountList.length > 0]);
+
     useEffect(() => {
         if (!createCompleted) {
             if (region !== '') {
@@ -475,15 +488,6 @@ const CreateVertexScheduler = ({
                 console.error(error);
             });
     }, [projectId]);
-
-    useEffect(() => {
-        subNetworkAPI(primaryNetworkSelected)
-        // setSubNetworkSelected(subNetworkList[0])
-    }, [primaryNetworkSelected, primaryNetworkSelected !== null]);
-
-    useEffect(() => {
-        setServiceAccountSelected(serviceAccountList[0])
-    }, [serviceAccountList.length > 0]);
 
     return (
         <>
