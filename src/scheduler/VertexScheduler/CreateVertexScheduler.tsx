@@ -113,6 +113,7 @@ const CreateVertexScheduler = ({
     const [subNetworkSelected, setSubNetworkSelected] = useState<{ name: string; link: string } | null>(null);
     const [sharedNetworkList, setSharedNetworkList] = useState<string[]>([]);
     const [sharedNetworkSelected, setSharedNetworkSelected] = useState(null);
+    // const [sharedNetworkSelected, setSharedNetworkSelected] = useState<{ name: string; network: string, subnetwork: string } | null>(null);
     // const [networkTags, setNetworkTags] = useState<string>('');
     const [maxRuns, setMaxRuns] = useState('');
     const [scheduleField, setScheduleField] = useState<string>('');
@@ -158,6 +159,7 @@ const CreateVertexScheduler = ({
    */
     const handlePrimaryNetwork = (primaryValue: React.SetStateAction<{ name: string; link: string; } | null>) => {
         setPrimaryNetworkSelected(primaryValue)
+        setSubNetworkSelected(subNetworkList[0])
     }
 
     /**
@@ -476,7 +478,7 @@ const CreateVertexScheduler = ({
 
     useEffect(() => {
         subNetworkAPI(primaryNetworkSelected)
-        setSubNetworkSelected(subNetworkList[0])
+        // setSubNetworkSelected(subNetworkList[0])
     }, [primaryNetworkSelected, primaryNetworkSelected !== null]);
 
     useEffect(() => {
@@ -798,6 +800,11 @@ const CreateVertexScheduler = ({
                                         <Autocomplete
                                             className="create-scheduler-style"
                                             options={sharedNetworkList}
+                                            // getOptionLabel={option => option.name}
+                                            // value={subNetworkSelected}
+                                            // value={sharedNetworkSelected.find(
+                                            //     option => option.name === subNetworkSelected?.name
+                                            // ) || null}
                                             value={sharedNetworkSelected}
                                             onChange={(_event, val) => handleSharedNetwork(val)}
                                             renderInput={params => (
