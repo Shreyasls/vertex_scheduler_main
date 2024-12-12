@@ -388,12 +388,12 @@ export class VertexServices {
                     setNextPageFlag
                 );
             } else {
-                DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-                toast.error('Failed to fetch Update api');
+                DataprocLoggingService.log('Error in pause schedule', LOG_LEVEL.ERROR);
+                toast.error('Failed to pause schedule');
             }
         } catch (error) {
-            DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-            toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+            DataprocLoggingService.log('Error in pause schedule', LOG_LEVEL.ERROR);
+            toast.error(`Failed to pause schedule : ${error}`, toastifyCustomStyle);
         }
     };
 
@@ -422,12 +422,12 @@ export class VertexServices {
                     setNextPageFlag
                 );
             } else {
-                DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-                toast.error('Failed to fetch Update api');
+                DataprocLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
+                toast.error('Failed to resume schedule');
             }
         } catch (error) {
-            DataprocLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-            toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+            DataprocLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
+            toast.error(`Failed to resume schedule : ${error}`, toastifyCustomStyle);
         }
     };
 
@@ -518,7 +518,7 @@ export class VertexServices {
         } catch (reason) {
             setEditNotebookLoading('');
             toast.error(
-                `Error on POST {dataToSend}.\n${reason}`,
+                `Error in updating notebook.\n${reason}`,
                 toastifyCustomStyle
             );
         }

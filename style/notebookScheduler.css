@@ -368,13 +368,21 @@
 }
 
 .table-cell-width {
-  width: 612px !important;
+  width: 512px !important;
 }
 
 .btn-refresh {
-  line-height: 5.8;
+  line-height: 5;
 }
 
 .btn-refresh-text {
   font-size: 12px !important;
+}
+
+.success_icon {
+  padding-right: 5px;
+}
+
+.icon-size {
+  width: 14px;
 }
