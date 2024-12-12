@@ -965,6 +965,10 @@ const CreateVertexScheduler = ({
                                         placeholder=""
                                         Label="Schedule*"
                                     />
+                                    {
+                                        scheduleField === '' &&
+                                        <ErrorMessage message="Schedule field is required" />
+                                    }
                                     <span className="tab-description tab-text-sub-cl">Schedules are specified using unix-cron format. E.g. every minute: "* * * * *", every 3 hours: "0 */3 * * *", every Monday at 9:00: "0 9 * * 1".
                                         <LearnMore />
                                     </span>
