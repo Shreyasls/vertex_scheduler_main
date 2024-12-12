@@ -165,6 +165,10 @@ class Client:
                                 "acceleratorType": job.accelerator_type,
                                 "acceleratorCount": job.accelerator_count,
                             },
+                            "persistentDiskSpec": {
+                                "diskType": "pd-standard",
+                                "diskSizeGb": "200",
+                            },
                             "networkSpec": {
                                 "enableInternetAccess": "TRUE",
                                 "network": job.network,

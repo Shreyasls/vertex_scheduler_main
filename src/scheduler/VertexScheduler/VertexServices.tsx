@@ -65,6 +65,33 @@ interface TriggerSchedule {
 }
 
 export class VertexServices {
+    static getParentProjectAPIService = async (
+        setHostProject: (value: string) => void,
+    ) => {
+        try {
+            const formattedResponse: any = await requestAPI(`api/compute/getXpnHost`);
+            if (formattedResponse.length === 0) {
+                // Handle the case where the list is empty
+                toast.error(
+                    'No machine type in this region',
+                    toastifyCustomStyle
+                );
+            } else {
+                if (formattedResponse) {
+                    setHostProject(formattedResponse);
+                }
+            }
+        } catch (error) {
+            DataprocLoggingService.log(
+                'Error listing machine type',
+                LOG_LEVEL.ERROR
+            );
+            // toast.error(
+            //     `Failed to fetch machine type list`,
+            //     toastifyCustomStyle
+            // );
+        }
+    };
     static machineTypeAPIService = async (
         region: string,
         setMachineTypeList: (value: string[]) => void,
@@ -216,12 +243,13 @@ export class VertexServices {
 
     static subNetworkAPIService = async (
         region: string,
+        primaryNetworkSelected: string,
         setSubNetworkList: (value: { name: string; link: string }[]) => void,
         setSubNetworkLoading: (value: boolean) => void
     ) => {
         try {
             setSubNetworkLoading(true)
-            const formattedResponse: any = await requestAPI(`api/compute/subNetwork?region_id=${region}`);
+            const formattedResponse: any = await requestAPI(`api/compute/subNetwork?region_id=${region}&network_id=${primaryNetworkSelected}`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
                 toast.error(
@@ -443,7 +471,7 @@ export class VertexServices {
             );
             if (data.name) {
                 toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
-            } 
+            }
             else {
                 toast.error(
                     `Failed to Trigger ${displayName}`,
@@ -468,7 +496,7 @@ export class VertexServices {
     ) => {
         try {
             const serviceURL = `api/vertex/deleteSchedule`;
-            const deleteResponse : DeleteSchedulerAPIResponse = await requestAPI(
+            const deleteResponse: DeleteSchedulerAPIResponse = await requestAPI(
                 serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`, { method: 'DELETE' }
             );
             if (deleteResponse.done) {
