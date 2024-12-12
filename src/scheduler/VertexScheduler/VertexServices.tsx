@@ -283,7 +283,7 @@ export class VertexServices {
     };
 
     static sharedNetworkAPIService = async (
-        setSharedNetworkList: (value: string[]) => void,
+        setSharedNetworkList: (value: {name: string; network: string, subnetwork: string}[]) => void,
         setSharedNetworkLoading: (value: boolean) => void
     ) => {
         try {
@@ -301,6 +301,7 @@ export class VertexServices {
                 //     sharedNetworkList.push(data.subnetwork);
                 // });
                 const sharedNetworkList = formattedResponse.map((network: any) => ({
+                    name: network.network.split('/').pop(),
                     network: network.network,
                     subnetwork: network.subnetwork
                 }));

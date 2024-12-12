@@ -111,9 +111,8 @@ const CreateVertexScheduler = ({
     const [primaryNetworkSelected, setPrimaryNetworkSelected] = useState<{ name: string; link: string } | null>(null);
     const [subNetworkList, setSubNetworkList] = useState<{ name: string; link: string }[]>([]);
     const [subNetworkSelected, setSubNetworkSelected] = useState<{ name: string; link: string } | null>(null);
-    const [sharedNetworkList, setSharedNetworkList] = useState<string[]>([]);
-    const [sharedNetworkSelected, setSharedNetworkSelected] = useState(null);
-    // const [sharedNetworkSelected, setSharedNetworkSelected] = useState<{ name: string; network: string, subnetwork: string } | null>(null);
+    const [sharedNetworkList, setSharedNetworkList] = useState<{ name: string; network: string, subnetwork: string }[]>([]);
+    const [sharedNetworkSelected, setSharedNetworkSelected] = useState<{ name: string; network: string, subnetwork: string } | null>(null);
     // const [networkTags, setNetworkTags] = useState<string>('');
     const [maxRuns, setMaxRuns] = useState('');
     const [scheduleField, setScheduleField] = useState<string>('');
@@ -169,14 +168,8 @@ const CreateVertexScheduler = ({
    * Service account selection
    * @param {string} serviceAccountSelected seleted kernel
    */
-    // const handleServiceAccountSelected = (serviceAccountalue: any) => {
-    //     setServiceAccountSelected(serviceAccountalue)
-    // }
     const handleServiceAccountChange = (value: any) => {
-        // setServiceAccountSelected(value?.displayName || '');
-        // data.serviceAccount = value?.email;
         setServiceAccountSelected(value);
-        // data.serviceAccount = value?.email;
     };
     /**
    * Sub Network selection
@@ -190,7 +183,7 @@ const CreateVertexScheduler = ({
    * Primary Network selection
    * @param {string} primaryNetworkSelected seleted kernel
    */
-    const handleSharedNetwork = (shredNetworkValue: any) => {
+    const handleSharedNetwork = (shredNetworkValue: React.SetStateAction<{ name: string; network: string; subnetwork: string; } | null>) => {
         setSharedNetworkSelected(shredNetworkValue)
     }
 
@@ -425,8 +418,8 @@ const CreateVertexScheduler = ({
             cloud_storage_bucket: `gs://${cloudStorage}`,
             parameters: parameterDetailUpdated,
             service_account: serviceAccountSelected?.email,
-            network: primaryNetworkSelected?.link.split('/v1/')[1],
-            subnetwork: subNetworkSelected?.link.split('/v1/')[1],
+            network: networkSelected === "networkInThisProject" ? primaryNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.network.split('/v1/')[1],
+            subnetwork: networkSelected === "networkInThisProject" ? subNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
             start_time: startDate,
             end_time: endDate,
         }
@@ -810,12 +803,10 @@ const CreateVertexScheduler = ({
                                         <Autocomplete
                                             className="create-scheduler-style"
                                             options={sharedNetworkList}
-                                            // getOptionLabel={option => option.name}
-                                            // value={subNetworkSelected}
-                                            // value={sharedNetworkSelected.find(
-                                            //     option => option.name === subNetworkSelected?.name
-                                            // ) || null}
-                                            value={sharedNetworkSelected}
+                                            getOptionLabel={option => option.name}
+                                            value={sharedNetworkList.find(
+                                                option => option.name === sharedNetworkSelected?.name
+                                            ) || null}
                                             onChange={(_event, val) => handleSharedNetwork(val)}
                                             renderInput={params => (
                                                 <TextField {...params} label="Shared subnetwork*" />
