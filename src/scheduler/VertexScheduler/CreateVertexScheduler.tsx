@@ -446,11 +446,9 @@ const CreateVertexScheduler = ({
         }
     };
 
-    // useEffect(() => {
-    //     subNetworkList()
-    //     subNetworkAPI(primaryNetworkSelected)
-    //     // setSubNetworkSelected(subNetworkList[0])
-    // }, [primaryNetworkSelected, primaryNetworkSelected !== null]);
+    useEffect(() => {
+        sharedNetworkAPI()
+    }, [Object.keys(hostProject).length > 0]);
 
     useEffect(() => {
         setServiceAccountSelected(serviceAccountList[0])
@@ -465,7 +463,6 @@ const CreateVertexScheduler = ({
             cloudStorageAPI()
             serviceAccountAPI()
             primaryNetworkAPI()
-            sharedNetworkAPI()
             if (serviceAccountList.length > 0) {
                 setServiceAccountSelected(serviceAccountList[0])
             }
