@@ -158,7 +158,6 @@ const CreateVertexScheduler = ({
    */
     const handlePrimaryNetwork = (primaryValue: React.SetStateAction<{ name: string; link: string; } | null>) => {
         setPrimaryNetworkSelected(primaryValue)
-        setSubNetworkSelected(subNetworkList[0])
     }
 
     /**
@@ -477,7 +476,8 @@ const CreateVertexScheduler = ({
 
     useEffect(() => {
         subNetworkAPI(primaryNetworkSelected)
-    }, [primaryNetworkSelected !== null]);
+        setSubNetworkSelected(subNetworkList[0])
+    }, [primaryNetworkSelected, primaryNetworkSelected !== null]);
 
     useEffect(() => {
         setServiceAccountSelected(serviceAccountList[0])
