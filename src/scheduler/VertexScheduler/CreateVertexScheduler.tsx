@@ -160,9 +160,9 @@ const CreateVertexScheduler = ({
     const handlePrimaryNetwork = (primaryValue: React.SetStateAction<{ name: string; link: string; } | null>) => {
         setPrimaryNetworkSelected(primaryValue)
         subNetworkAPI(primaryValue)
-        if (!subNetworkLoading) {
-            setSubNetworkSelected(subNetworkList[0])
-        }
+        // if (!subNetworkLoading) {
+        //     setSubNetworkSelected(subNetworkList[0])
+        // }
     }
 
     /**
@@ -777,6 +777,9 @@ const CreateVertexScheduler = ({
                                                 loading={primaryNetworkLoading}
                                             //disabled={editMode}
                                             />
+                                            {
+                                                !primaryNetworkSelected && <ErrorMessage message="Primary network is required" />
+                                            }
                                         </div>
                                         <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
                                             <Autocomplete
@@ -795,6 +798,9 @@ const CreateVertexScheduler = ({
                                                 loading={subNetworkLoading}
                                             //disabled={editMode}
                                             />
+                                            {
+                                                !subNetworkSelected && <ErrorMessage message="Sub network is required" />
+                                            }
                                         </div>
                                     </div>
                                 </> :
