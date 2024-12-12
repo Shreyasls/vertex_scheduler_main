@@ -395,7 +395,7 @@ function listVertexScheduler({
             cell.column.Header === 'Status' ?
               <>
                 <div className='execution-history-main-wrapper'>
-                  {cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? (cell.row.original.status === 'COMPLETED' ?
+                  {cell.row.original.lastScheduledRunResponse.runResponse !== null && cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? (cell.row.original.status === 'COMPLETED' ?
                     <div>
                       <iconSuccess.react
                         tag="div"
@@ -406,7 +406,7 @@ function listVertexScheduler({
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
-                      /> : 
+                      /> :
                       <iconSuccess.react
                         tag="div"
                         title="Done !"
