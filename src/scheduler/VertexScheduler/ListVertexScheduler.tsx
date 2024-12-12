@@ -404,7 +404,7 @@ function listVertexScheduler({
                     </div> : (cell.row.original.status === 'ACTIVE' ?
                       <iconActive.react
                         tag="div"
-                        title={cell.row.original.lastScheduledRunResponse.runResponse}
+                        title={cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       /> :
                       <iconSuccess.react
@@ -416,7 +416,7 @@ function listVertexScheduler({
                     : <div>
                       <iconFailed.react
                         tag="div"
-                        title={cell.row.original.lastScheduledRunResponse.runResponse}
+                        title={cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
                     </div>}
