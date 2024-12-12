@@ -27,6 +27,8 @@ from dataproc_jupyter_plugin.models.models import (
     DescribeUpdateVertexJob,
     DescribeBucketName
 )
+from dataproc_jupyter_plugin.models.models import DescribeVertexJob, DescribeBucketName
+
 
 
 class Client:
@@ -114,7 +116,7 @@ class Client:
             raise IOError(f"Error in creating Bucket: {error}")
 
     async def upload_to_gcs(self, bucket_name, file_path, job_name):
-        input_notebook = file_path.split('/')[-1]
+        input_notebook = file_path.split("/")[-1]
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
 
@@ -137,7 +139,12 @@ class Client:
             schedule_value = (
                 "* * * * *" if job.schedule_value == "" else job.schedule_value
             )
-            cron = (schedule_value if job.time_zone == "UTC" else f"TZ={job.time_zone} {schedule_value}")
+            cron = (
+                schedule_value
+                if job.time_zone == "UTC"
+                else f"TZ={job.time_zone} {schedule_value}"
+            )
+            machine_type = job.machine_type.split(" ", 1)[0]
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             print(f"2. {api_endpoint}")
             headers = self.create_headers()
@@ -154,9 +161,13 @@ class Client:
                         "labels": job.parameters,
                         "customEnvironmentSpec": {
                             "machineSpec": {
-                                "machineType": job.machine_type,
+                                "machineType": machine_type,
                                 "acceleratorType": job.accelerator_type,
                                 "acceleratorCount": job.accelerator_count,
+                            },
+                            "persistentDiskSpec": {
+                                "diskType": "pd-standard",
+                                "diskSizeGb": "200",
                             },
                             "networkSpec": {
                                 "enableInternetAccess": "TRUE",
@@ -192,7 +203,7 @@ class Client:
         except Exception as e:
             self.log.exception(f"Error creating schedule: {str(e)}")
             raise Exception(f"Error creating schedule: {str(e)}")
-    
+
     async def create_job_schedule(self, input_data):
         try:
             job = DescribeVertexJob(**input_data)
@@ -242,6 +253,7 @@ class Client:
                                 "displayName": schedule.get("displayName"),
                                 "schedule": schedule_value,
                                 "status": schedule.get("state"),
+                                "lastScheduledRunResponse": schedule.get("lastScheduledRunResponse")
                             }
                             schedule_list.append(formatted_schedule)
                         resp["schedules"] = schedule_list

@@ -370,3 +370,11 @@
 .table-cell-width {
   width: 612px !important;
 }
+
+.btn-refresh {
+  line-height: 5.8;
+}
+
+.btn-refresh-text {
+  font-size: 12px !important;
+}
