@@ -460,6 +460,10 @@ const CreateVertexScheduler = ({
             });
     }, [projectId]);
 
+    useEffect(() => {
+        setServiceAccountSelected(serviceAccountList[0])
+    }, [serviceAccountList.length > 0]);
+
     return (
         <>
             {
@@ -631,6 +635,7 @@ const CreateVertexScheduler = ({
                                         option => option.displayName === serviceAccountSelected?.displayName
                                     ) || null
                                 }
+                                clearIcon={false}
                                 loading={serviceAccountLoading}
                                 // onChange={handleServiceAccountChange}
                                 onChange={(_event, val) => handleServiceAccountChange(val)}
