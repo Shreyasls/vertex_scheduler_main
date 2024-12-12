@@ -296,10 +296,14 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                let sharedNetworkList: string[] = [];
-                formattedResponse.forEach((data: { subnetwork: string }) => {
-                    sharedNetworkList.push(data.subnetwork);
-                });
+                // let sharedNetworkList: string[] = [];
+                // formattedResponse.forEach((data: { subnetwork: string }) => {
+                //     sharedNetworkList.push(data.subnetwork);
+                // });
+                const sharedNetworkList = formattedResponse.map((network: any) => ({
+                    network: network.network,
+                    subnetwork: network.subnetwork
+                }));
                 sharedNetworkList.sort();
                 setSharedNetworkList(sharedNetworkList);
             }
