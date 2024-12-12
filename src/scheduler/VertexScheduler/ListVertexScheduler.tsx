@@ -277,7 +277,7 @@ function listVertexScheduler({
         <div
           role="button"
           className="icon-buttons-style"
-          title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSE" ? 'Unpause' : 'Pause')}
+          title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
           onClick={e => {
             is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
           }}
