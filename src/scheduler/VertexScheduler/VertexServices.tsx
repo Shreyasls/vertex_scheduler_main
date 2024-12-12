@@ -249,7 +249,7 @@ export class VertexServices {
     ) => {
         try {
             setSubNetworkLoading(true)
-            const formattedResponse: any = await requestAPI(`api/compute/subNetwork?region_id=${region}?network_id=${primaryNetworkSelected}`);
+            const formattedResponse: any = await requestAPI(`api/compute/subNetwork?region_id=${region}&network_id=${primaryNetworkSelected}`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
                 toast.error(
