@@ -138,8 +138,10 @@ class Client:
                     if not resp:
                         return res
                     else:
-                        res["name"]: resp.get(name)
+                        res["name"]: resp.get("name")
                         return res
+                elif response.status == 204:
+                    return res
                 else:
                     self.log.exception("Error getting xpn host")
                     raise Exception(
