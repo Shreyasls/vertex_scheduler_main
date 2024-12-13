@@ -184,12 +184,12 @@ class Client:
                 },
             }
             print(f"4. {payload}")
-            if job.start_time:
-                payload["startTime"]: job.start_time
-            if job.end_time:
-                payload["endTime"]: job.end_time
             if job.max_run_count:
-                payload["maxRunCount"]: job.max_run_count
+                payload["maxRunCount"] = job.max_run_count
+            if job.start_time:
+                payload["startTime"] = job.start_time
+            if job.end_time:
+                payload["endTime"] = job.end_time
 
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
@@ -481,7 +481,7 @@ class Client:
             return {"error": str(e)}
 
 
-    async def list_notebook_execution_jobs(self, region_id, schedule_id):
+    async def list_notebook_execution_jobs(self, region_id, schedule_id, start_date):
         try:
             execution_jobs = []
             api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy=createTime desc"
