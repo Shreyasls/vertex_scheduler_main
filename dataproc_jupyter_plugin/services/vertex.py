@@ -479,3 +479,23 @@ class Client:
             return res
         except Exception as e:
             return {"error": str(e)}
+
+
+    async def list_notebook_execution_jobs(self, region_id, job_id):
+        try:
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?notebookExecutionJob={job_id}&orderBy=createTime desc"
+
+            headers = self.create_headers()
+            async with self.client_session.post(
+                api_endpoint, headers=headers
+            ) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    self.log.exception("Error fetching notebook execution jobs")
+                    raise Exception(
+                        f"Error fetching notebook execution jobs: {response.reason} {await response.text()}"
+                    )
+        except Exception as e:
+            self.log.exception(f"Error fetching list of notebook execution jobs: {str(e)}")
+            return {"Error fetching list of notebook execution jobs": str(e)}
