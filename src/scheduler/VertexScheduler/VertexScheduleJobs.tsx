@@ -88,18 +88,29 @@ const NotebookJobComponent = ({
     // setIsLoadingKernelDetail?: (value: boolean) => void;
 }): React.JSX.Element => {
     const [showExecutionHistory, setShowExecutionHistory] = useState(false);
-    const [composerName, 
-        //setComposerName
-        ] = useState('');
-    const [bucketName, 
+    const [composerName, setComposerName] = useState('');
+    const [bucketName,
         //setBucketName
-        ] = useState('');
-    const [dagId, 
+    ] = useState('');
+    const [dagId,
         //setDagId
-        ] = useState('');
+    ] = useState('');
 
     const handleBackButton = () => {
         setShowExecutionHistory(false);
+    };
+
+    // const handleDagIdSelection = (composerName: string, dagId: string) => {
+    //     setShowExecutionHistory(true);
+    //     console.log(composerName)
+    //     setComposerName(composerName);
+    //     // setDagId(dagId);
+    // };
+
+    const handleDagIdSelection = (dagId: any) => {
+        setShowExecutionHistory(true);
+        console.log(dagId.name)
+        setComposerName(dagId.name.split('/').pop());
     };
 
     return (
@@ -116,6 +127,7 @@ const NotebookJobComponent = ({
                     <ListVertexScheduler
                         app={app}
                         settingRegistry={settingRegistry}
+                        handleDagIdSelection={handleDagIdSelection}
                     />
                 </div>
             )}
