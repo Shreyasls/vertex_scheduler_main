@@ -62,7 +62,8 @@ const NotebookJobComponent = ({
   setTimeZoneSelected,
   setEditMode,
   setIsLoadingKernelDetail,
-  notebookSelector
+  notebookSelector,
+  setExecutionPageFlag
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -94,6 +95,7 @@ const NotebookJobComponent = ({
   setEditMode?: (value: boolean) => void;
   setIsLoadingKernelDetail?: (value: boolean) => void;
   notebookSelector:string;
+  setExecutionPageFlag: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -110,6 +112,7 @@ const NotebookJobComponent = ({
   const handleBackButton = () => {
     setShowExecutionHistory(false);
     setBackComposerName(composerName);
+    setExecutionPageFlag(true);
   };
 
   // const handleSchedulerSelector = (
@@ -128,6 +131,7 @@ const NotebookJobComponent = ({
           dagId={dagId}
           handleBackButton={handleBackButton}
           bucketName={bucketName}
+          setExecutionPageFlag={setExecutionPageFlag}
         />
       ) : (
         <div>
@@ -179,17 +183,20 @@ export class NotebookJobs extends DataprocWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
   notebookSelector: string;
+  setExecutionPageFlag: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
     themeManager: IThemeManager,
-    notebookSelector: string
+    notebookSelector: string,
+    setExecutionPageFlag: (value: boolean) => void
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
     this.notebookSelector = notebookSelector;
+    this.setExecutionPageFlag = setExecutionPageFlag;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -198,6 +205,7 @@ export class NotebookJobs extends DataprocWidget {
         settingRegistry={this.settingRegistry}
         themeManager={this.themeManager}
         notebookSelector={this.notebookSelector}
+        setExecutionPageFlag = {this.setExecutionPageFlag}
       />
     );
   }
