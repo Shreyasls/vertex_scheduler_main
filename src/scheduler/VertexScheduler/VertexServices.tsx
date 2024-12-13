@@ -283,7 +283,7 @@ export class VertexServices {
     };
 
     static sharedNetworkAPIService = async (
-        setSharedNetworkList: (value: {name: string; network: string, subnetwork: string}[]) => void,
+        setSharedNetworkList: (value: { name: string; network: string, subnetwork: string }[]) => void,
         setSharedNetworkLoading: (value: boolean) => void
     ) => {
         try {
@@ -346,7 +346,7 @@ export class VertexServices {
                     );
                 } else {
                     toast.success(
-                        `Job scheduler successfully created`,
+                        `Job ${payload.display_name} successfully created`,
                         toastifyCustomStyle
                     );
                 }
@@ -558,33 +558,56 @@ export class VertexServices {
     };
 
     static executionHistoryServiceList = async (
-        scheduleId: string,
         region: string,
-        setInputNotebookFilePath: (value: string) => void,
-        setEditNotebookLoading: (value: string) => void,
+        scheduleId: string,
+        // setInputNotebookFilePath: (value: string) => void,
+        // setEditNotebookLoading: (value: string) => void,
     ) => {
-        setEditNotebookLoading(scheduleId);
+        // setEditNotebookLoading(scheduleId);
         try {
-            const serviceURL = `api/logEntries/listEntries`;
-            const formattedResponse: any = await requestAPI(serviceURL + `?filter_query=${region}`
+            const serviceURL = `api/vertex/listNotebookExecutionJobs`;
+            // const formattedResponse: any = await requestAPI(serviceURL + `?region_id="us-central1"&schedule_id=3912928786789695488&start_date="2024-12-11T00:00:00.000Z"`
+            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${scheduleId}&start_date="2024-12-11T00:00:00.000Z"`
             );
-            if (formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
-                setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
-            } else {
-                setEditNotebookLoading('');
-                toast.error(
-                    `File path not found`,
-                    toastifyCustomStyle
-                );
-            }
-
-        } catch (reason) {
-            setEditNotebookLoading('');
+            console.log(formattedResponse)
+            // if (formattedResponse.length === 0) {
+            //     // Handle the case where the list is empty
+            //     toast.error(
+            //         'No machine type in this region',
+            //         toastifyCustomStyle
+            //     );
+            // } else {
+            //     if (formattedResponse) {
+            //         setHostProject(formattedResponse);
+            //     }
+            // }
+        } catch (error) {
             toast.error(
-                `Error in updating notebook.\n${reason}`,
+                `Error in fetching the execution history`,
                 toastifyCustomStyle
             );
         }
+        // try {
+        //     const serviceURL = `api/vertex/listNotebookExecutionJobs`;
+        //     const formattedResponse: any = await requestAPI(serviceURL + `?region_id="us-central1"&schedule_id="3912928786789695488"&start_date="2024-12-11T00:00:00.000Z"`
+        //     );
+        //     if (formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
+        //         setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
+        //     } else {
+        //         setEditNotebookLoading('');
+        //         toast.error(
+        //             `File path not found`,
+        //             toastifyCustomStyle
+        //         );
+        //     }
+
+        // } catch (reason) {
+        //     setEditNotebookLoading('');
+        //     toast.error(
+        //         `Error in updating notebook.\n${reason}`,
+        //         toastifyCustomStyle
+        //     );
+        // }
     };
 
 

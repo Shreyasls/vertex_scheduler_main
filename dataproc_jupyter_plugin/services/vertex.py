@@ -184,12 +184,12 @@ class Client:
                 },
             }
             print(f"4. {payload}")
-            if job.start_time:
-                payload["startTime"]: job.start_time
-            if job.end_time:
-                payload["endTime"]: job.end_time
             if job.max_run_count:
-                payload["maxRunCount"]: job.max_run_count
+                payload["maxRunCount"] = job.max_run_count
+            if job.start_time:
+                payload["startTime"] = job.start_time
+            if job.end_time:
+                payload["endTime"] = job.end_time
 
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
@@ -408,15 +408,15 @@ class Client:
             )
 
             if data.kernel_name:
-                notebook_execution_job["kernelName"]: data.kernel_name
+                notebook_execution_job["kernelName"] = data.kernel_name
             if data.service_account:
-                notebook_execution_job["serviceAccount"]: data.service_account
+                notebook_execution_job["serviceAccount"] = data.service_account
             if data.cloud_storage_bucket:
-                notebook_execution_job["gcsOutputUri"]: data.cloud_storage_bucket
+                notebook_execution_job["gcsOutputUri"] = data.cloud_storage_bucket
             if data.parameters:
-                notebook_execution_job["labels"]: data.parameters
+                notebook_execution_job["labels"] = data.parameters
             if data.machine_type:
-                notebook_execution_job["customEnvironmentSpec"]: {
+                notebook_execution_job["customEnvironmentSpec"] = {
                     "machineSpec": {
                         "machineType": data.machine_type,
                         "acceleratorType": data.accelerator_type,
@@ -424,13 +424,13 @@ class Client:
                     }
                 }
             if data.network:
-                notebook_execution_job["customEnvironmentSpec"]: {
+                notebook_execution_job["customEnvironmentSpec"] = {
                     "networkSpec": {
                         "network": data.network,
                     }
                 }
             if data.subnetwork:
-                notebook_execution_job["customEnvironmentSpec"]: {
+                notebook_execution_job["customEnvironmentSpec"] = {
                     "networkSpec": {
                         "subnetwork": data.subnetwork,
                     }
@@ -447,9 +447,9 @@ class Client:
             }
 
             if data.start_time:
-                payload["startTime"]: data.start_time
+                payload["startTime"] = data.start_time
             if data.end_date:
-                payload["endTime"]: data.end_time
+                payload["endTime"] = data.end_time
 
             keys = get_keys(payload)
             filtered_keys = [item for item in keys if "displayName" not in item]
@@ -481,16 +481,25 @@ class Client:
             return {"error": str(e)}
 
 
-    async def list_notebook_execution_jobs(self, region_id, job_id):
+    async def list_notebook_execution_jobs(self, region_id, schedule_id, start_date):
         try:
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?notebookExecutionJob={job_id}&orderBy=createTime desc"
+            execution_jobs = []
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy=createTime desc"
 
             headers = self.create_headers()
-            async with self.client_session.post(
+            async with self.client_session.get(
                 api_endpoint, headers=headers
             ) as response:
                 if response.status == 200:
-                    return await response.json()
+                    resp = await response.json()
+                    if not resp:
+                        return execution_jobs
+                    else:
+                        jobs = resp.get("notebookExecutionJobs")
+                        for job in jobs:
+                            if start_date.split("T", 1)[0] == job.createTime.split("T", 1)[0]:
+                                execution_jobs.append(job)
+                        return execution_jobs
                 else:
                     self.log.exception("Error fetching notebook execution jobs")
                     raise Exception(

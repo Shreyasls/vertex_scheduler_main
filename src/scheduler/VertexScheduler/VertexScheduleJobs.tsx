@@ -20,9 +20,10 @@ import { DataprocWidget } from '../../controls/DataprocWidget';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
 import ListVertexScheduler from '../VertexScheduler/ListVertexScheduler';
-import ExecutionHistory from '../executionHistory';
+// import ExecutionHistory from '../executionHistory';
 // import { scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import VertexExecutionHistory from './VertexExecutionHistory';
 
 
 const NotebookJobComponent = ({
@@ -119,7 +120,7 @@ const NotebookJobComponent = ({
     return (
         <>
             {showExecutionHistory ? (
-                <ExecutionHistory
+                <VertexExecutionHistory
                     composerName={composerName}
                     dagId={dagId}
                     handleBackButton={handleBackButton}
