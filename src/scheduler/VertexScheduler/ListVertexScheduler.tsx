@@ -406,7 +406,7 @@ function listVertexScheduler({
       );
     } else {
       const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' ||  cell.row.original.status === 'COMPLETED' && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
-      
+
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
           {
@@ -424,14 +424,14 @@ function listVertexScheduler({
                       <iconListComplete.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
-                        className="icon-white logo-alignment-style success_icon icon-size"
+                        className="icon-white logo-alignment-style success_icon icon-size-status"
                       />
                     </div>)
                     : (cell.row.original.status === 'ACTIVE' ?
                       <iconActive.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
-                        className="icon-white logo-alignment-style success_icon icon-size"
+                        className="icon-white logo-alignment-style success_icon icon-size-status"
                       /> :
                       <iconListPause.react
                         tag="div"
@@ -443,7 +443,7 @@ function listVertexScheduler({
                     <div>
                       <iconFailed.react
                         tag="div"
-                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
+                        title={!cell.row.original.lastScheduledRunResponse ? 'Not started' : cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
                     </div> }
