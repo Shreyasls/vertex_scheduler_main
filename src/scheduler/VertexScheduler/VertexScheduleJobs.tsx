@@ -28,6 +28,7 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 const NotebookJobComponent = ({
     app,
     settingRegistry,
+    setExecutionPageFlag
     // composerSelectedFromCreate,
     // setCreateCompleted,
     // setJobNameSelected,
@@ -59,6 +60,7 @@ const NotebookJobComponent = ({
     app: JupyterLab;
     themeManager: IThemeManager;
     settingRegistry: ISettingRegistry;
+    setExecutionPageFlag: (value: boolean) => void;
     // composerSelectedFromCreate: string;
     // setCreateCompleted?: (value: boolean) => void;
     // setJobNameSelected?: (value: string) => void;
@@ -100,6 +102,7 @@ const NotebookJobComponent = ({
 
     const handleBackButton = () => {
         setShowExecutionHistory(false);
+        setExecutionPageFlag(true);
     };
 
     return (
@@ -110,6 +113,7 @@ const NotebookJobComponent = ({
                     dagId={dagId}
                     handleBackButton={handleBackButton}
                     bucketName={bucketName}
+                    setExecutionPageFlag={setExecutionPageFlag}
                 />
             ) : (
                 <div>
@@ -126,15 +130,18 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends DataprocWidget {
     app: JupyterLab;
     settingRegistry: ISettingRegistry;
+    setExecutionPageFlag: (value: boolean) => void;
 
     constructor(
         app: JupyterLab,
         settingRegistry: ISettingRegistry,
         themeManager: IThemeManager,
+        setExecutionPageFlag: (value: boolean) => void
     ) {
         super(themeManager);
         this.app = app;
         this.settingRegistry = settingRegistry;
+        this.setExecutionPageFlag = setExecutionPageFlag
     }
     renderInternal(): React.JSX.Element {
         return (
@@ -142,6 +149,7 @@ export class NotebookJobs extends DataprocWidget {
                 app={this.app}
                 settingRegistry={this.settingRegistry}
                 themeManager={this.themeManager}
+                setExecutionPageFlag={this.setExecutionPageFlag}
             />
         );
     }

@@ -57,7 +57,8 @@ const CreateVertexScheduler = ({
     jobNameSpecialValidation,
     jobNameUniqueValidation,
     setJobNameUniqueValidation,
-    notebookSelector
+    notebookSelector,
+    setExecutionPageFlag
 }: {
     themeManager: IThemeManager;
     app: JupyterLab;
@@ -76,6 +77,7 @@ const CreateVertexScheduler = ({
     jobNameUniqueValidation: boolean;
     setJobNameUniqueValidation: React.Dispatch<React.SetStateAction<boolean>>;
     notebookSelector: string;
+    setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
 
     const [parameterDetail, setParameterDetail] = useState(['']);
@@ -487,6 +489,7 @@ const CreateVertexScheduler = ({
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
+                        setExecutionPageFlag={setExecutionPageFlag}
                     // composerSelectedFromCreate='vertex'
                     // setCreateCompleted={setCreateCompleted}
                     // setJobNameSelected={setJobNameSelected}
