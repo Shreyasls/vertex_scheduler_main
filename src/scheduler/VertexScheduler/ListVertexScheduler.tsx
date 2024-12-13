@@ -277,7 +277,7 @@ function listVertexScheduler({
         <div
           role="button"
           className="icon-buttons-style"
-          title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSE" ? 'Unpause' : 'Pause')}
+          title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
           onClick={e => {
             is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
           }}
@@ -395,7 +395,7 @@ function listVertexScheduler({
             cell.column.Header === 'Status' ?
               <>
                 <div className='execution-history-main-wrapper'>
-                  {cell.row.original.lastScheduledRunResponse.runResponse !== null && cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? (cell.row.original.status === 'COMPLETED' ?
+                  {cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? (cell.row.original.status === 'COMPLETED' ?
                     <div>
                       <iconSuccess.react
                         tag="div"
@@ -404,7 +404,7 @@ function listVertexScheduler({
                     </div> : (cell.row.original.status === 'ACTIVE' ?
                       <iconActive.react
                         tag="div"
-                        title={cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse}
+                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       /> :
                       <iconSuccess.react
@@ -416,7 +416,7 @@ function listVertexScheduler({
                     : <div>
                       <iconFailed.react
                         tag="div"
-                        title={cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse}
+                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
                     </div>}
