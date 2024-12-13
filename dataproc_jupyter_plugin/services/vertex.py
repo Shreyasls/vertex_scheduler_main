@@ -145,6 +145,8 @@ class Client:
                 else f"TZ={job.time_zone} {schedule_value}"
             )
             machine_type = job.machine_type.split(" ", 1)[0]
+            labels = {param.split(":")[0]: param.split(":")[1] for param in job.parameters}
+
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             print(f"2. {api_endpoint}")
             headers = self.create_headers()
@@ -152,13 +154,12 @@ class Client:
             payload = {
                 "displayName": job.display_name,
                 "cron": cron,
-                "maxRunCount": job.max_run_count,
                 "maxConcurrentRunCount": "1",
                 "createNotebookExecutionJobRequest": {
                     "parent": f"projects/{self.project_id}/locations/{self.region_id}",
                     "notebookExecutionJob": {
                         "displayName": job.display_name,
-                        "labels": job.parameters,
+                        "labels": labels,
                         "customEnvironmentSpec": {
                             "machineSpec": {
                                 "machineType": machine_type,
@@ -187,6 +188,8 @@ class Client:
                 payload["startTime"]: job.start_time
             if job.end_time:
                 payload["endTime"]: job.end_time
+            if job.max_run_count:
+                payload["maxRunCount"]: job.max_run_count
 
             async with self.client_session.post(
                 api_endpoint, headers=headers, json=payload
