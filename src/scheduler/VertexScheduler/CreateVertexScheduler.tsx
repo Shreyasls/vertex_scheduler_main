@@ -449,10 +449,6 @@ const CreateVertexScheduler = ({
     };
 
     useEffect(() => {
-        sharedNetworkAPI()
-    }, [Object.keys(hostProject).length > 0]);
-
-    useEffect(() => {
         setServiceAccountSelected(serviceAccountList[0])
     }, [serviceAccountList.length > 0]);
 
@@ -461,13 +457,16 @@ const CreateVertexScheduler = ({
             if (region !== '') {
                 machineTypeAPI()
             }
+            if (serviceAccountList.length > 0) {
+                setServiceAccountSelected(serviceAccountList[0])
+            }
+            if(Object.keys(hostProject).length > 0){
+                sharedNetworkAPI()
+            }
             hostProjectAPI()
             cloudStorageAPI()
             serviceAccountAPI()
             primaryNetworkAPI()
-            if (serviceAccountList.length > 0) {
-                setServiceAccountSelected(serviceAccountList[0])
-            }
         }
         authApi()
             .then((credentials) => {

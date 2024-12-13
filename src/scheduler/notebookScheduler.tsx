@@ -37,6 +37,7 @@ import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { INotebookModel } from '@jupyterlab/notebook';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import CreateVertexScheduler from './VertexScheduler/CreateVertexScheduler';
+import ErrorMessage from './common/ErrorMessage';
 
 const iconError = new LabIcon({
   name: 'launcher:error-icon',
@@ -141,7 +142,10 @@ const NotebookSchedulerComponent = ({
                   disabled={editMode}
                 />
               </div>
-              {!jobNameValidation && !editMode && jobNameSelected === '' && (
+              {
+                jobNameSelected === '' && <ErrorMessage message="Name is required" />
+              }
+              {!jobNameValidation && !editMode && (
                 <div className="error-key-parent">
                   <iconError.react tag="div" className="logo-alignment-style" />
                   <div className="error-key-missing">Name is required</div>
