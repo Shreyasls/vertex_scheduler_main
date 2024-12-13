@@ -557,5 +557,35 @@ export class VertexServices {
         }
     };
 
+    static executionHistoryServiceList = async (
+        scheduleId: string,
+        region: string,
+        setInputNotebookFilePath: (value: string) => void,
+        setEditNotebookLoading: (value: string) => void,
+    ) => {
+        setEditNotebookLoading(scheduleId);
+        try {
+            const serviceURL = `api/logEntries/listEntries`;
+            const formattedResponse: any = await requestAPI(serviceURL + `?filter_query=${region}`
+            );
+            if (formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
+                setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
+            } else {
+                setEditNotebookLoading('');
+                toast.error(
+                    `File path not found`,
+                    toastifyCustomStyle
+                );
+            }
+
+        } catch (reason) {
+            setEditNotebookLoading('');
+            toast.error(
+                `Error in updating notebook.\n${reason}`,
+                toastifyCustomStyle
+            );
+        }
+    };
+
 
 }

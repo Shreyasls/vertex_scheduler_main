@@ -107,10 +107,12 @@ interface IDagList {
 function listVertexScheduler({
   app,
   settingRegistry,
+  handleDagIdSelection
 }: {
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
-
+  // handleDagIdSelection: (composerName: string, dagId: string) => void;
+  handleDagIdSelection: (dagId: any) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -130,6 +132,7 @@ function listVertexScheduler({
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
+  // const [vertexSelectedList, setVertexSelectedList] = useState('');
 
   const columns = React.useMemo(
     () => [
@@ -395,7 +398,8 @@ function listVertexScheduler({
         <td
           {...cell.getCellProps()}
           className="clusters-table-data"
-        //onClick={() => handleDagIdSelection(composerSelectedList, cell.value)}
+          onClick={() => handleDagIdSelection(cell.row.original)}
+          // onClick={() => handleDagIdSelection(vertexSelectedList, cell.value)}
         >
           {cell.value}
         </td>
