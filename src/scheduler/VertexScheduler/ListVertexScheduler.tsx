@@ -28,9 +28,11 @@ import {
   Button
 } from '@mui/material';
 import deleteIcon from '../../../style/icons/scheduler_delete.svg';
-import CompletedIcon from '../../../style/icons/dag_task_success_icon.svg'
-import FailedIcon from '../../../style/icons/dag_task_failed_icon.svg'
-import ActiveIcon from '../../../style/icons/cluster_running_icon.svg'
+import CompletedIcon from '../../../style/icons/dag_task_success_icon.svg';
+import FailedIcon from '../../../style/icons/list_error_icon.svg';
+import ActiveIcon from '../../../style/icons/list_active_icon.svg';
+import ListPauseIcon from '../../../style/icons/list_pause_icon.svg';
+import ListCompleteIcon from '../../../style/icons/list_completed_with_error.svg'
 import { LabIcon } from '@jupyterlab/ui-components';
 import playIcon from '../../../style/icons/scheduler_play.svg';
 import pauseIcon from '../../../style/icons/scheduler_pause.svg';
@@ -83,6 +85,16 @@ const iconFailed = new LabIcon({
 const iconActive = new LabIcon({
   name: 'launcher:active-icon',
   svgstr: ActiveIcon
+});
+
+const iconListPause = new LabIcon({
+  name: 'launcher:list-pause-icon',
+  svgstr: ListPauseIcon
+});
+
+const iconListComplete = new LabIcon({
+  name: 'launcher:list-complete-icon',
+  svgstr: ListCompleteIcon
 });
 
 
@@ -393,38 +405,49 @@ function listVertexScheduler({
         </td>
       );
     } else {
+      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' ||  cell.row.original.status === 'COMPLETED' && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
+      
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
           {
             cell.column.Header === 'Status' ?
               <>
                 <div className='execution-history-main-wrapper'>
-                  {cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? (cell.row.original.status === 'COMPLETED' ?
+                  {cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse ? (cell.row.original.status === 'COMPLETED' ? (cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? <div>
+                    <iconSuccess.react
+                      tag="div"
+                      title='Done !'
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  </div> :
                     <div>
-                      <iconSuccess.react
+                      <iconListComplete.react
                         tag="div"
+                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
-                    </div> : (cell.row.original.status === 'ACTIVE' ?
+                    </div>)
+                    : (cell.row.original.status === 'ACTIVE' ?
                       <iconActive.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       /> :
-                      <iconSuccess.react
+                      <iconListPause.react
                         tag="div"
-                        title="Done !"
+                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
                     ))
-                    : <div>
+                    : 
+                    <div>
                       <iconFailed.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
-                    </div>}
-                  {cell.render('Cell')}
+                    </div> }
+                  <div className={ alignIcon ? 'text-icon' : ''}>{cell.render('Cell')}</div>
                 </div>
 
               </>

@@ -386,3 +386,7 @@
 .icon-size {
   width: 14px;
 }
+
+.text-icon {
+  line-height: 2;
+}
