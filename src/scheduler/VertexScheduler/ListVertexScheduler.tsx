@@ -487,6 +487,7 @@ function listVertexScheduler({
 
   useEffect(() => {
     checkPreviewEnabled();
+    window.scrollTo(0, 0)
   }, [])
 
   useEffect(() => {
