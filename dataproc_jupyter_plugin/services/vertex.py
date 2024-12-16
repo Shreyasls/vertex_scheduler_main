@@ -117,15 +117,13 @@ class Client:
 
     async def upload_to_gcs(self, bucket_name, file_path, job_name):
         input_notebook = file_path.split("/")[-1]
-        print(f"2. input_notebook {input_notebook}")
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
 
         # uploading the input file
         blob_name = f"{job_name}/{input_notebook}"
-        print(f"3. blob_name {blob_name}")
         blob = bucket.blob(blob_name)
-        blob.upload_from_filename(input_notebook)
+        blob.upload_from_filename(file_path)
 
         # uploading json file containing the input file path
         json_blob_name = f"{job_name}/{job_name}.json"
@@ -218,11 +216,9 @@ class Client:
                 await self.create_gcs_bucket(VERTEX_STORAGE_BUCKET)
                 print("The bucket is created")
 
-            print(f"1. job.input_filename {job.input_filename}")
             file_path = await self.upload_to_gcs(
                 VERTEX_STORAGE_BUCKET, job.input_filename, job.display_name
             )
-            print(f"4. file_path {file_path}")
             res = await self.create_schedule(job, file_path, VERTEX_STORAGE_BUCKET)
             return res
         except Exception as e:
