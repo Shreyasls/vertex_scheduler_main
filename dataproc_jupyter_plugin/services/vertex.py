@@ -259,6 +259,7 @@ class Client:
                                 "displayName": schedule.get("displayName"),
                                 "schedule": schedule_value,
                                 "status": schedule.get("state"),
+                                "createTime": schedule.get("createTime"),
                                 "lastScheduledRunResponse": schedule.get(
                                     "lastScheduledRunResponse"
                                 ),
