@@ -35,6 +35,17 @@ const iconLeftArrow = new LabIcon({
     svgstr: LeftArrowIcon
 });
 
+interface IDagRunList {
+    dagRunId: string;
+    // filteredDate: Date;
+    startDate: string;
+    endDate: string;
+    gcsUrl: string;
+    state: string;
+    date: Date;
+    time: string;
+}
+
 const VertexExecutionHistory = ({
     region,
     setRegion,
@@ -56,6 +67,7 @@ const VertexExecutionHistory = ({
     const today = dayjs()
 
     const [dagRunId, setDagRunId] = useState('');
+    const [jobRunsData, setJobRunsData] = useState<IDagRunList | undefined>();
     // const [region, setRegion] = useState('')
     const currentDate = new Date().toLocaleDateString();
     const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(null);
@@ -123,101 +135,6 @@ const VertexExecutionHistory = ({
         // console.log('New month selected:', newMonth);
         // console.log('Previous month value:', newMonth.subtract(1, 'month').format('MMMM YYYY'));
     };
-
-    // const CustomDay = (props: PickersDayProps<Dayjs>) => {
-    //     // const { day, isFirstVisibleCell, isLastVisibleCell } = props;
-    //     const { day } = props;
-    //     // if (isFirstVisibleCell) {
-    //     //     // setStartDate(new Date(day.toDate()).toISOString());
-    //     // }
-    //     // if (isLastVisibleCell) {
-    //     //     const nextDate = new Date(day.toDate());
-    //     //     nextDate.setDate(day.toDate().getDate() + 1);
-    //     //     // setEndDate(nextDate.toISOString());
-    //     // }
-
-    //     const totalViewDates = day.date();
-    //     // const formatDate = (date: Dayjs) => date.format('YYYY-MM-DD');
-    //     const formattedTotalViewDate = totalViewDates.toString().padStart(2, '0');
-
-    //     //Color codes to highlight dates in calendar
-    //     //Blue color code for running status
-    //     const isBlueExecution =
-    //         blueListDates.length > 0 &&
-    //         blueListDates.includes(formattedTotalViewDate);
-    //     //Grey color code for queued status
-    //     const isGreyExecution =
-    //         greyListDates.length > 0 &&
-    //         greyListDates.includes(formattedTotalViewDate);
-    //     //Orange color code for combination of failed and success status
-    //     const isOrangeExecution =
-    //         orangeListDates.length > 0 &&
-    //         orangeListDates.includes(formattedTotalViewDate);
-    //     //Red color code for only with failed status
-    //     const isRedExecution =
-    //         redListDates.length > 0 && redListDates.includes(formattedTotalViewDate);
-    //     //Green color code for only one with success status
-    //     const isGreenExecution =
-    //         greenListDates.length > 0 &&
-    //         greenListDates.includes(formattedTotalViewDate);
-    //     //Green color code for multiple success status
-    //     const isDarkGreenExecution =
-    //         darkGreenListDates.length > 0 &&
-    //         darkGreenListDates.includes(formattedTotalViewDate);
-
-    //     const isSelectedExecution =
-    //         [selectedDate?.date()].includes(totalViewDates) &&
-    //         selectedDate?.month() === day?.month();
-    //     const currentDataExecution =
-    //         [dayjs(currentDate)?.date()].includes(totalViewDates) &&
-    //         [dayjs(currentDate)?.month()].includes(day.month());
-
-    //     return (
-    //         <PickersDay
-    //             {...props}
-    //             style={{
-    //                 border: 'none',
-    //                 borderRadius:
-    //                     isSelectedExecution ||
-    //                         isDarkGreenExecution ||
-    //                         isGreenExecution ||
-    //                         isRedExecution ||
-    //                         isOrangeExecution ||
-    //                         isGreyExecution ||
-    //                         isBlueExecution
-    //                         ? '50%'
-    //                         : 'none',
-    //                 backgroundColor: isSelectedExecution
-    //                     ? '#3B78E7'
-    //                     : isDarkGreenExecution
-    //                         ? '#1E6631'
-    //                         : isGreenExecution
-    //                             ? '#34A853'
-    //                             : isOrangeExecution
-    //                                 ? '#FFA52C'
-    //                                 : isRedExecution
-    //                                     ? '#EA3323'
-    //                                     : isBlueExecution
-    //                                         ? '#00BFA5'
-    //                                         : isGreyExecution
-    //                                             ? '#AEAEAE'
-    //                                             : 'transparent',
-    //                 color:
-    //                     isSelectedExecution ||
-    //                         isDarkGreenExecution ||
-    //                         isGreenExecution ||
-    //                         isRedExecution ||
-    //                         isOrangeExecution ||
-    //                         isGreyExecution ||
-    //                         isBlueExecution
-    //                         ? 'white'
-    //                         : currentDataExecution
-    //                             ? '#3367D6'
-    //                             : 'inherit'
-    //             }}
-    //         />
-    //     );
-    // };
 
     const getFormattedDate = (dateList: any[], day: string | number | Date | dayjs.Dayjs | null | undefined) => {
 
@@ -349,6 +266,7 @@ const VertexExecutionHistory = ({
                             dagId={scheduleName}
                             // startDate={startDate}
                             // endDate={endDate}
+                            setJobRunsData={setJobRunsData}
                             setDagRunId={setDagRunId}
                             selectedMonth={selectedMonth}
                             selectedDate={selectedDate}
@@ -370,6 +288,7 @@ const VertexExecutionHistory = ({
                                 composerName={schedulerData}
                                 dagId={scheduleName}
                                 dagRunId={dagRunId}
+                                jobRunsData={jobRunsData}
                             />
                         )}
                     </div>

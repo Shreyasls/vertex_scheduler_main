@@ -88,6 +88,7 @@ export class VertexServices {
                     'No machine type in this region',
                     toastifyCustomStyle
                 );
+                setHostProject('')
             } else {
                 if (formattedResponse) {
                     setHostProject(formattedResponse);
@@ -98,6 +99,7 @@ export class VertexServices {
                 'Error listing machine type',
                 LOG_LEVEL.ERROR
             );
+            setHostProject('')
             // toast.error(
             //     `Failed to fetch machine type list`,
             //     toastifyCustomStyle
@@ -114,6 +116,7 @@ export class VertexServices {
             const formattedResponse: any = await requestAPI(`api/vertex/uiConfig?region_id=${region}`);
             if (formattedResponse.length === 0) {
                 // Handle the case where the list is empty
+                setMachineTypeList([])
                 toast.error(
                     'No machine type in this region',
                     toastifyCustomStyle
@@ -125,11 +128,12 @@ export class VertexServices {
             }
             setMachineTypeLoading(false)
         } catch (error) {
+            setMachineTypeList([])
+            setMachineTypeLoading(false)
             DataprocLoggingService.log(
                 'Error listing machine type',
                 LOG_LEVEL.ERROR
             );
-            setMachineTypeLoading(false)
             toast.error(
                 `Failed to fetch machine type list`,
                 toastifyCustomStyle
@@ -144,27 +148,19 @@ export class VertexServices {
         try {
             setCloudStorageLoading(true)
             const formattedResponse: any = await requestAPI(`api/storage/listBucket`);
-            if (formattedResponse.length === 0) {
-                // Handle the case where the list is empty
+            if (formattedResponse.length > 0) {
+                setCloudStorageList(formattedResponse)
+            } else {
+                setCloudStorageList([])
                 toast.error(
                     'No cloud storage buckets',
                     toastifyCustomStyle
                 );
-            } else {
-                // console.log(formattedResponse)
-                // let cloudStorageList: string[] = [];
-                // formattedResponse.forEach((data: { name: string; }) => {
-                //     cloudStorageList.push(data.name);
-                // });
-                // const cloudStorageList = formattedResponse['items'].map((bucket: { name: any; }) => (
-                //     bucket.name
-                // ));
-                // cloudStorageList.sort();
-                // setCloudStorageList(cloudStorageList);
-                setCloudStorageList(formattedResponse)
             }
             setCloudStorageLoading(false)
         } catch (error) {
+            setCloudStorageList([])
+            setCloudStorageLoading(false)
             DataprocLoggingService.log(
                 'Error listing cloud storage bucket',
                 LOG_LEVEL.ERROR
@@ -173,7 +169,6 @@ export class VertexServices {
                 `Failed to fetch cloud storage bucket`,
                 toastifyCustomStyle
             );
-            setCloudStorageLoading(false)
         }
     };
 
@@ -192,6 +187,7 @@ export class VertexServices {
                     'No service accounts',
                     toastifyCustomStyle
                 );
+                setServiceAccountList([])
             } else {
                 const serviceAccountList = formattedResponse.map((account: any) => ({
                     displayName: account.displayName,
@@ -202,6 +198,8 @@ export class VertexServices {
             }
             setServiceAccountLoading(false)
         } catch (error) {
+            setServiceAccountList([])
+            setServiceAccountLoading(false)
             DataprocLoggingService.log(
                 'Error listing service accounts',
                 LOG_LEVEL.ERROR
@@ -210,7 +208,6 @@ export class VertexServices {
                 `Failed to fetch service accounts list`,
                 toastifyCustomStyle
             );
-            setServiceAccountLoading(false)
         }
     };
 
@@ -222,7 +219,7 @@ export class VertexServices {
             setPrimaryNetworkLoading(true)
             const formattedResponse: any = await requestAPI(`api/compute/network`);
             if (formattedResponse.length === 0) {
-                // Handle the case where the list is empty
+                setPrimaryNetworkList([])
                 toast.error(
                     'No primary networks',
                     toastifyCustomStyle
@@ -241,6 +238,8 @@ export class VertexServices {
             }
             setPrimaryNetworkLoading(false)
         } catch (error) {
+            setPrimaryNetworkList([])
+            setPrimaryNetworkLoading(false)
             DataprocLoggingService.log(
                 'Error listing primary network',
                 LOG_LEVEL.ERROR
@@ -249,7 +248,6 @@ export class VertexServices {
                 `Failed to fetch primary network list`,
                 toastifyCustomStyle
             );
-            setPrimaryNetworkLoading(false)
         }
     };
 
@@ -263,7 +261,7 @@ export class VertexServices {
             setSubNetworkLoading(true)
             const formattedResponse: any = await requestAPI(`api/compute/subNetwork?region_id=${region}&network_id=${primaryNetworkSelected}`);
             if (formattedResponse.length === 0) {
-                // Handle the case where the list is empty
+                setSubNetworkList([])
                 toast.error(
                     'No sub networks',
                     toastifyCustomStyle
@@ -282,6 +280,8 @@ export class VertexServices {
             }
             setSubNetworkLoading(false)
         } catch (error) {
+            setSubNetworkList([])
+            setSubNetworkLoading(false)
             DataprocLoggingService.log(
                 'Error listing sub networks',
                 LOG_LEVEL.ERROR
@@ -290,7 +290,6 @@ export class VertexServices {
                 `Failed to fetch sub networks list`,
                 toastifyCustomStyle
             );
-            setSubNetworkLoading(false)
         }
     };
 
@@ -302,7 +301,7 @@ export class VertexServices {
             setSharedNetworkLoading(true)
             const formattedResponse: any = await requestAPI(`api/compute/sharedNetwork`);
             if (formattedResponse.length === 0) {
-                // Handle the case where the list is empty
+                setSharedNetworkList([])
                 toast.error(
                     'No shared networks',
                     toastifyCustomStyle
@@ -322,6 +321,8 @@ export class VertexServices {
             }
             setSharedNetworkLoading(false)
         } catch (error) {
+            setSharedNetworkList([])
+            setSharedNetworkLoading(false)
             DataprocLoggingService.log(
                 'Error listing shared networks',
                 LOG_LEVEL.ERROR
@@ -330,7 +331,6 @@ export class VertexServices {
                 `Failed to fetch shared networks list`,
                 toastifyCustomStyle
             );
-            setSharedNetworkLoading(false)
         }
     };
 
@@ -594,6 +594,12 @@ export class VertexServices {
             let transformDagRunListDataCurrent = [];
             if (formattedResponse && formattedResponse.length > 0) {
                 transformDagRunListDataCurrent = formattedResponse.map((dagRun: any) => {
+                    const createTime = new Date(dagRun.createTime);
+                    const updateTime = new Date(dagRun.updateTime);
+                    const timeDifferenceMilliseconds = updateTime.getTime() - createTime.getTime(); // Difference in milliseconds
+                    const totalSeconds = Math.floor(timeDifferenceMilliseconds / 1000); // Convert to seconds
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
                     return {
                         dagRunId: dagRun.name.split('/').pop(),
                         // filteredDate: new Date(dagRun.createTime)
@@ -604,7 +610,7 @@ export class VertexServices {
                         gcsUrl: dagRun.gcsOutputUri,
                         state: dagRun.jobState.split('_')[2].toLowerCase(),
                         date: new Date(dagRun.createTime).toDateString(),
-                        time: new Date(dagRun.createTime).toTimeString().split(' ')[0]
+                        time: `${minutes} min ${seconds} sec`
                     };
                 });
             }
@@ -675,48 +681,52 @@ export class VertexServices {
     };
 
     static vertexJobTaskLogsListService = async (
-        // composerName: string,
-        // dagId: string,
         dagRunId: string,
-        startDate: string,
-        endDate: string,
+        jobRunsData: IDagRunList | undefined,
         setDagTaskInstancesList: (value: any) => void,
         setIsLoading: (value: boolean) => void
-      ) => {
+    ) => {
         setDagTaskInstancesList([]);
         setIsLoading(true);
+        const start_date = encodeURIComponent(jobRunsData?.startDate || '');
+        const end_date = encodeURIComponent(jobRunsData?.endDate || '');
+        console.log(start_date)
+        console.log(end_date)
         try {
-        //   dagRunId = encodeURIComponent(dagRunId);
-          const data: any = await requestAPI(
-            `api/logEntries/listEntries?filter_query=timestamp >= \"${startDate}" AND timestamp <= \"${endDate}" AND SEARCH(\"${dagRunId}\")`
-          );
-          console.log(data)
-        //   data.task_instances.sort(
-        //     (a: any, b: any) =>
-        //       new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-        //   );
-        //   let transformDagRunTaskInstanceListData = [];
-        //   transformDagRunTaskInstanceListData = data.task_instances.map(
-        //     (dagRunTask: any) => {
-        //       return {
-        //         tryNumber: dagRunTask.try_number,
-        //         taskId: dagRunTask.task_id,
-        //         duration: dagRunTask.duration,
-        //         state: dagRunTask.state,
-        //         date: new Date(dagRunTask.start_date).toDateString(),
-        //         time: new Date(dagRunTask.start_date).toTimeString().split(' ')[0]
-        //       };
-        //     }
-        //   );
-        //   setDagTaskInstancesList(transformDagRunTaskInstanceListData);
-          setIsLoading(false);
+            //   dagRunId = encodeURIComponent(dagRunId);
+            const data: any = await requestAPI(
+                `api/logEntries/listEntries?filter_query=timestamp >= \"${start_date}" AND timestamp <= \"${end_date}" AND SEARCH(\"${dagRunId}\")`
+            );
+            // console.log(data)
+            //   data.task_instances.sort(
+            //     (a: any, b: any) =>
+            //       new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+            //   );
+            let transformDagRunTaskInstanceListData = [];
+            transformDagRunTaskInstanceListData = data.entries.map(
+                (dagRunTask: any) => {
+                    return {
+                        severity: dagRunTask.severity,
+                        textPayload: dagRunTask.textPayload && dagRunTask.textPayload ? dagRunTask.textPayload : '',
+                        // duration: dagRunTask.duration,
+                        // state: dagRunTask.state,
+                        date: new Date(dagRunTask.timestamp).toDateString(),
+                        time: new Date(dagRunTask.timestamp).toTimeString().split(' ')[0],
+                        fullData: dagRunTask,
+                    };
+                }
+            );
+            setDagTaskInstancesList(transformDagRunTaskInstanceListData);
+            setIsLoading(false);
         } catch (reason) {
-          if (!toast.isActive('credentialsError')) {
-            toast.error(`Error on GET credentials..\n${reason}`, {
-              ...toastifyCustomStyle,
-              toastId: 'credentialsError'
-            });
-          }
+            setIsLoading(false);
+            setDagTaskInstancesList([]);
+            // if (!toast.isActive('credentialsError')) {
+            //     toast.error(`Error on GET credentials..\n${reason}`, {
+            //         ...toastifyCustomStyle,
+            //         toastId: 'credentialsError'
+            //     });
+            // }
         }
-      };
+    };
 }

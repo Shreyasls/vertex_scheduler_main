@@ -43,90 +43,13 @@ interface IDagRunList {
     time: string;
 }
 
-// const schedulerLists = {
-//     "notebookExecutionJobs": [
-//         {
-//             "name": "projects/411524708443/locations/us-central1/notebookExecutionJobs/4764804007711473664",
-//             "displayName": "test19",
-//             "gcsNotebookSource": {
-//                 "uri": "gs://vertex-schedules/test19/vertex.ipynb"
-//             },
-//             "scheduleResourceName": "projects/411524708443/locations/us-central1/schedules/3912928786789695488",
-//             "gcsOutputUri": "gs://bq-table-shub",
-//             "jobState": "JOB_STATE_SUCCEEDED",
-//             "createTime": "2024-12-12T18:05:01.674901Z",
-//             "updateTime": "2024-12-12T18:08:46.961478Z",
-//             "serviceAccount": "411524708443-compute@developer.gserviceaccount.com",
-//             "kernelName": "python3"
-//         },
-//         {
-//             "name": "projects/411524708443/locations/us-central1/notebookExecutionJobs/2112183827190251520",
-//             "displayName": "test19",
-//             "gcsNotebookSource": {
-//                 "uri": "gs://vertex-schedules/test19/vertex.ipynb"
-//             },
-//             "scheduleResourceName": "projects/411524708443/locations/us-central1/schedules/3912928786789695488",
-//             "gcsOutputUri": "gs://bq-table-shub",
-//             "jobState": "JOB_STATE_SUCCEEDED",
-//             "createTime": "2024-12-12T18:04:00.899723Z",
-//             "updateTime": "2024-12-12T18:07:56.114234Z",
-//             "serviceAccount": "411524708443-compute@developer.gserviceaccount.com",
-//             "kernelName": "python3"
-//         },
-//         {
-//             "name": "projects/411524708443/locations/us-central1/notebookExecutionJobs/1873493046939615232",
-//             "displayName": "test19",
-//             "gcsNotebookSource": {
-//                 "uri": "gs://vertex-schedules/test19/vertex.ipynb"
-//             },
-//             "scheduleResourceName": "projects/411524708443/locations/us-central1/schedules/3912928786789695488",
-//             "gcsOutputUri": "gs://bq-table-shub",
-//             "jobState": "JOB_STATE_SUCCEEDED",
-//             "createTime": "2024-12-12T18:03:00.899506Z",
-//             "updateTime": "2024-12-12T18:06:45.679086Z",
-//             "serviceAccount": "411524708443-compute@developer.gserviceaccount.com",
-//             "kernelName": "python3"
-//         },
-//         {
-//             "name": "projects/411524708443/locations/us-central1/notebookExecutionJobs/8944144461911293952",
-//             "displayName": "test19",
-//             "gcsNotebookSource": {
-//                 "uri": "gs://vertex-schedules/test19/vertex.ipynb"
-//             },
-//             "scheduleResourceName": "projects/411524708443/locations/us-central1/schedules/3912928786789695488",
-//             "gcsOutputUri": "gs://bq-table-shub",
-//             "jobState": "JOB_STATE_SUCCEEDED",
-//             "createTime": "2024-12-12T18:02:00.941160Z",
-//             "updateTime": "2024-12-12T18:06:06.321532Z",
-//             "serviceAccount": "411524708443-compute@developer.gserviceaccount.com",
-//             "kernelName": "python3"
-//         },
-//     ]
-// }
-
-// interface ISchedulerList {
-//     name: string
-//     displayName: string
-//     gcsNotebookSource: GcsNotebookSource
-//     scheduleResourceName: string
-//     gcsOutputUri: string
-//     jobState: string
-//     createTime: string
-//     updateTime: string
-//     serviceAccount: string
-//     kernelName: string
-// }
-
-// interface GcsNotebookSource {
-//     uri: string
-// }
-
 const VertexJobRuns = ({
     region,
     schedulerData,
     dagId,
     // startDate,
     // endDate,
+    setJobRunsData,
     setDagRunId,
     selectedMonth,
     selectedDate,
@@ -145,6 +68,7 @@ const VertexJobRuns = ({
     dagId: string;
     // startDate: string;
     // endDate: string;
+    setJobRunsData: React.Dispatch<React.SetStateAction<IDagRunList | undefined>>;
     setDagRunId: (value: string) => void;
     selectedMonth: Dayjs | null;
     selectedDate: Dayjs | null;
@@ -184,8 +108,6 @@ const VertexJobRuns = ({
         };
     }, []);
 
-    // const data = dagRunsCurrentDateList.length > 0 ? dagRunsCurrentDateList : dagRunsList;
-    // const data = dagRunsList;
     const filteredData = React.useMemo(() => {
         if (selectedDate) {
             const selectedDateString = selectedDate.toDate().toDateString(); // Only date, ignoring time
@@ -193,9 +115,16 @@ const VertexJobRuns = ({
                 return new Date(dagRun.date).toDateString() === selectedDateString;
             });
         }
-        return dagRunsList; // If no date is selected, return all data
+        return dagRunsList;
     }, [dagRunsList, selectedDate]);
-    // console.log(filteredData)
+
+    // Sync filtered data with the parent component's state
+    useEffect(() => {
+        if (filteredData.length > 0) {
+            setJobRunsData(filteredData[0]);
+            setDagRunId(filteredData[0].dagRunId)
+        }
+    }, [filteredData, setJobRunsData]);
 
     const columns = React.useMemo(
         () => [

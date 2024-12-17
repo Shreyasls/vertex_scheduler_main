@@ -99,14 +99,17 @@ const CreateVertexScheduler = ({
     const [projectId, setProjectId] = useState('');
     const [kernel] = useState(['python3', 'pytorch', 'tensorflow']);
     const [kernelSelected, setKernelSelected] = useState(null);
-    const [cloudStorageList, setCloudStorageList] = useState<string[]>([]);
-    const [cloudStorage, setCloudStorage] = useState(null);
     const [machineTypeList, setMachineTypeList] = useState<string[]>([]);
     const [machineTypeSelected, setMachineTypeSelected] = useState(null);
     // const [machineTypeValidation, setMachineTypeValidation] = useState<boolean>(false);
     const [acceleratorType, setAcceleratorType] = useState(null);
     const [acceleratedCount, setAcceleratedCount] = useState(null);
     const [networkSelected, setNetworkSelected] = useState('networkInThisProject');
+    const [cloudStorageList, setCloudStorageList] = useState<string[]>([]);
+    const [cloudStorage, setCloudStorage] = useState(null);
+    const [diskTypeOptions] = useState(["pd-standard (Persistent Disk Standard", "pd-ssd (Persistent Disk Solid state Drive)", "pd-standard (Persistent Disk Hard Disk Drive)", "pd-balanced (Balanced Persistent Disk)", "pd-extreme (Extreme Persistent Disk)"]);
+    const [diskTypeSelected, setDiskTypeSelected] = useState(diskTypeOptions[0]);
+    const [diskSize, setDiskSize] = useState('100');
     const [serviceAccountList, setServiceAccountList] = useState<{ displayName: string; email: string }[]>([]);
     const [serviceAccountSelected, setServiceAccountSelected] = useState<{ displayName: string; email: string } | null>(null);
     const [primaryNetworkList, setPrimaryNetworkList] = useState<{ name: string; link: string }[]>([]);
@@ -143,6 +146,32 @@ const CreateVertexScheduler = ({
     const handleKernel = (kernelValue: any) => {
         setKernelSelected(kernelValue)
     }
+
+    /**
+   * Kernel selection
+   * @param {string} kernelSelected seleted kernel
+   */
+    const handleDiskType = (diskValue: any) => {
+        setDiskTypeSelected(diskValue)
+    }
+
+    /**
+    * Max Runs
+    * @param {string} maxRuns seleted machine type
+    */
+    const handleDiskSize = (e: any | React.ChangeEvent<HTMLInputElement>) => {
+        const re = /^[1-9][0-9]*$/;
+        if (e.target.value === '' || re.test(e.target.value)) {
+            setDiskSize(e.target.value);
+        }
+    };
+
+    const handleDefaultDiskSize = (e: any | React.ChangeEvent<HTMLInputElement>) => {
+        // const re = /^[1-9][0-9]*$/;
+        if (e.target.value === '') {
+            setDiskSize('100');
+        }
+    };
 
     const handleSchedule = (e: any | React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
@@ -424,6 +453,8 @@ const CreateVertexScheduler = ({
             subnetwork: networkSelected === "networkInThisProject" ? subNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
             start_time: startDate,
             end_time: endDate,
+            diskType: diskTypeSelected,
+            diskSizeGb: diskSize
         }
         console.log(payload)
         await VertexServices.createVertexSchedulerService(
@@ -460,7 +491,7 @@ const CreateVertexScheduler = ({
             if (serviceAccountList.length > 0) {
                 setServiceAccountSelected(serviceAccountList[0])
             }
-            if(Object.keys(hostProject).length > 0){
+            if (Object.keys(hostProject).length > 0) {
                 sharedNetworkAPI()
             }
             hostProjectAPI()
@@ -638,6 +669,31 @@ const CreateVertexScheduler = ({
                             !cloudStorage && <ErrorMessage message="Cloud storage bucket is required" />
                         }
                         <span className="tab-description tab-text-sub-cl">Where results are stored. Select an existing bucket or create a new one.</span>
+                        <div className="execution-history-main-wrapper">
+                            <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                                <Autocomplete
+                                    className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                    options={diskTypeOptions}
+                                    value={diskTypeSelected}
+                                    onChange={(_event, val) => handleDiskType(val)}
+                                    renderInput={params => (
+                                        <TextField {...params} label="Disk Type" />
+                                    )}
+                                    clearIcon={false}
+                                />
+                            </div>
+                            <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                                <Input
+                                    className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                    value={diskSize}
+                                    onChange={e => handleDiskSize(e)}
+                                    onBlur={(e: any) => handleDefaultDiskSize(e)}
+                                    type="number"
+                                    placeholder=""
+                                    Label="Disk Size (in GB)"
+                                />
+                            </div>
+                        </div>
                         <>
                             <div className="create-job-scheduler-title sub-title-heading ">
                                 Parameters

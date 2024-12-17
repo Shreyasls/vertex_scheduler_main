@@ -1,244 +1,266 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, CircularProgress, IconButton } from '@mui/material';
+import { Typography, CircularProgress } from '@mui/material';
 import { SchedulerService } from '../schedulerServices';
 import { LabIcon } from '@jupyterlab/ui-components';
-import dagTaskSuccessIcon from '../../../style/icons/dag_task_success_icon.svg';
-import dagTaskFailedIcon from '../../../style/icons/dag_task_failed_icon.svg';
-import stopIcon from '../../../style/icons/stop_icon.svg';
+// import dagTaskSuccessIcon from '../../../style/icons/dag_task_success_icon.svg';
+// import dagTaskFailedIcon from '../../../style/icons/dag_task_failed_icon.svg';
+// import stopIcon from '../../../style/icons/stop_icon.svg';
 import expandLessIcon from '../../../style/icons/expand_less.svg';
 import expandMoreIcon from '../../../style/icons/expand_more.svg';
 import { handleDebounce } from '../../utils/utils';
+import { VertexServices } from './VertexServices';
 // import { VertexServices } from './VertexServices';
 
-const iconDagTaskFailed = new LabIcon({
-  name: 'launcher:dag-task-failed-icon',
-  svgstr: dagTaskFailedIcon
-});
+// const iconDagTaskFailed = new LabIcon({
+//     name: 'launcher:dag-task-failed-icon',
+//     svgstr: dagTaskFailedIcon
+// });
 
-const iconDagTaskSuccess = new LabIcon({
-  name: 'launcher:dag-task-success-icon',
-  svgstr: dagTaskSuccessIcon
-});
+// const iconDagTaskSuccess = new LabIcon({
+//     name: 'launcher:dag-task-success-icon',
+//     svgstr: dagTaskSuccessIcon
+// });
 
-const iconStop = new LabIcon({
-  name: 'launcher:stop-icon',
-  svgstr: stopIcon
-});
+// const iconStop = new LabIcon({
+//     name: 'launcher:stop-icon',
+//     svgstr: stopIcon
+// });
 
 const iconExpandLess = new LabIcon({
-  name: 'launcher:expand-less-icon',
-  svgstr: expandLessIcon
+    name: 'launcher:expand-less-icon',
+    svgstr: expandLessIcon
 });
 
 const iconExpandMore = new LabIcon({
-  name: 'launcher:expand-more-icon',
-  svgstr: expandMoreIcon
+    name: 'launcher:expand-more-icon',
+    svgstr: expandMoreIcon
 });
 
+interface IDagRunList {
+    dagRunId: string;
+    // filteredDate: Date;
+    startDate: string;
+    endDate: string;
+    gcsUrl: string;
+    state: string;
+    date: Date;
+    time: string;
+}
+// Info, notice,error
 const VertexJobTaskLogs = ({
-  composerName,
-  dagId,
-  dagRunId,
+    composerName,
+    dagId,
+    dagRunId,
+    jobRunsData,
 }: {
-  composerName: string;
-  dagId: string;
-  dagRunId: string;
+    composerName: string;
+    dagId: string;
+    dagRunId: string;
+    jobRunsData: IDagRunList | undefined;
 }): JSX.Element => {
-  const [dagTaskInstancesList] = useState<any>([]);
-  const [isLoading] = useState(true);
-  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
-  const [expanded, setExpanded] = useState<string | false>(false);
-  const [loglist, setLogList] = useState('');
+    const [dagTaskInstancesList, setDagTaskInstancesList] = useState<any>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [expanded, setExpanded] = useState<string | false>(false);
+    const [loglist, setLogList] = useState('');
 
-  const [height, setHeight] = useState(window.innerHeight - 320);
+    const [height, setHeight] = useState(window.innerHeight - 320);
+    console.log(dagTaskInstancesList)
+    function handleUpdateHeight() {
+        let updateHeight = window.innerHeight - 320;
+        setHeight(updateHeight);
+    }
 
-  function handleUpdateHeight() {
-    let updateHeight = window.innerHeight - 320;
-    setHeight(updateHeight);
-  }
+    // Debounce the handleUpdateHeight function
+    const debouncedHandleUpdateHeight = handleDebounce(handleUpdateHeight, 500);
 
-  // Debounce the handleUpdateHeight function
-  const debouncedHandleUpdateHeight = handleDebounce(handleUpdateHeight, 500);
+    // Add event listener for window resize using useEffect
+    useEffect(() => {
+        window.addEventListener('resize', debouncedHandleUpdateHeight);
 
-  // Add event listener for window resize using useEffect
-  useEffect(() => {
-    window.addEventListener('resize', debouncedHandleUpdateHeight);
+        // Cleanup function to remove event listener on component unmount
+        return () => {
+            window.removeEventListener('resize', debouncedHandleUpdateHeight);
+        };
+    }, []);
 
-    // Cleanup function to remove event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', debouncedHandleUpdateHeight);
+    const listDagTaskInstancesRunsList = async () => {
+        await VertexServices.vertexJobTaskLogsListService(
+            dagRunId,
+            jobRunsData,
+            setDagTaskInstancesList,
+            setIsLoading
+        );
     };
-  }, []);
 
-//   const listDagTaskInstancesRunsList = async () => {
-//     await VertexServices.vertexJobTaskLogsListService(
-//       composerName,
-//       dagId,
-//       dagRunId,
-//       setDagTaskInstancesList,
-//       setIsLoading
-//     );
-//   };
+    useEffect(() => {
+        if (dagRunId && jobRunsData) {
+            listDagTaskInstancesRunsList();
+            setExpanded(false);
+        }
+    }, [dagRunId, jobRunsData]);
 
-  useEffect(() => {
-    // listDagTaskInstancesRunsList();
-    setExpanded(false);
-  }, [dagRunId]);
+    useEffect(() => {
+        if (dagTaskInstancesList.length > 0) {
+            setExpanded('0');
+            listDagTaskLogList('0', dagTaskInstancesList[0].tryNumber);
+        }
+    }, [dagTaskInstancesList]);
 
-  useEffect(() => {
-    if (dagTaskInstancesList.length > 0) {
-      setExpanded('0');
-      listDagTaskLogList('0', dagTaskInstancesList[0].tryNumber);
-    }
-  }, [dagTaskInstancesList]);
+    const handleChange = (
+        index: string,
+        iconIndex: number,
+        fromClick: string
+    ) => {
+        if (`${index}` === expanded && fromClick === 'expandClick') {
+            setExpanded(false);
+        } else {
+            setExpanded(`${index}`);
+            listDagTaskLogList(index, iconIndex);
+        }
+    };
 
-  const handleChange = (
-    index: string,
-    iconIndex: number,
-    fromClick: string
-  ) => {
-    if (`${index}` === expanded && fromClick === 'expandClick') {
-      setExpanded(false);
-    } else {
-      setExpanded(`${index}`);
-      listDagTaskLogList(index, iconIndex);
-    }
-  };
-
-  const listDagTaskLogList = async (index: string, iconIndex: number) => {
-    await SchedulerService.listDagTaskLogsListService(
-      composerName,
-      dagId,
-      dagRunId,
-      dagTaskInstancesList[index].taskId,
-      iconIndex,
-      setLogList,
-      setIsLoadingLogs
-    );
-  };
-  return (
-    <div>
-      {dagTaskInstancesList.length > 0 ? (
+    const listDagTaskLogList = async (index: string, iconIndex: number) => {
+        await SchedulerService.listDagTaskLogsListService(
+            composerName,
+            dagId,
+            dagRunId,
+            dagTaskInstancesList[index].taskId,
+            iconIndex,
+            setLogList,
+            setIsLoadingLogs
+        );
+    };
+    return (
         <div>
-          <div className="accordion-row-parent-header">
-            <div className="accordion-row-data">Task Id</div>
-            <div className="accordion-row-data">Attempts</div>
-            <div className="accordion-row-data">Duration (in seconds)</div>
-            <div className="accordion-row-data-expand-logo"></div>
-          </div>
-          {dagTaskInstancesList.length > 0 &&
-            dagTaskInstancesList.map((taskInstance: any, index: string) => (
-              <div>
-                <div className="accordion-row-parent">
-                  <div className="accordion-row-data">
-                    {taskInstance.taskId}
-                  </div>
-                  <div className="accordion-row-data">
-                    {taskInstance.tryNumber === 0 ? (
-                      <IconButton disabled>
-                        <iconStop.react tag="div" />
-                      </IconButton>
-                    ) : (
-                      <div className="logo-row-container">
-                        {Array.from({ length: taskInstance.tryNumber }).map(
-                          (_, i) => (
-                            <IconButton
-                              key={i}
-                              onClick={() =>
-                                handleChange(index, i + 1, 'attemptsClick')
-                              }
-                            >
-                              {i === taskInstance.tryNumber - 1 ? (
-                                taskInstance.state === 'failed' ? (
-                                  <iconDagTaskFailed.react tag="div" />
+            {dagTaskInstancesList.length > 0 ? (
+                <div>
+                    <div className="accordion-vertex-row-parent-header">
+                        <div className="accordion-vertex-row-data">Severity</div>
+                        {/* <div className="accordion-vertex-row-data">Date</div> */}
+                        <div className="accordion-vertex-row-data">Time Stamp</div>
+                        <div className="accordion-vertex-row-data">Summary</div>
+                        <div className="accordion-row-data-expand-logo"></div>
+                    </div>
+                    {dagTaskInstancesList.length > 0 &&
+                        dagTaskInstancesList.map((taskInstance: any, index: string) => (
+                            <div>
+                                <div className="accordion-vertex-row-parent">
+                                    <div className="accordion-vertex-row-data">
+                                        {taskInstance.severity}
+                                    </div>
+                                    <div className="accordion-vertex-row-data">
+                                        {taskInstance.date + " " + taskInstance.time}
+                                    </div>
+                                    {/* <div className="accordion-vertex-row-data">
+                                        {taskInstance.time}
+                                    </div> */}
+                                    {/* <div className="accordion-row-data">
+                                        {taskInstance.tryNumber === 0 ? (
+                                            <IconButton disabled>
+                                                <iconStop.react tag="div" />
+                                            </IconButton>
+                                        ) : (
+                                            <div className="logo-row-container">
+                                                {Array.from({ length: taskInstance.tryNumber }).map(
+                                                    (_, i) => (
+                                                        <IconButton
+                                                            key={i}
+                                                            onClick={() =>
+                                                                handleChange(index, i + 1, 'attemptsClick')
+                                                            }
+                                                        >
+                                                            {i === taskInstance.tryNumber - 1 ? (
+                                                                taskInstance.state === 'failed' ? (
+                                                                    <iconDagTaskFailed.react tag="div" />
+                                                                ) : (
+                                                                    <iconDagTaskSuccess.react tag="div" />
+                                                                )
+                                                            ) : (
+                                                                <iconDagTaskFailed.react tag="div" />
+                                                            )}
+                                                        </IconButton>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+                                    </div> */}
+                                    <div className="accordion-vertex-row-data">
+                                        {taskInstance.textPayload.split(']')[1]}
+                                    </div>
+                                    {taskInstance.tryNumber !== 0 ? (
+                                        <div
+                                            className="accordion-row-data-expand-logo"
+                                            onClick={() =>
+                                                handleChange(
+                                                    index,
+                                                    taskInstance.tryNumber,
+                                                    'expandClick'
+                                                )
+                                            }
+                                        >
+                                            {expanded === `${index}` ? (
+                                                <iconExpandLess.react
+                                                    tag="div"
+                                                    className="icon-white logo-alignment-style-accordion"
+                                                />
+                                            ) : (
+                                                <iconExpandMore.react
+                                                    tag="div"
+                                                    className="icon-white logo-alignment-style-accordion"
+                                                />
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="accordion-row-data-expand-logo"></div>
+                                    )}
+                                </div>
+
+                                {isLoadingLogs && expanded === `${index}` ? (
+                                    <div className="spin-loader-main">
+                                        <CircularProgress
+                                            className="spin-loader-custom-style"
+                                            color="primary"
+                                            size={18}
+                                        />
+                                        Loading Dag Runs Task Logs
+                                    </div>
                                 ) : (
-                                  <iconDagTaskSuccess.react tag="div" />
-                                )
-                              ) : (
-                                <iconDagTaskFailed.react tag="div" />
-                              )}
-                            </IconButton>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div className="accordion-row-data">
-                    {taskInstance.duration}
-                  </div>
-                  {taskInstance.tryNumber !== 0 ? (
-                    <div
-                      className="accordion-row-data-expand-logo"
-                      onClick={() =>
-                        handleChange(
-                          index,
-                          taskInstance.tryNumber,
-                          'expandClick'
-                        )
-                      }
-                    >
-                      {expanded === `${index}` ? (
-                        <iconExpandLess.react
-                          tag="div"
-                          className="icon-white logo-alignment-style-accordion"
-                        />
-                      ) : (
-                        <iconExpandMore.react
-                          tag="div"
-                          className="icon-white logo-alignment-style-accordion"
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <div className="accordion-row-data-expand-logo"></div>
-                  )}
+                                    expanded === `${index}` && (
+                                        <div>
+                                            {' '}
+                                            <Typography>
+                                                <pre
+                                                    className="logs-content-style"
+                                                    style={{ maxHeight: height }}
+                                                >
+                                                    {loglist}
+                                                </pre>
+                                            </Typography>{' '}
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                        ))}
                 </div>
-
-                {isLoadingLogs && expanded === `${index}` ? (
-                  <div className="spin-loader-main">
-                    <CircularProgress
-                      className="spin-loader-custom-style"
-                      color="primary"
-                      size={18}
-                    />
-                    Loading Dag Runs Task Logs
-                  </div>
-                ) : (
-                  expanded === `${index}` && (
-                    <div>
-                      {' '}
-                      <Typography>
-                        <pre
-                          className="logs-content-style"
-                          style={{ maxHeight: height }}
-                        >
-                          {loglist}
-                        </pre>
-                      </Typography>{' '}
-                    </div>
-                  )
-                )}
-              </div>
-            ))}
+            ) : (
+                <div>
+                    {isLoading ? (
+                        <div className="spin-loader-main">
+                            <CircularProgress
+                                className="spin-loader-custom-style"
+                                color="primary"
+                                size={18}
+                            />
+                            Loading Dag Runs Task Instances
+                        </div>
+                    ) : (
+                        <div className="no-data-style">No rows to display</div>
+                    )}
+                </div>
+            )}
         </div>
-      ) : (
-        <div>
-          {isLoading ? (
-            <div className="spin-loader-main">
-              <CircularProgress
-                className="spin-loader-custom-style"
-                color="primary"
-                size={18}
-              />
-              Loading Dag Runs Task Instances
-            </div>
-          ) : (
-            <div className="no-data-style">No rows to display</div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default VertexJobTaskLogs;
