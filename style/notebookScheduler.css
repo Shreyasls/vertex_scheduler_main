@@ -390,3 +390,7 @@
 .text-icon {
   line-height: 2;
 }
+
+.icon-size-status {
+  width: 12px;
+}

@@ -123,7 +123,7 @@ class Client:
         # uploading the input file
         blob_name = f"{job_name}/{input_notebook}"
         blob = bucket.blob(blob_name)
-        blob.upload_from_filename(input_notebook)
+        blob.upload_from_filename(file_path)
 
         # uploading json file containing the input file path
         json_blob_name = f"{job_name}/{job_name}.json"
@@ -408,15 +408,15 @@ class Client:
             )
 
             if data.kernel_name:
-                notebook_execution_job["kernelName"]: data.kernel_name
+                notebook_execution_job["kernelName"] = data.kernel_name
             if data.service_account:
-                notebook_execution_job["serviceAccount"]: data.service_account
+                notebook_execution_job["serviceAccount"] = data.service_account
             if data.cloud_storage_bucket:
-                notebook_execution_job["gcsOutputUri"]: data.cloud_storage_bucket
+                notebook_execution_job["gcsOutputUri"] = data.cloud_storage_bucket
             if data.parameters:
-                notebook_execution_job["labels"]: data.parameters
+                notebook_execution_job["labels"] = data.parameters
             if data.machine_type:
-                notebook_execution_job["customEnvironmentSpec"]: {
+                notebook_execution_job["customEnvironmentSpec"] = {
                     "machineSpec": {
                         "machineType": data.machine_type,
                         "acceleratorType": data.accelerator_type,
@@ -424,13 +424,13 @@ class Client:
                     }
                 }
             if data.network:
-                notebook_execution_job["customEnvironmentSpec"]: {
+                notebook_execution_job["customEnvironmentSpec"] = {
                     "networkSpec": {
                         "network": data.network,
                     }
                 }
             if data.subnetwork:
-                notebook_execution_job["customEnvironmentSpec"]: {
+                notebook_execution_job["customEnvironmentSpec"] = {
                     "networkSpec": {
                         "subnetwork": data.subnetwork,
                     }
@@ -447,9 +447,9 @@ class Client:
             }
 
             if data.start_time:
-                payload["startTime"]: data.start_time
+                payload["startTime"] = data.start_time
             if data.end_date:
-                payload["endTime"]: data.end_time
+                payload["endTime"] = data.end_time
 
             keys = get_keys(payload)
             filtered_keys = [item for item in keys if "displayName" not in item]
