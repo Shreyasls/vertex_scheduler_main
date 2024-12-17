@@ -105,14 +105,18 @@ interface IDagList {
 }
 
 function listVertexScheduler({
+  region,
+  setRegion,
   app,
   settingRegistry,
   handleDagIdSelection
 }: {
+  region: string;
+  setRegion: (value: string) => void;
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
-  // handleDagIdSelection: (composerName: string, dagId: string) => void;
-  handleDagIdSelection: (dagId: any) => void;
+  handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
+  // handleDagIdSelection: (dagId: any) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -128,7 +132,7 @@ function listVertexScheduler({
   console.log(isPreviewEnabled)
   const [nextPageFlag, setNextPageFlag] = useState<string>('');
   console.log(nextPageFlag);
-  const [region, setRegion] = useState<string>('');
+  // const [region, setRegion] = useState<string>('');
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
@@ -398,15 +402,15 @@ function listVertexScheduler({
         <td
           {...cell.getCellProps()}
           className="clusters-table-data"
-          onClick={() => handleDagIdSelection(cell.row.original)}
-          // onClick={() => handleDagIdSelection(vertexSelectedList, cell.value)}
+          onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
+        // onClick={() => handleDagIdSelection(vertexSelectedList, cell.value)}
         >
           {cell.value}
         </td>
       );
     } else {
-      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' ||  cell.row.original.status === 'COMPLETED' && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
-      
+      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED' && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
+
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
           {
@@ -439,15 +443,15 @@ function listVertexScheduler({
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
                     ))
-                    : 
+                    :
                     <div>
                       <iconFailed.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
-                    </div> }
-                  <div className={ alignIcon ? 'text-icon' : ''}>{cell.render('Cell')}</div>
+                    </div>}
+                  <div className={alignIcon ? 'text-icon' : ''}>{cell.render('Cell')}</div>
                 </div>
 
               </>

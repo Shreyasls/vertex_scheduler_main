@@ -66,6 +66,7 @@
 
 .actions-icon {
   display: flex;
+  justify-content: center;
 }
 
 .cluster-status-parent {

@@ -91,13 +91,12 @@ const NotebookJobComponent = ({
     // setIsLoadingKernelDetail?: (value: boolean) => void;
 }): React.JSX.Element => {
     const [showExecutionHistory, setShowExecutionHistory] = useState(false);
-    const [composerName, setComposerName] = useState('');
+    const [region, setRegion] = useState<string>('');
+    const [schedulerData, setScheduleData] = useState('');
     const [bucketName,
         //setBucketName
     ] = useState('');
-    const [dagId,
-        //setDagId
-    ] = useState('');
+    const [scheduleName, setScheduleName] = useState('');
 
     const handleBackButton = () => {
         setShowExecutionHistory(false);
@@ -111,18 +110,20 @@ const NotebookJobComponent = ({
     //     // setDagId(dagId);
     // };
 
-    const handleDagIdSelection = (dagId: any) => {
+    const handleDagIdSelection = (schedulerData: any, scheduleName: string) => {
         setShowExecutionHistory(true);
-        console.log(dagId.name)
-        setComposerName(dagId.name.split('/').pop());
+        setScheduleName(scheduleName)
+        setScheduleData(schedulerData);
     };
 
     return (
         <>
             {showExecutionHistory ? (
                 <VertexExecutionHistory
-                    composerName={composerName}
-                    dagId={dagId}
+                    region={region}
+                    setRegion={setRegion}
+                    schedulerData={schedulerData}
+                    scheduleName={scheduleName}
                     handleBackButton={handleBackButton}
                     bucketName={bucketName}
                     setExecutionPageFlag={setExecutionPageFlag}
@@ -130,6 +131,8 @@ const NotebookJobComponent = ({
             ) : (
                 <div>
                     <ListVertexScheduler
+                        region={region}
+                        setRegion={setRegion}
                         app={app}
                         settingRegistry={settingRegistry}
                         handleDagIdSelection={handleDagIdSelection}

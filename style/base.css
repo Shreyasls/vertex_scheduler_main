@@ -112,6 +112,7 @@
   position: sticky;
   top: 0;
   background-color: var(--jp-layout-color1);
+  z-index: 1;
 }
 .logs-button {
   cursor: context-menu !important;

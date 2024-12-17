@@ -20,6 +20,7 @@ import { JupyterLab } from '@jupyterlab/application';
 import { requestAPI } from '../../handler/handler';
 import { DataprocLoggingService, LOG_LEVEL } from '../../utils/loggingService';
 import { toastifyCustomStyle } from '../../utils/utils';
+import { Dayjs } from 'dayjs';
 
 interface IPayload {
     input_filename: string;
@@ -62,6 +63,17 @@ interface DeleteSchedulerAPIResponse {
 interface TriggerSchedule {
     metedata: object;
     name: string;
+}
+
+
+interface IDagRunList {
+    dagRunId: string;
+    startDate: string;
+    endDate: string;
+    gcsUrl: string;
+    state: string;
+    date: Date;
+    time: string;
 }
 
 export class VertexServices {
@@ -341,7 +353,7 @@ export class VertexServices {
             } else {
                 if (editMode) {
                     toast.success(
-                        `Job scheduler successfully updated`,
+                        `Job ${payload.display_name} successfully updated`,
                         toastifyCustomStyle
                     );
                 } else {
@@ -559,56 +571,152 @@ export class VertexServices {
 
     static executionHistoryServiceList = async (
         region: string,
-        scheduleId: string,
-        // setInputNotebookFilePath: (value: string) => void,
-        // setEditNotebookLoading: (value: string) => void,
+        schedulerData: any,
+        selectedMonth: Dayjs | null,
+        setIsLoading: (value: boolean) => void,
+        setDagRunsList: (value: IDagRunList[]) => void,
+        setBlueListDates: (value: string[]) => void,
+        setGreyListDates: (value: string[]) => void,
+        setOrangeListDates: (value: string[]) => void,
+        setRedListDates: (value: string[]) => void,
+        setGreenListDates: (value: string[]) => void,
+        setDarkGreenListDates: (value: string[]) => void,
     ) => {
-        // setEditNotebookLoading(scheduleId);
+        setIsLoading(true)
+        let selected_month = selectedMonth && selectedMonth.toISOString()
+        // console.log(selected_date)
+        let schedule_id = schedulerData.name.split('/').pop()
+        const serviceURL = `api/vertex/listNotebookExecutionJobs`;
+        // const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${scheduleId}&start_date=2024-12-12T00:00:00.000Z`
+        const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}`
+        );
         try {
-            const serviceURL = `api/vertex/listNotebookExecutionJobs`;
-            // const formattedResponse: any = await requestAPI(serviceURL + `?region_id="us-central1"&schedule_id=3912928786789695488&start_date="2024-12-11T00:00:00.000Z"`
-            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${scheduleId}&start_date="2024-12-11T00:00:00.000Z"`
-            );
-            console.log(formattedResponse)
-            // if (formattedResponse.length === 0) {
-            //     // Handle the case where the list is empty
-            //     toast.error(
-            //         'No machine type in this region',
-            //         toastifyCustomStyle
-            //     );
-            // } else {
-            //     if (formattedResponse) {
-            //         setHostProject(formattedResponse);
-            //     }
-            // }
+            let transformDagRunListDataCurrent = [];
+            if (formattedResponse && formattedResponse.length > 0) {
+                transformDagRunListDataCurrent = formattedResponse.map((dagRun: any) => {
+                    return {
+                        dagRunId: dagRun.name.split('/').pop(),
+                        // filteredDate: new Date(dagRun.createTime)
+                        // .toDateString()
+                        // .split(' ')[2],
+                        startDate: dagRun.createTime,
+                        endDate: dagRun.updateTime,
+                        gcsUrl: dagRun.gcsOutputUri,
+                        state: dagRun.jobState.split('_')[2].toLowerCase(),
+                        date: new Date(dagRun.createTime).toDateString(),
+                        time: new Date(dagRun.createTime).toTimeString().split(' ')[0]
+                    };
+                });
+            }
+            // Group data by date and state
+            const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce((result: any, item: any) => {
+                const date = item.date; // Group by date
+                const status = item.state; // Group by state
+
+                if (!result[date]) {
+                    result[date] = {};
+                }
+
+                if (!result[date][status]) {
+                    result[date][status] = [];
+                }
+
+                result[date][status].push(item);
+
+                return result;
+            }, {});
+
+            // Initialize grouping lists
+            let blueList: string[] = [];
+            let greyList: string[] = [];
+            let orangeList: string[] = [];
+            let redList: string[] = [];
+            let greenList: string[] = [];
+            let darkGreenList: string[] = [];
+
+            // Process grouped data
+            Object.keys(groupedDataByDateStatus).forEach((dateValue) => {
+                if (groupedDataByDateStatus[dateValue].running) {
+                    blueList.push(dateValue);
+                } else if (groupedDataByDateStatus[dateValue].queued) {
+                    greyList.push(dateValue);
+                } else if (
+                    groupedDataByDateStatus[dateValue].failed &&
+                    groupedDataByDateStatus[dateValue].succeeded
+                ) {
+                    orangeList.push(dateValue);
+                } else if (groupedDataByDateStatus[dateValue].failed) {
+                    redList.push(dateValue);
+                } else if (
+                    groupedDataByDateStatus[dateValue].succeeded &&
+                    groupedDataByDateStatus[dateValue].succeeded.length === 1
+                ) {
+                    greenList.push(dateValue);
+                } else {
+                    darkGreenList.push(dateValue);
+                }
+            });
+            // Update state lists with their respective transformations
+            setBlueListDates(blueList);
+            setGreyListDates(greyList);
+            setOrangeListDates(orangeList);
+            setRedListDates(redList);
+            setGreenListDates(greenList);
+            setDarkGreenListDates(darkGreenList);
+            console.log(transformDagRunListDataCurrent.length)
+            setDagRunsList(transformDagRunListDataCurrent)
         } catch (error) {
             toast.error(
                 `Error in fetching the execution history`,
                 toastifyCustomStyle
             );
         }
-        // try {
-        //     const serviceURL = `api/vertex/listNotebookExecutionJobs`;
-        //     const formattedResponse: any = await requestAPI(serviceURL + `?region_id="us-central1"&schedule_id="3912928786789695488"&start_date="2024-12-11T00:00:00.000Z"`
-        //     );
-        //     if (formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
-        //         setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
-        //     } else {
-        //         setEditNotebookLoading('');
-        //         toast.error(
-        //             `File path not found`,
-        //             toastifyCustomStyle
-        //         );
-        //     }
-
-        // } catch (reason) {
-        //     setEditNotebookLoading('');
-        //     toast.error(
-        //         `Error in updating notebook.\n${reason}`,
-        //         toastifyCustomStyle
-        //     );
-        // }
+        setIsLoading(false)
     };
 
-
+    static vertexJobTaskLogsListService = async (
+        // composerName: string,
+        // dagId: string,
+        dagRunId: string,
+        startDate: string,
+        endDate: string,
+        setDagTaskInstancesList: (value: any) => void,
+        setIsLoading: (value: boolean) => void
+      ) => {
+        setDagTaskInstancesList([]);
+        setIsLoading(true);
+        try {
+        //   dagRunId = encodeURIComponent(dagRunId);
+          const data: any = await requestAPI(
+            `api/logEntries/listEntries?filter_query=timestamp >= \"${startDate}" AND timestamp <= \"${endDate}" AND SEARCH(\"${dagRunId}\")`
+          );
+          console.log(data)
+        //   data.task_instances.sort(
+        //     (a: any, b: any) =>
+        //       new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+        //   );
+        //   let transformDagRunTaskInstanceListData = [];
+        //   transformDagRunTaskInstanceListData = data.task_instances.map(
+        //     (dagRunTask: any) => {
+        //       return {
+        //         tryNumber: dagRunTask.try_number,
+        //         taskId: dagRunTask.task_id,
+        //         duration: dagRunTask.duration,
+        //         state: dagRunTask.state,
+        //         date: new Date(dagRunTask.start_date).toDateString(),
+        //         time: new Date(dagRunTask.start_date).toTimeString().split(' ')[0]
+        //       };
+        //     }
+        //   );
+        //   setDagTaskInstancesList(transformDagRunTaskInstanceListData);
+          setIsLoading(false);
+        } catch (reason) {
+          if (!toast.isActive('credentialsError')) {
+            toast.error(`Error on GET credentials..\n${reason}`, {
+              ...toastifyCustomStyle,
+              toastId: 'credentialsError'
+            });
+          }
+        }
+      };
 }
