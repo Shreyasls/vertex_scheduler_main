@@ -22,18 +22,12 @@ import { PickersDayProps, PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs, { Dayjs } from 'dayjs';
 // import ListDagRuns from '../listDagRuns';
-import { LabIcon } from '@jupyterlab/ui-components';
-import LeftArrowIcon from '../../../style/icons/left_arrow_icon.svg';
 import { Box, LinearProgress } from '@mui/material';
 import { authApi, handleDebounce } from '../../utils/utils';
 import VertexJobRuns from './VertexJobRuns';
 import VertexJobTaskLogs from './VertexJobTaskLogs';
+import { IconLeftArrow } from '../../utils/icons';
 // import { handleDebounce } from '../utils/utils';
-
-const iconLeftArrow = new LabIcon({
-    name: 'launcher:left-arrow-icon',
-    svgstr: LeftArrowIcon
-});
 
 interface IDagRunList {
     dagRunId: string;
@@ -220,7 +214,7 @@ const VertexExecutionHistory = ({
                         className="scheduler-back-arrow-icon"
                         onClick={() => handleBackButton()}
                     >
-                        <iconLeftArrow.react
+                        <IconLeftArrow.react
                             tag="div"
                             className="icon-white logo-alignment-style"
                         />

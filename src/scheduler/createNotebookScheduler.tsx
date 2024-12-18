@@ -39,13 +39,11 @@ import { KernelSpecAPI } from '@jupyterlab/services';
 import tzdata from 'tzdata';
 import { SchedulerService } from './schedulerServices';
 import NotebookJobComponent from './notebookJobs';
-// import LeftArrowIcon from '../../style/icons/left_arrow_icon.svg';
-import { LabIcon } from '@jupyterlab/ui-components';
-import errorIcon from '../../style/icons/error_icon.svg';
 import { Button } from '@mui/material';
 import { scheduleMode } from '../utils/const';
 import { scheduleValueExpression } from '../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import ErrorMessage from './common/ErrorMessage';
 
 interface IDagList {
   jobid: string;
@@ -53,16 +51,6 @@ interface IDagList {
   schedule: string;
   scheduleInterval: string;
 }
-
-// const iconLeftArrow = new LabIcon({
-//   name: 'launcher:left-arrow-icon',
-//   svgstr: LeftArrowIcon
-// });
-
-const iconError = new LabIcon({
-  name: 'launcher:error-icon',
-  svgstr: errorIcon
-});
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -752,12 +740,7 @@ const CreateNotebookScheduler = ({
             </div>
             {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
               !emailList.length && (
-                <div className="error-key-parent">
-                  <iconError.react tag="div" className="logo-alignment-style" />
-                  <div className="error-key-missing">
-                    Email recipients is required field
-                  </div>
-                </div>
+                <ErrorMessage message="Email recipients is required field" />
               )}
             <div className="create-scheduler-label">Schedule</div>
             <div className="create-scheduler-form-element">

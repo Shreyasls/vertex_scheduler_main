@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, CircularProgress } from '@mui/material';
 import { SchedulerService } from '../schedulerServices';
-import { LabIcon } from '@jupyterlab/ui-components';
 // import dagTaskSuccessIcon from '../../../style/icons/dag_task_success_icon.svg';
 // import dagTaskFailedIcon from '../../../style/icons/dag_task_failed_icon.svg';
 // import stopIcon from '../../../style/icons/stop_icon.svg';
-import expandLessIcon from '../../../style/icons/expand_less.svg';
-import expandMoreIcon from '../../../style/icons/expand_more.svg';
 import { handleDebounce } from '../../utils/utils';
 import { VertexServices } from './VertexServices';
+import { IconExpandLess, IconExpandMore } from '../../utils/icons';
 // import { VertexServices } from './VertexServices';
 
 // const iconDagTaskFailed = new LabIcon({
@@ -25,16 +23,6 @@ import { VertexServices } from './VertexServices';
 //     name: 'launcher:stop-icon',
 //     svgstr: stopIcon
 // });
-
-const iconExpandLess = new LabIcon({
-    name: 'launcher:expand-less-icon',
-    svgstr: expandLessIcon
-});
-
-const iconExpandMore = new LabIcon({
-    name: 'launcher:expand-more-icon',
-    svgstr: expandMoreIcon
-});
 
 interface IDagRunList {
     dagRunId: string;
@@ -200,12 +188,12 @@ const VertexJobTaskLogs = ({
                                             }
                                         >
                                             {expanded === `${index}` ? (
-                                                <iconExpandLess.react
+                                                <IconExpandLess.react
                                                     tag="div"
                                                     className="icon-white logo-alignment-style-accordion"
                                                 />
                                             ) : (
-                                                <iconExpandMore.react
+                                                <IconExpandMore.react
                                                     tag="div"
                                                     className="icon-white logo-alignment-style-accordion"
                                                 />

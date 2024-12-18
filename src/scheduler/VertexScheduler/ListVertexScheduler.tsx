@@ -27,76 +27,13 @@ import {
   CircularProgress,
   Button
 } from '@mui/material';
-import deleteIcon from '../../../style/icons/scheduler_delete.svg';
-import CompletedIcon from '../../../style/icons/dag_task_success_icon.svg';
-import FailedIcon from '../../../style/icons/list_error_icon.svg';
-import ActiveIcon from '../../../style/icons/list_active_icon.svg';
-import ListPauseIcon from '../../../style/icons/list_pause_icon.svg';
-import ListCompleteIcon from '../../../style/icons/list_completed_with_error.svg'
-import { LabIcon } from '@jupyterlab/ui-components';
-import playIcon from '../../../style/icons/scheduler_play.svg';
-import pauseIcon from '../../../style/icons/scheduler_pause.svg';
-import EditIconDisable from '../../../style/icons/scheduler_edit_dag.svg';
-import EditNotebookIcon from '../../../style/icons/scheduler_edit_calendar.svg';
 import DeletePopup from '../../utils/deletePopup';
-import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { VertexServices } from './VertexServices';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/utils';
-
-const iconDelete = new LabIcon({
-  name: 'launcher:delete-icon',
-  svgstr: deleteIcon
-});
-const iconPlay = new LabIcon({
-  name: 'launcher:play-icon',
-  svgstr: playIcon
-});
-const iconPause = new LabIcon({
-  name: 'launcher:pause-icon',
-  svgstr: pauseIcon
-});
-const iconEditDag = new LabIcon({
-  name: 'launcher:edit-disable-icon',
-  svgstr: EditIconDisable
-});
-const iconEditNotebook = new LabIcon({
-  name: 'launcher:edit-notebook-icon',
-  svgstr: EditNotebookIcon
-});
-
-const iconTrigger = new LabIcon({
-  name: 'launcher:trigger-icon',
-  svgstr: triggerIcon
-});
-
-const iconSuccess = new LabIcon({
-  name: 'launcher:success-icon',
-  svgstr: CompletedIcon
-});
-
-const iconFailed = new LabIcon({
-  name: 'launcher:failed-icon',
-  svgstr: FailedIcon
-});
-
-const iconActive = new LabIcon({
-  name: 'launcher:active-icon',
-  svgstr: ActiveIcon
-});
-
-const iconListPause = new LabIcon({
-  name: 'launcher:list-pause-icon',
-  svgstr: ListPauseIcon
-});
-
-const iconListComplete = new LabIcon({
-  name: 'launcher:list-complete-icon',
-  svgstr: ListCompleteIcon
-});
-
+import { IconActive, IconDelete, IconEditDag, IconEditNotebook, IconFailed, IconListComplete, IconListPause, IconPause, IconPlay, IconSuccess, IconTrigger } from '../../utils/icons';
 
 interface IDagList {
   displayName: string;
@@ -301,17 +238,17 @@ function listVertexScheduler({
             is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
           }}
         >
-          {is_status_paused === 'COMPLETED' ? <iconPlay.react
+          {is_status_paused === 'COMPLETED' ? <IconPlay.react
             tag="div"
             className="icon-buttons-style-disable disable-complete-btn"
           /> : (
             is_status_paused === 'PAUSED' ?
-              (<iconPlay.react
+              (<IconPlay.react
                 tag="div"
                 className="icon-white logo-alignment-style"
               />
               ) : (
-                <iconPause.react
+                <IconPause.react
                   tag="div"
                   className="icon-white logo-alignment-style"
                 />
@@ -324,7 +261,7 @@ function listVertexScheduler({
           data-scheduleId={data.name}
           onClick={e => handleTriggerSchedule(e, data.displayName)}
         >
-          <iconTrigger.react
+          <IconTrigger.react
             tag="div"
             className="icon-white logo-alignment-style"
           />
@@ -345,7 +282,7 @@ function listVertexScheduler({
           data-jobid={data.jobid}
         //onClick={e => handleEditDags(e)}
         >
-          <iconEditNotebook.react
+          <IconEditNotebook.react
             tag="div"
             className="icon-white logo-alignment-style"
           />
@@ -369,7 +306,7 @@ function listVertexScheduler({
               data-scheduleId={data.name}
               onClick={e => handleEditVertex(e, data.displayName)}
             >
-              <iconEditDag.react
+              <IconEditDag.react
                 tag="div"
                 className="icon-white logo-alignment-style"
               />
@@ -381,7 +318,7 @@ function listVertexScheduler({
           title="Delete"
           onClick={() => handleDeletePopUp(data.name, data.displayName)}
         >
-          <iconDelete.react
+          <IconDelete.react
             tag="div"
             className="icon-white logo-alignment-style"
           />
@@ -418,26 +355,26 @@ function listVertexScheduler({
               <>
                 <div className='execution-history-main-wrapper'>
                   {cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse ? (cell.row.original.status === 'COMPLETED' ? (cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? <div>
-                    <iconSuccess.react
+                    <IconSuccess.react
                       tag="div"
                       title='Done !'
                       className="icon-white logo-alignment-style success_icon icon-size"
                     />
                   </div> :
                     <div>
-                      <iconListComplete.react
+                      <IconListComplete.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size-status"
                       />
                     </div>)
                     : (cell.row.original.status === 'ACTIVE' ?
-                      <iconActive.react
+                      <IconActive.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size-status"
                       /> :
-                      <iconListPause.react
+                      <IconListPause.react
                         tag="div"
                         title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"
@@ -445,7 +382,7 @@ function listVertexScheduler({
                     ))
                     :
                     <div>
-                      <iconFailed.react
+                      <IconFailed.react
                         tag="div"
                         title={!cell.row.original.lastScheduledRunResponse ? 'Not started' : cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
                         className="icon-white logo-alignment-style success_icon icon-size"

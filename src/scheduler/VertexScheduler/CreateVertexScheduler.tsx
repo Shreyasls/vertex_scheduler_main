@@ -29,16 +29,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 // import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import dayjs from 'dayjs';
-import { LabIcon } from '@jupyterlab/ui-components';
-import errorIcon from '../../../style/icons/error_icon.svg';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ErrorMessage from '../common/ErrorMessage';
+import { IconError } from '../../utils/icons';
 
 // export type internalScheduleMode = 'cronFormat' | 'userFriendly';
-const iconError = new LabIcon({
-    name: 'launcher:error-icon',
-    svgstr: errorIcon
-});
 
 const CreateVertexScheduler = ({
     themeManager,
@@ -1008,7 +1003,7 @@ const CreateVertexScheduler = ({
                                             {
                                                 endDateError &&
                                                 <div className="error-key-parent">
-                                                    <iconError.react tag="div" className="logo-alignment-style" />
+                                                    <IconError.react tag="div" className="logo-alignment-style" />
                                                     <div className="error-key-missing">End date should be greater than Start date</div>
                                                 </div>
                                             }

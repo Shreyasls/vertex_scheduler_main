@@ -21,16 +21,10 @@ import { useTable, useGlobalFilter } from 'react-table';
 import TableData from '../../utils/tableData';
 import { ICellProps, handleDebounce } from '../../utils/utils';
 import { Dayjs } from 'dayjs';
-import { LabIcon } from '@jupyterlab/ui-components';
-import downloadIcon from '../../../style/icons/scheduler_download.svg';
 import { CircularProgress } from '@mui/material';
 import { SchedulerService } from '../schedulerServices';
 import { VertexServices } from './VertexServices';
-
-const iconDownload = new LabIcon({
-    name: 'launcher:download-icon',
-    svgstr: downloadIcon
-});
+import { IconDownload } from '../../utils/icons';
 
 interface IDagRunList {
     dagRunId: string;
@@ -277,7 +271,7 @@ const VertexJobRuns = ({
                                 : undefined
                         }
                     >
-                        <iconDownload.react
+                        <IconDownload.react
                             tag="div"
                             className="icon-white logo-alignment-style"
                         />
