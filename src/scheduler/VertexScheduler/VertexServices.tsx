@@ -22,13 +22,23 @@ import { DataprocLoggingService, LOG_LEVEL } from '../../utils/loggingService';
 import { toastifyCustomStyle } from '../../utils/utils';
 import { Dayjs } from 'dayjs';
 
+interface IMachineType {
+    machineType: string
+    acceleratorConfigs: AcceleratorConfig[]
+}
+
+interface AcceleratorConfig {
+    acceleratorType: string
+    allowedCounts: number[]
+}
+
 interface IPayload {
     input_filename: string;
     display_name: string;
-    machine_type: null;
-    accelerator_type?: null;
-    accelerator_count?: number | null;
-    kernel_name: null;
+    machine_type: string | null;
+    accelerator_type?: string | null;
+    accelerator_count?: string | null;
+    kernel_name: string | null;
     schedule_value: string | undefined;
     time_zone?: string;
     max_run_count: string | number;
@@ -38,8 +48,8 @@ interface IPayload {
     service_account: string | undefined,
     network: string | undefined;
     subnetwork: string | undefined;
-    start_time: null | undefined;
-    end_time: null | undefined;
+    start_time: string | null | undefined;
+    end_time: string | null | undefined;
 }
 
 interface IDagList {
@@ -108,7 +118,7 @@ export class VertexServices {
     };
     static machineTypeAPIService = async (
         region: string,
-        setMachineTypeList: (value: string[]) => void,
+        setMachineTypeList: (value: IMachineType[]) => void,
         setMachineTypeLoading: (value: boolean) => void,
     ) => {
         try {
@@ -189,7 +199,7 @@ export class VertexServices {
                 );
                 setServiceAccountList([])
             } else {
-                const serviceAccountList = formattedResponse.map((account: any) => ({
+                const serviceAccountList = formattedResponse.map((account: { displayName: any; email: any; }) => ({
                     displayName: account.displayName,
                     email: account.email
                 }));
@@ -225,7 +235,7 @@ export class VertexServices {
                     toastifyCustomStyle
                 );
             } else {
-                const primaryNetworkList = formattedResponse.map((network: any) => ({
+                const primaryNetworkList = formattedResponse.map((network: { name: any; selfLink: any; }) => ({
                     name: network.name,
                     link: network.selfLink
                 }));
@@ -253,7 +263,7 @@ export class VertexServices {
 
     static subNetworkAPIService = async (
         region: string,
-        primaryNetworkSelected: string,
+        primaryNetworkSelected: string | undefined,
         setSubNetworkList: (value: { name: string; link: string }[]) => void,
         setSubNetworkLoading: (value: boolean) => void
     ) => {
@@ -271,7 +281,7 @@ export class VertexServices {
                 // formattedResponse.forEach((data: { name: string }) => {
                 //     subNetworkList.push(data.name);
                 // });
-                const subNetworkList = formattedResponse.map((network: any) => ({
+                const subNetworkList = formattedResponse.map((network: { name: any; selfLink: any; }) => ({
                     name: network.name,
                     link: network.selfLink
                 }));
@@ -311,7 +321,7 @@ export class VertexServices {
                 // formattedResponse.forEach((data: { subnetwork: string }) => {
                 //     sharedNetworkList.push(data.subnetwork);
                 // });
-                const sharedNetworkList = formattedResponse.map((network: any) => ({
+                const sharedNetworkList = formattedResponse.map((network: { network: string; subnetwork: any; }) => ({
                     name: network.network.split('/').pop(),
                     network: network.network,
                     subnetwork: network.subnetwork
@@ -593,7 +603,7 @@ export class VertexServices {
         try {
             let transformDagRunListDataCurrent = [];
             if (formattedResponse && formattedResponse.length > 0) {
-                transformDagRunListDataCurrent = formattedResponse.map((dagRun: any) => {
+                transformDagRunListDataCurrent = formattedResponse.map((dagRun: { createTime: string | number | Date; updateTime: string | number | Date; name: string; gcsOutputUri: any; jobState: string; }) => {
                     const createTime = new Date(dagRun.createTime);
                     const updateTime = new Date(dagRun.updateTime);
                     const timeDifferenceMilliseconds = updateTime.getTime() - createTime.getTime(); // Difference in milliseconds
@@ -615,7 +625,7 @@ export class VertexServices {
                 });
             }
             // Group data by date and state
-            const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce((result: any, item: any) => {
+            const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce((result: { [x: string]: { [x: string]: { date: any; state: any; }[]; }; }, item: { date: any; state: any; }) => {
                 const date = item.date; // Group by date
                 const status = item.state; // Group by state
 
@@ -681,7 +691,7 @@ export class VertexServices {
     };
 
     static vertexJobTaskLogsListService = async (
-        dagRunId: string,
+        dagRunId: string|undefined,
         jobRunsData: IDagRunList | undefined,
         setDagTaskInstancesList: (value: any) => void,
         setIsLoading: (value: boolean) => void
@@ -704,7 +714,7 @@ export class VertexServices {
             //   );
             let transformDagRunTaskInstanceListData = [];
             transformDagRunTaskInstanceListData = data.entries.map(
-                (dagRunTask: any) => {
+                (dagRunTask: { severity: any; textPayload: any; timestamp: string | number | Date; }) => {
                     return {
                         severity: dagRunTask.severity,
                         textPayload: dagRunTask.textPayload && dagRunTask.textPayload ? dagRunTask.textPayload : '',

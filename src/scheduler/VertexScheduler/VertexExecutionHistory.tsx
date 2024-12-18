@@ -60,7 +60,7 @@ const VertexExecutionHistory = ({
 
     const today = dayjs()
 
-    const [dagRunId, setDagRunId] = useState('');
+    const [dagRunId, setDagRunId] = useState<string>('');
     const [jobRunsData, setJobRunsData] = useState<IDagRunList | undefined>();
     // const [region, setRegion] = useState('')
     const currentDate = new Date().toLocaleDateString();
@@ -111,29 +111,35 @@ const VertexExecutionHistory = ({
         setExecutionPageFlag(false);
     }, []);
 
-    const handleDateSelection = (selectedValue: any) => {
+    const handleDateSelection = (selectedValue: React.SetStateAction<dayjs.Dayjs | null>) => {
         setDagRunId('');
         setSelectedDate(selectedValue);
     };
 
-    const handleMonthChange = (newMonth: any) => {
-        // Check if the new month is different from the current month
-        if (newMonth.month() !== today.month()) {
-            // Reset selected date if the month changes
+    const handleMonthChange = (newMonth: React.SetStateAction<dayjs.Dayjs | null>) => {
+        const resolvedMonth = typeof newMonth === 'function' ? newMonth(today) : newMonth;
+
+        if (!resolvedMonth) {
             setSelectedDate(null);
+            setSelectedMonth(null);
+            return;
+        }
+
+        if (resolvedMonth.month() !== today.month()) {
+            setSelectedDate(null);
+            setJobRunsData(undefined)
+            setDagRunId('')
         } else {
-            // Keep the selected date unchanged if we're still in the current month
             setSelectedDate(today);
         }
-        setSelectedMonth(newMonth)
-        // console.log('New month selected:', newMonth);
-        // console.log('Previous month value:', newMonth.subtract(1, 'month').format('MMMM YYYY'));
+
+        setSelectedMonth(resolvedMonth);
     };
 
-    const getFormattedDate = (dateList: any[], day: string | number | Date | dayjs.Dayjs | null | undefined) => {
+    const getFormattedDate = (dateList: string[], day: string | number | Date | dayjs.Dayjs | null | undefined) => {
 
         const formattedDay = dayjs(day).format('YYYY-MM-DD');
-        const date_list = dateList.map(dateStr => new Date(dateStr).toISOString().split('T')[0]).includes(formattedDay);
+        const date_list = dateList.map((dateStr) => new Date(dateStr).toISOString().split('T')[0]).includes(formattedDay);
         return date_list
     }
     const CustomDay = (props: PickersDayProps<Dayjs>) => {
@@ -273,6 +279,7 @@ const VertexExecutionHistory = ({
                             bucketName={bucketName}
                             setIsLoading={setIsLoading}
                             isLoading={isLoading}
+                            jobRunsData={jobRunsData}
                         />
                         {/* )} */}
                     </div>

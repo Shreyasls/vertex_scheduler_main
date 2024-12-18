@@ -55,7 +55,8 @@ const VertexJobRuns = ({
     setDarkGreenListDates,
     bucketName,
     setIsLoading,
-    isLoading
+    isLoading,
+    jobRunsData
 }: {
     region: string;
     schedulerData: string;
@@ -75,6 +76,7 @@ const VertexJobRuns = ({
     bucketName: string;
     setIsLoading: (value: boolean) => void;
     isLoading: boolean;
+    jobRunsData: IDagRunList | undefined;
 }): JSX.Element => {
     const [dagRunsList, setDagRunsList] = useState<IDagRunList[]>([]);
     // const [dagRunsCurrentDateList, setDagRunsCurrentDateList] = useState([]);
@@ -120,6 +122,7 @@ const VertexJobRuns = ({
         }
     }, [filteredData, setJobRunsData]);
 
+    console.log(jobRunsData)
     const columns = React.useMemo(
         () => [
             {
@@ -229,8 +232,10 @@ const VertexJobRuns = ({
         );
     };
 
-    const handleDagRunStateClick = (data: any) => {
-        setDagRunId(data.dagRunId);
+    const handleDagRunStateClick = (data: { id?: string; status?: string; dagRunId?: string; }) => {
+        if (data.dagRunId) {
+            setDagRunId(data.dagRunId);
+        }
     };
 
     const handleDownloadOutput = async (event: React.MouseEvent) => {
@@ -244,7 +249,7 @@ const VertexJobRuns = ({
         );
     };
 
-    const renderActions = (data: any) => {
+    const renderActions = (data: { id?: string; status?: string; dagRunId?: string; state?: string; }) => {
         return (
             <div className="actions-icon">
                 {data.dagRunId === downloadOutputDagRunId ? (

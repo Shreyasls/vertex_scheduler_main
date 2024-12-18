@@ -53,7 +53,7 @@ const VertexJobTaskLogs = ({
     const [loglist, setLogList] = useState('');
 
     const [height, setHeight] = useState(window.innerHeight - 320);
-    console.log(dagTaskInstancesList)
+    console.log(dagRunId)
     function handleUpdateHeight() {
         let updateHeight = window.innerHeight - 320;
         setHeight(updateHeight);
@@ -131,7 +131,7 @@ const VertexJobTaskLogs = ({
                         <div className="accordion-row-data-expand-logo"></div>
                     </div>
                     {dagTaskInstancesList.length > 0 &&
-                        dagTaskInstancesList.map((taskInstance: any, index: string) => (
+                        dagTaskInstancesList.map((taskInstance: { severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; date: string; time: string; textPayload: string; tryNumber: number; }, index: string) => (
                             <div>
                                 <div className="accordion-vertex-row-parent">
                                     <div className="accordion-vertex-row-data">

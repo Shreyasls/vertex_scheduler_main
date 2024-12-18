@@ -243,7 +243,6 @@ const NotebookSchedulerComponent = ({
           : <CreateVertexScheduler
             themeManager={themeManager}
             app={app}
-            context={context}
             settingRegistry={settingRegistry}
             createCompleted={createCompleted}
             setCreateCompleted={setCreateCompleted}
@@ -253,11 +252,6 @@ const NotebookSchedulerComponent = ({
             setInputFileSelected={setInputFileSelected}
             editMode={editMode}
             setEditMode={setEditMode}
-            jobNameValidation={jobNameValidation}
-            jobNameSpecialValidation={jobNameSpecialValidation}
-            jobNameUniqueValidation={jobNameUniqueValidation}
-            setJobNameUniqueValidation={setJobNameUniqueValidation}
-            notebookSelector={notebookSelector}
             setExecutionPageFlag={setExecutionPageFlag}
           />
       }
