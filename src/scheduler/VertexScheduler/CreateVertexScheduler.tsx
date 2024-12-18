@@ -147,6 +147,10 @@ const CreateVertexScheduler = ({
         setKernelSelected(kernelValue)
     }
 
+    const handleDefaultDiskType = () => {
+        setDiskTypeSelected(diskTypeOptions[0])
+    }
+
     /**
    * Kernel selection
    * @param {string} kernelSelected seleted kernel
@@ -679,6 +683,7 @@ const CreateVertexScheduler = ({
                                     renderInput={params => (
                                         <TextField {...params} label="Disk Type" />
                                     )}
+                                    onBlur={() => handleDefaultDiskType()}
                                     clearIcon={false}
                                 />
                             </div>
