@@ -41,12 +41,11 @@ import { Input } from '../../controls/MuiWrappedInput';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/utils';
 import VertexScheduleJobs from './VertexScheduleJobs';
-import { DISK_TYPE_VALUE, internalScheduleMode, KERNEL_VALUE, scheduleMode, scheduleValueExpression } from '../../utils/const';
+import { CORN_EXP_DOC_URL, DISK_TYPE_VALUE, internalScheduleMode, KERNEL_VALUE, scheduleMode, scheduleValueExpression } from '../../utils/const';
 import { VertexServices } from './VertexServices';
 import LabelProperties from '../../jobs/labelProperties';
 import LearnMore from '../common/LearnMore';
 import ErrorMessage from '../common/ErrorMessage';
-import { IconError } from '../../utils/icons';
 
 interface IMachineType {
     machineType: string
@@ -781,7 +780,9 @@ const CreateVertexScheduler = ({
                                     />
                                     <div>
                                         <span className="sub-para tab-text-sub-cl">Choose a shared VPC network from the project that is different from the clusters project</span>
-                                        <LearnMore />
+                                        <div className="learn-more-a-tag learn-more-url">
+                                            <LearnMore />
+                                        </div>
                                     </div>
                                     <FormControlLabel
                                         value="networkShared"
@@ -792,7 +793,9 @@ const CreateVertexScheduler = ({
                                         }
                                     />
                                     <span className="sub-para tab-text-sub-cl">Choose a shared VPC network from the project that is different from the clusters project</span>
-                                    <LearnMore />
+                                    <div className="learn-more-a-tag learn-more-url">
+                                        <LearnMore />
+                                    </div>
                                 </RadioGroup>
                             </FormControl>
                         </div>
@@ -978,10 +981,7 @@ const CreateVertexScheduler = ({
                                             />
                                             {
                                                 endDateError &&
-                                                <div className="error-key-parent">
-                                                    <IconError.react tag="div" className="logo-alignment-style" />
-                                                    <div className="error-key-missing">End date should be greater than Start date</div>
-                                                </div>
+                                                <ErrorMessage message="End date should be greater than Start date" />
                                             }
                                         </div>
                                     </LocalizationProvider>
@@ -1003,9 +1003,13 @@ const CreateVertexScheduler = ({
                                         scheduleField === '' &&
                                         <ErrorMessage message="Schedule field is required" />
                                     }
-                                    <span className="tab-description tab-text-sub-cl">Schedules are specified using unix-cron format. E.g. every minute: "* * * * *", every 3 hours: "0 */3 * * *", every Monday at 9:00: "0 9 * * 1".
-                                        <LearnMore />
-                                    </span>
+                                    <div>
+                                        <span className="tab-description tab-text-sub-cl">Schedules are specified using unix-cron format. E.g. every minute: "* * * * *", every 3 hours: "0 */3 * * *", every Monday at 9:00: "0 9 * * 1".
+                                        </span>
+                                        <div className="learn-more-url">
+                                            <LearnMore path={CORN_EXP_DOC_URL} />
+                                        </div>
+                                    </div>
                                 </div>
                             }
                             {scheduleMode === 'runSchedule' && internalScheduleMode === 'userFriendly' && (

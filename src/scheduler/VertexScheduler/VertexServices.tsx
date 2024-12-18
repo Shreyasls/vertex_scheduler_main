@@ -713,7 +713,7 @@ export class VertexServices {
             //       new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
             //   );
             let transformDagRunTaskInstanceListData = [];
-            transformDagRunTaskInstanceListData = data.entries.map(
+            transformDagRunTaskInstanceListData = data.map(
                 (dagRunTask: { severity: any; textPayload: any; timestamp: string | number | Date; }) => {
                     return {
                         severity: dagRunTask.severity,
