@@ -453,8 +453,8 @@ const CreateVertexScheduler = ({
             subnetwork: networkSelected === "networkInThisProject" ? subNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
             start_time: startDate,
             end_time: endDate,
-            diskType: diskTypeSelected,
-            diskSizeGb: diskSize
+            disk_type: diskTypeSelected,
+            disk_size: diskSize
         }
         console.log(payload)
         await VertexServices.createVertexSchedulerService(
