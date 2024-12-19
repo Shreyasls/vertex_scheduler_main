@@ -16,11 +16,11 @@
  */
 import { JupyterLab } from "@jupyterlab/application";
 import { toast } from "react-toastify";
+import { Dayjs } from "dayjs";
 import { requestAPI } from "../handler/handler";
-import { ICreatePayload, IDagList, IDagRunList, IDeleteSchedulerAPIResponse, IMachineType, ITriggerSchedule, IUpdateSchedulerAPIResponse } from "../scheduler/VertexScheduler/VertexInterfaces";
 import { DataprocLoggingService, LOG_LEVEL } from "../utils/loggingService";
 import { toastifyCustomStyle } from "../utils/utils";
-import { Dayjs } from "dayjs";
+import { ICreatePayload, IDagList, IDagRunList, IDeleteSchedulerAPIResponse, IMachineType, ITriggerSchedule, IUpdateSchedulerAPIResponse } from "../scheduler/VertexScheduler/VertexInterfaces";
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -154,8 +154,8 @@ export class VertexServices {
     };
 
     static handleUpdateSchedulerResumeAPIService = async (
-        region: string,
         scheduleId: string,
+        region: string,
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
