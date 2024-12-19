@@ -23,19 +23,9 @@ import { ICellProps, handleDebounce } from '../../utils/utils';
 import { Dayjs } from 'dayjs';
 import { CircularProgress } from '@mui/material';
 import { SchedulerService } from '../schedulerServices';
-import { VertexServices } from './VertexServices';
 import { IconDownload } from '../../utils/icons';
-
-interface IDagRunList {
-    dagRunId: string;
-    // filteredDate: Date;
-    startDate: string;
-    endDate: string;
-    gcsUrl: string;
-    state: string;
-    date: Date;
-    time: string;
-}
+import { VertexServices } from '../../Services/Vertex';
+import { IDagRunList } from './VertexInterfaces';
 
 const VertexJobRuns = ({
     region,

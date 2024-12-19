@@ -27,18 +27,8 @@ import { authApi, handleDebounce } from '../../utils/utils';
 import VertexJobRuns from './VertexJobRuns';
 import VertexJobTaskLogs from './VertexJobTaskLogs';
 import { IconLeftArrow } from '../../utils/icons';
+import { IDagRunList } from './VertexInterfaces';
 // import { handleDebounce } from '../utils/utils';
-
-interface IDagRunList {
-    dagRunId: string;
-    // filteredDate: Date;
-    startDate: string;
-    endDate: string;
-    gcsUrl: string;
-    state: string;
-    date: Date;
-    time: string;
-}
 
 const VertexExecutionHistory = ({
     region,

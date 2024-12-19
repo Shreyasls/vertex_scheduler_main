@@ -5,9 +5,9 @@ import { SchedulerService } from '../schedulerServices';
 // import dagTaskFailedIcon from '../../../style/icons/dag_task_failed_icon.svg';
 // import stopIcon from '../../../style/icons/stop_icon.svg';
 import { handleDebounce } from '../../utils/utils';
-import { VertexServices } from './VertexServices';
 import { IconExpandLess, IconExpandMore } from '../../utils/icons';
-// import { VertexServices } from './VertexServices';
+import { LogEntriesServices } from '../../Services/LogEntries';
+import { IDagRunList } from './VertexInterfaces';
 
 // const iconDagTaskFailed = new LabIcon({
 //     name: 'launcher:dag-task-failed-icon',
@@ -24,17 +24,6 @@ import { IconExpandLess, IconExpandMore } from '../../utils/icons';
 //     svgstr: stopIcon
 // });
 
-interface IDagRunList {
-    dagRunId: string;
-    // filteredDate: Date;
-    startDate: string;
-    endDate: string;
-    gcsUrl: string;
-    state: string;
-    date: Date;
-    time: string;
-}
-// Info, notice,error
 const VertexJobTaskLogs = ({
     composerName,
     dagId,
@@ -73,7 +62,7 @@ const VertexJobTaskLogs = ({
     }, []);
 
     const listDagTaskInstancesRunsList = async () => {
-        await VertexServices.vertexJobTaskLogsListService(
+        await LogEntriesServices.vertexJobTaskLogsListService(
             dagRunId,
             jobRunsData,
             setDagTaskInstancesList,
