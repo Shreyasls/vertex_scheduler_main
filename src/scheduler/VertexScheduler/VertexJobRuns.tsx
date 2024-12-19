@@ -56,7 +56,9 @@ const VertexJobRuns = ({
     bucketName,
     setIsLoading,
     isLoading,
-    jobRunsData
+    jobRunsData,
+    dagRunsList,
+    setDagRunsList
 }: {
     region: string;
     schedulerData: string;
@@ -77,8 +79,9 @@ const VertexJobRuns = ({
     setIsLoading: (value: boolean) => void;
     isLoading: boolean;
     jobRunsData: IDagRunList | undefined;
+    dagRunsList: IDagRunList[];
+    setDagRunsList: (value: IDagRunList[]) => void;
 }): JSX.Element => {
-    const [dagRunsList, setDagRunsList] = useState<IDagRunList[]>([]);
     // const [dagRunsCurrentDateList, setDagRunsCurrentDateList] = useState([]);
     const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState('');
     const [listDagRunHeight, setListDagRunHeight] = useState(
@@ -107,7 +110,7 @@ const VertexJobRuns = ({
     const filteredData = React.useMemo(() => {
         if (selectedDate) {
             const selectedDateString = selectedDate.toDate().toDateString(); // Only date, ignoring time
-            return dagRunsList.filter((dagRun) => {
+            return dagRunsList.filter((dagRun: { date: string | number | Date; }) => {
                 return new Date(dagRun.date).toDateString() === selectedDateString;
             });
         }

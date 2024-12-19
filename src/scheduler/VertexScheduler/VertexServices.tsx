@@ -691,7 +691,7 @@ export class VertexServices {
     };
 
     static vertexJobTaskLogsListService = async (
-        dagRunId: string|undefined,
+        dagRunId: string | undefined,
         jobRunsData: IDagRunList | undefined,
         setDagTaskInstancesList: (value: any) => void,
         setIsLoading: (value: boolean) => void

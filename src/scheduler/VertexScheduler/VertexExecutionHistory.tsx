@@ -61,6 +61,7 @@ const VertexExecutionHistory = ({
     const today = dayjs()
 
     const [dagRunId, setDagRunId] = useState<string>('');
+    const [dagRunsList, setDagRunsList] = useState<IDagRunList[]>([]);
     const [jobRunsData, setJobRunsData] = useState<IDagRunList | undefined>();
     // const [region, setRegion] = useState('')
     const currentDate = new Date().toLocaleDateString();
@@ -128,14 +129,15 @@ const VertexExecutionHistory = ({
         if (resolvedMonth.month() !== today.month()) {
             setSelectedDate(null);
             setJobRunsData(undefined)
-            setDagRunId('')
         } else {
             setSelectedDate(today);
         }
 
+        setDagRunId('')
+        setDagRunsList([])
         setSelectedMonth(resolvedMonth);
     };
-
+    console.log(dagRunId)
     const getFormattedDate = (dateList: string[], day: string | number | Date | dayjs.Dayjs | null | undefined) => {
 
         const formattedDay = dayjs(day).format('YYYY-MM-DD');
@@ -257,6 +259,7 @@ const VertexExecutionHistory = ({
                                 slots={{
                                     day: CustomDay
                                 }}
+                                disableFuture
                             />
                         </LocalizationProvider>
                         {/* {startDate !== '' && endDate !== '' && ( */}
@@ -280,6 +283,8 @@ const VertexExecutionHistory = ({
                             setIsLoading={setIsLoading}
                             isLoading={isLoading}
                             jobRunsData={jobRunsData}
+                            dagRunsList={dagRunsList}
+                            setDagRunsList={setDagRunsList}
                         />
                         {/* )} */}
                     </div>
