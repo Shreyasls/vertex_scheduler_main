@@ -21,6 +21,7 @@ import { requestAPI } from "../handler/handler";
 import { DataprocLoggingService, LOG_LEVEL } from "../utils/loggingService";
 import { toastifyCustomStyle } from "../utils/utils";
 import { ICreatePayload, IDagList, IDagRunList, IDeleteSchedulerAPIResponse, IMachineType, ITriggerSchedule, IUpdateSchedulerAPIResponse } from "../scheduler/VertexScheduler/VertexInterfaces";
+import { scheduleMode } from "../utils/const";
 
 export class VertexServices {
     static machineTypeAPIService = async (
@@ -279,6 +280,96 @@ export class VertexServices {
             );
         }
     };
+
+    static editVertexSJobService = async (
+        jobId: string,
+        region: string,
+        setInputNotebookFilePath: (value: string) => void,
+        setEditDagLoading: (value: string) => void,
+        setCreateCompleted: (value: boolean) => void,
+        setInputFileSelected: (value: string) => void,
+        setRegion: (value: string) => void,
+        setMachineTypeSelected: (value: string | null) => void,
+        setAcceleratedCount: (value: string | null) => void,
+        setAcceleratorType: (value: string | null) => void,
+        setKernelSelected: (value: string | null) => void,
+        setCloudStorage: (value: string | null) => void,
+        setDiskTypeSelected: (value: string | null) => void,
+        setDiskSize: (value: string) => void,
+        setParameterDetail: (value: string[]) => void,
+        setParameterDetailUpdated: (value: string[]) => void,
+        setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void,
+        setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void,
+        setSubNetworkSelected: (value: { name: string; link: string } | null) => void,
+        setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void,
+        setScheduleMode: (value: scheduleMode) => void,
+        setScheduleValue: (value: string) => void,
+        setScheduleField: (value: string) => void,
+        setStartDate: (value: Date | null) => void,
+        setEndDate: (value: Date | null) => void,
+        setMaxRuns: (value: string) => void,
+        setTimeZoneSelected: (value: string) => void,
+        setEditMode: (value: boolean) => void,
+    ) => {
+        setEditDagLoading(jobId);
+        try {
+            const serviceURL = `api/vertex/getSchedule`;
+            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${jobId}`
+            );
+            if (formattedResponse && Object.keys(formattedResponse).length > 0) {
+                console.log(formattedResponse)
+                // setInputNotebookFilePath()
+                setCreateCompleted(false)
+                setRegion(region)
+                setInputFileSelected(formattedResponse.displayName)
+                // setRegion()
+                setMachineTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.machineType)
+                setAcceleratedCount(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorCount)
+                setAcceleratorType(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorType)
+                setKernelSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.kernelName)
+                // setCloudStorage()
+                setDiskTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskType)
+                setDiskSize(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskSizeGb)
+                // setParameterDetail()
+                // setParameterDetailUpdated()
+                setServiceAccountSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.serviceAccount)
+                // setPrimaryNetworkSelected()
+                // setSubNetworkSelected()
+                // setSharedNetworkSelected()
+                // setScheduleMode()
+                // setScheduleValue()
+                // setScheduleField()
+                // setStartDate()
+                // setEndDate()
+                setMaxRuns(formattedResponse['maxRunCount'])
+                // setTimeZoneSelected()
+                setEditMode(true)
+            } else {
+                setEditDagLoading('');
+                toast.error(
+                    `File path not found`,
+                    toastifyCustomStyle
+                );
+            }
+            // if (formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty("gcsNotebookSource")) {
+            //     setInputNotebookFilePath(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri);
+            // } else {
+            //     setEditNotebookLoading('');
+            //     toast.error(
+            //         `File path not found`,
+            //         toastifyCustomStyle
+            //     );
+            // }
+
+        } catch (reason) {
+            setEditDagLoading('');
+            toast.error(
+                `Error in updating notebook.\n${reason}`,
+                toastifyCustomStyle
+            );
+        }
+    };
+
     static executionHistoryServiceList = async (
         region: string,
         schedulerData: any,

@@ -28,7 +28,7 @@ import {
   Button
 } from '@mui/material';
 import DeletePopup from '../../utils/deletePopup';
-import { PLUGIN_ID } from '../../utils/const';
+import { PLUGIN_ID, scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/utils';
@@ -36,12 +36,35 @@ import { IconActive, IconDelete, IconEditDag, IconEditNotebook, IconFailed, Icon
 import { VertexServices } from '../../Services/Vertex';
 import { IDagList } from './VertexInterfaces';
 
-function listVertexScheduler({
+function ListVertexScheduler({
   region,
   setRegion,
   app,
   settingRegistry,
-  handleDagIdSelection
+  handleDagIdSelection,
+  setCreateCompleted,
+  setInputFileSelected,
+  setMachineTypeSelected,
+  setAcceleratedCount,
+  setAcceleratorType,
+  setKernelSelected,
+  setCloudStorage,
+  setDiskTypeSelected,
+  setDiskSize,
+  setParameterDetail,
+  setParameterDetailUpdated,
+  setServiceAccountSelected,
+  setPrimaryNetworkSelected,
+  setSubNetworkSelected,
+  setSharedNetworkSelected,
+  setScheduleMode,
+  setScheduleValue,
+  setScheduleField,
+  setStartDate,
+  setEndDate,
+  setMaxRuns,
+  setTimeZoneSelected,
+  setEditMode,
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -49,14 +72,35 @@ function listVertexScheduler({
   settingRegistry: ISettingRegistry;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
   // handleDagIdSelection: (dagId: any) => void;
+  setCreateCompleted: (value: boolean) => void;
+  setInputFileSelected: (value: string) => void;
+  setMachineTypeSelected: (value: string | null) => void;
+  setAcceleratedCount: (value: string | null) => void;
+  setAcceleratorType: (value: string | null) => void;
+  setKernelSelected: (value: string | null) => void;
+  setCloudStorage: (value: string | null) => void;
+  setDiskTypeSelected: (value: string | null) => void;
+  setDiskSize: (value: string) => void;
+  setParameterDetail: (value: string[]) => void;
+  setParameterDetailUpdated: (value: string[]) => void;
+  setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void;
+  setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void;
+  setScheduleMode: (value: scheduleMode) => void;
+  setScheduleValue: (value: string) => void;
+  setScheduleField: (value: string) => void;
+  setStartDate: (value: Date | null) => void;
+  setEndDate: (value: Date | null) => void;
+  setMaxRuns: (value: string) => void;
+  setTimeZoneSelected: (value: string) => void;
+  setEditMode: (value: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
-  // const [editDagLoading,
-  //   //setEditDagLoading
-  // ] = useState('');
+  const [editDagLoading, setEditDagLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
   const [editNotebookLoading, setEditNotebookLoading] = useState<string>('');
   const [deletingSchedule, setDeletingSchedule] = useState<boolean>(false);
@@ -190,7 +234,7 @@ function listVertexScheduler({
   * Edit schedule
   * @param {}
   */
-  const handleEditVertex = async (event: React.MouseEvent, displayName: string) => {
+  const handleEditVertex = async (event: React.MouseEvent) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
       await VertexServices.editVertexSchedulerService(
@@ -198,6 +242,46 @@ function listVertexScheduler({
         region,
         setInputNotebookFilePath,
         setEditNotebookLoading,
+      );
+    }
+  };
+
+  /**
+  * Edit job
+  * @param {}
+  */
+  const handleEditJob = async (event: React.MouseEvent, displayName: string) => {
+    const jobId = event.currentTarget.getAttribute('data-jobid');
+    if (jobId !== null) {
+      await VertexServices.editVertexSJobService(
+        jobId,
+        region,
+        setInputNotebookFilePath,
+        setEditDagLoading,
+        setCreateCompleted,
+        setInputFileSelected,
+        setRegion,
+        setMachineTypeSelected,
+        setAcceleratedCount,
+        setAcceleratorType,
+        setKernelSelected,
+        setCloudStorage,
+        setDiskTypeSelected,
+        setDiskSize,
+        setParameterDetail,
+        setParameterDetailUpdated,
+        setServiceAccountSelected,
+        setPrimaryNetworkSelected,
+        setSubNetworkSelected,
+        setSharedNetworkSelected,
+        setScheduleMode,
+        setScheduleValue,
+        setScheduleField,
+        setStartDate,
+        setEndDate,
+        setMaxRuns,
+        setTimeZoneSelected,
+        setEditMode
       );
     }
   };
@@ -222,6 +306,7 @@ function listVertexScheduler({
   );
 
   const renderActions = (data: any) => {
+    console.log(data)
     const is_status_paused = data.status;
     return (
       <div className="actions-icon">
@@ -261,7 +346,7 @@ function listVertexScheduler({
             className="icon-white logo-alignment-style"
           />
         </div>
-        {/* {data.jobid === editDagLoading ? (
+        {data.name === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -269,20 +354,21 @@ function listVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) : ( */}
-        <div
-          role="button"
-          className="icon-buttons-style"
-          title="Edit Schedule"
-          data-jobid={data.jobid}
-        //onClick={e => handleEditDags(e)}
-        >
-          <IconEditNotebook.react
-            tag="div"
-            className="icon-white logo-alignment-style"
-          />
-        </div>
-        {/* )} */}
+        ) : (
+          <div
+            role="button"
+            className="icon-buttons-style"
+            title="Edit Schedule"
+            // data-jobid={data.jobid}
+            data-jobid={data.name}
+            onClick={e => handleEditJob(e, data.displayName)}
+          >
+            <IconEditNotebook.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          </div>
+        )}
         {
           // isPreviewEnabled &&
           (data.name === editNotebookLoading ? (
@@ -299,7 +385,7 @@ function listVertexScheduler({
               className="icon-buttons-style"
               title="Edit Notebook"
               data-scheduleId={data.name}
-              onClick={e => handleEditVertex(e, data.displayName)}
+              onClick={e => handleEditVertex(e)}
             >
               <IconEditDag.react
                 tag="div"
@@ -341,7 +427,10 @@ function listVertexScheduler({
         </td>
       );
     } else {
-      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' ||  cell.row.original.status === 'COMPLETED' && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
+      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED'
+        // to do  
+        // && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK'
+        ;
 
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
@@ -553,4 +642,4 @@ function listVertexScheduler({
     </div>
   );
 }
-export default listVertexScheduler;
+export default ListVertexScheduler;

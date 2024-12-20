@@ -514,6 +514,12 @@ const CreateVertexScheduler = ({
         setServiceAccountSelected(serviceAccountList[0])
     }, [serviceAccountList.length > 0]);
 
+    // useEffect(() => {
+    //     if (!createCompleted && region !== '') {
+    //         machineTypeAPI()
+    //     }
+    // }, [region]);
+
     useEffect(() => {
         if (!createCompleted) {
             if (region !== '') {
@@ -551,6 +557,31 @@ const CreateVertexScheduler = ({
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
                         setExecutionPageFlag={setExecutionPageFlag}
+                        setCreateCompleted={setCreateCompleted}
+                        setInputFileSelected={setInputFileSelected}
+                        region={region}
+                        setRegion={setRegion}
+                        setMachineTypeSelected={setMachineTypeSelected}
+                        setAcceleratedCount={setAcceleratedCount}
+                        setAcceleratorType={setAcceleratorType}
+                        setKernelSelected={setKernelSelected}
+                        setCloudStorage={setCloudStorage}
+                        setDiskTypeSelected={setDiskTypeSelected}
+                        setDiskSize={setDiskSize}
+                        setParameterDetail={setParameterDetail}
+                        setParameterDetailUpdated={setParameterDetailUpdated}
+                        setServiceAccountSelected={setServiceAccountSelected}
+                        setPrimaryNetworkSelected={setPrimaryNetworkSelected}
+                        setSubNetworkSelected={setSubNetworkSelected}
+                        setSharedNetworkSelected={setSharedNetworkSelected}
+                        setScheduleMode={setScheduleMode}
+                        setScheduleValue={setScheduleValue}
+                        setScheduleField={setScheduleField}
+                        setStartDate={setStartDate}
+                        setEndDate={setEndDate}
+                        setMaxRuns={setMaxRuns}
+                        setTimeZoneSelected={setTimeZoneSelected}
+                        setEditMode={setEditMode}
                     />
                     :
                     <div className='submit-job-container'>

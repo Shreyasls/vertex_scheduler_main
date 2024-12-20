@@ -24,12 +24,38 @@ import ListVertexScheduler from '../VertexScheduler/ListVertexScheduler';
 // import { scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import VertexExecutionHistory from './VertexExecutionHistory';
+import { scheduleMode } from '../../utils/const';
 
 
-const NotebookJobComponent = ({
+const VertexScheduleJobs = ({
     app,
     settingRegistry,
-    setExecutionPageFlag
+    setExecutionPageFlag,
+    setCreateCompleted,
+    setInputFileSelected,
+    region,
+    setRegion,
+    setMachineTypeSelected,
+    setAcceleratedCount,
+    setAcceleratorType,
+    setKernelSelected,
+    setCloudStorage,
+    setDiskTypeSelected,
+    setDiskSize,
+    setParameterDetail,
+    setParameterDetailUpdated,
+    setServiceAccountSelected,
+    setPrimaryNetworkSelected,
+    setSubNetworkSelected,
+    setSharedNetworkSelected,
+    setScheduleMode,
+    setScheduleValue,
+    setScheduleField,
+    setStartDate,
+    setEndDate,
+    setMaxRuns,
+    setTimeZoneSelected,
+    setEditMode,
     // composerSelectedFromCreate,
     // setCreateCompleted,
     // setJobNameSelected,
@@ -62,14 +88,36 @@ const NotebookJobComponent = ({
     themeManager: IThemeManager;
     settingRegistry: ISettingRegistry;
     setExecutionPageFlag: (value: boolean) => void;
-    // composerSelectedFromCreate: string;
-    // setCreateCompleted?: (value: boolean) => void;
+    setCreateCompleted: (value: boolean) => void;
+    setInputFileSelected: (value: string) => void;
+    region: string;
+    setRegion: (value: string) => void;
+    setMachineTypeSelected: (value: string | null) => void;
+    setAcceleratedCount: (value: string | null) => void;
+    setAcceleratorType: (value: string | null) => void;
+    setKernelSelected: (value: string | null) => void;
+    setCloudStorage: (value: string | null) => void;
+    setDiskTypeSelected: (value: string | null) => void;
+    setDiskSize: (value: string) => void;
+    setParameterDetail: (value: string[]) => void;
+    setParameterDetailUpdated: (value: string[]) => void;
+    setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void;
+    setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void;
+    setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+    setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void;
+    setScheduleMode: (value: scheduleMode) => void;
+    setScheduleValue: (value: string) => void;
+    setScheduleField: (value: string) => void;
+    setStartDate: (value: Date | null) => void;
+    setEndDate: (value: Date | null) => void;
+    setMaxRuns: (value: string) => void;
+    setTimeZoneSelected: (value: string) => void;
+    setEditMode: (value: boolean) => void;
     // setJobNameSelected?: (value: string) => void;
     // setComposerSelected?: (value: string) => void;
     // setScheduleMode?: (value: scheduleMode) => void;
     // setScheduleValue?: (value: string) => void;
 
-    // setInputFileSelected?: (value: string) => void;
     // setParameterDetail?: (value: string[]) => void;
     // setParameterDetailUpdated?: (value: string[]) => void;
     // setSelectedMode?: (value: string) => void;
@@ -91,7 +139,7 @@ const NotebookJobComponent = ({
     // setIsLoadingKernelDetail?: (value: boolean) => void;
 }): React.JSX.Element => {
     const [showExecutionHistory, setShowExecutionHistory] = useState(false);
-    const [region, setRegion] = useState<string>('');
+    // const [region, setRegion] = useState<string>('');
     const [schedulerData, setScheduleData] = useState('');
     const [bucketName,
         //setBucketName
@@ -136,6 +184,29 @@ const NotebookJobComponent = ({
                         app={app}
                         settingRegistry={settingRegistry}
                         handleDagIdSelection={handleDagIdSelection}
+                        setCreateCompleted={setCreateCompleted}
+                        setInputFileSelected={setInputFileSelected}
+                        setMachineTypeSelected={setMachineTypeSelected}
+                        setAcceleratedCount={setAcceleratedCount}
+                        setAcceleratorType={setAcceleratorType}
+                        setKernelSelected={setKernelSelected}
+                        setCloudStorage={setCloudStorage}
+                        setDiskTypeSelected={setDiskTypeSelected}
+                        setDiskSize={setDiskSize}
+                        setParameterDetail={setParameterDetail}
+                        setParameterDetailUpdated={setParameterDetailUpdated}
+                        setServiceAccountSelected={setServiceAccountSelected}
+                        setPrimaryNetworkSelected={setPrimaryNetworkSelected}
+                        setSubNetworkSelected={setSubNetworkSelected}
+                        setSharedNetworkSelected={setSharedNetworkSelected}
+                        setScheduleMode={setScheduleMode}
+                        setScheduleValue={setScheduleValue}
+                        setScheduleField={setScheduleField}
+                        setStartDate={setStartDate}
+                        setEndDate={setEndDate}
+                        setMaxRuns={setMaxRuns}
+                        setTimeZoneSelected={setTimeZoneSelected}
+                        setEditMode={setEditMode}
                     />
                 </div>
             )}
@@ -161,14 +232,61 @@ export class NotebookJobs extends DataprocWidget {
     }
     renderInternal(): React.JSX.Element {
         return (
-            <NotebookJobComponent
+            <VertexScheduleJobs
                 app={this.app}
                 settingRegistry={this.settingRegistry}
                 themeManager={this.themeManager}
-                setExecutionPageFlag={this.setExecutionPageFlag}
-            />
+                setExecutionPageFlag={this.setExecutionPageFlag} setCreateCompleted={function (value: boolean): void {
+                    throw new Error('Function not implemented.');
+                } } setInputFileSelected={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } region={''} setRegion={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } setMachineTypeSelected={function (value: string | null): void {
+                    throw new Error('Function not implemented.');
+                } } setAcceleratedCount={function (value: string | null): void {
+                    throw new Error('Function not implemented.');
+                } } setAcceleratorType={function (value: string | null): void {
+                    throw new Error('Function not implemented.');
+                } } setKernelSelected={function (value: string | null): void {
+                    throw new Error('Function not implemented.');
+                } } setCloudStorage={function (value: string | null): void {
+                    throw new Error('Function not implemented.');
+                } } setDiskTypeSelected={function (value: string | null): void {
+                    throw new Error('Function not implemented.');
+                } } setDiskSize={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } setParameterDetail={function (value: string[]): void {
+                    throw new Error('Function not implemented.');
+                } } setParameterDetailUpdated={function (value: string[]): void {
+                    throw new Error('Function not implemented.');
+                } } setServiceAccountSelected={function (value: { displayName: string; email: string; } | null): void {
+                    throw new Error('Function not implemented.');
+                } } setPrimaryNetworkSelected={function (value: { name: string; link: string; } | null): void {
+                    throw new Error('Function not implemented.');
+                } } setSubNetworkSelected={function (value: { name: string; link: string; } | null): void {
+                    throw new Error('Function not implemented.');
+                } } setSharedNetworkSelected={function (value: { name: string; network: string; subnetwork: string; } | null): void {
+                    throw new Error('Function not implemented.');
+                } } setScheduleMode={function (value: scheduleMode): void {
+                    throw new Error('Function not implemented.');
+                } } setScheduleValue={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } setScheduleField={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } setStartDate={function (value: Date | null): void {
+                    throw new Error('Function not implemented.');
+                } } setEndDate={function (value: Date | null): void {
+                    throw new Error('Function not implemented.');
+                } } setMaxRuns={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } setTimeZoneSelected={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } } setEditMode={function (value: boolean): void {
+                    throw new Error('Function not implemented.');
+                } }            />
         );
     }
 }
 
-export default NotebookJobComponent;
+export default VertexScheduleJobs;
