@@ -341,7 +341,9 @@ function listVertexScheduler({
         </td>
       );
     } else {
-      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' ||  cell.row.original.status === 'COMPLETED' && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
+      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED';
+      // to do
+      //  && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
 
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
