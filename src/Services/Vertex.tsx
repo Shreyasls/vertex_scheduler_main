@@ -130,8 +130,10 @@ export class VertexServices {
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
-        displayName: string
+        displayName: string,
+        setResumeLoading: (value: string) => void,
     ) => {
+        setResumeLoading(scheduleId);
         try {
             const serviceURL = 'api/vertex/pauseSchedule';
             const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
@@ -148,11 +150,14 @@ export class VertexServices {
                     setIsLoading,
                     setNextPageFlag
                 );
+                setResumeLoading('');
             } else {
+                setResumeLoading('');
                 DataprocLoggingService.log('Error in pause schedule', LOG_LEVEL.ERROR);
                 toast.error('Failed to pause schedule');
             }
         } catch (error) {
+            setResumeLoading('');
             DataprocLoggingService.log('Error in pause schedule', LOG_LEVEL.ERROR);
             toast.error(`Failed to pause schedule : ${error}`, toastifyCustomStyle);
         }
@@ -195,23 +200,28 @@ export class VertexServices {
     static triggerSchedule = async (
         region: string,
         scheduleId: string,
-        displayName: string
+        displayName: string,
+        setTriggerLoading: (value: string) => void,
     ) => {
+        setTriggerLoading(scheduleId);
         try {
             const serviceURL = 'api/vertex/triggerSchedule';
             const data: ITriggerSchedule = await requestAPI(
                 serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
             );
             if (data.name) {
+                setTriggerLoading('');
                 toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
             }
             else {
+                setTriggerLoading('');
                 toast.error(
                     `Failed to Trigger ${displayName}`,
                     toastifyCustomStyle
                 );
             }
         } catch (reason) {
+            setTriggerLoading('');
             toast.error(
                 `Failed to Trigger ${displayName} : ${reason}`,
                 toastifyCustomStyle

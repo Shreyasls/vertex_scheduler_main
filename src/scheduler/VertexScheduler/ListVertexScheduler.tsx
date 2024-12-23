@@ -57,6 +57,8 @@ function listVertexScheduler({
   // const [editDagLoading,
   //   //setEditDagLoading
   // ] = useState('');
+  const [triggerLoading, setTriggerLoading] = useState('');
+  const [resumeLoading, setResumeLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
   const [editNotebookLoading, setEditNotebookLoading] = useState<string>('');
   const [deletingSchedule, setDeletingSchedule] = useState<boolean>(false);
@@ -124,7 +126,8 @@ function listVertexScheduler({
         setDagList,
         setIsLoading,
         setNextPageFlag,
-        displayName
+        displayName,
+        setResumeLoading
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
@@ -145,7 +148,7 @@ function listVertexScheduler({
   const handleTriggerSchedule = async (event: React.MouseEvent, displayName: string) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
-      await VertexServices.triggerSchedule(region, scheduleId, displayName);
+      await VertexServices.triggerSchedule(region, scheduleId, displayName, setTriggerLoading);
     }
   };
 
@@ -225,42 +228,64 @@ function listVertexScheduler({
     const is_status_paused = data.status;
     return (
       <div className="actions-icon">
-        <div
-          role="button"
-          className="icon-buttons-style"
-          title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
-          onClick={e => {
-            is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
-          }}
-        >
-          {is_status_paused === 'COMPLETED' ? <IconPlay.react
-            tag="div"
-            className="icon-buttons-style-disable disable-complete-btn"
-          /> : (
-            is_status_paused === 'PAUSED' ?
-              (<IconPlay.react
-                tag="div"
-                className="icon-white logo-alignment-style"
-              />
-              ) : (
-                <IconPause.react
+        {data.name === resumeLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) : (
+          <div
+            role="button"
+            className="icon-buttons-style"
+            title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
+            onClick={e => {
+              is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
+            }}
+          >
+            {is_status_paused === 'COMPLETED' ? <IconPlay.react
+              tag="div"
+              className="icon-buttons-style-disable disable-complete-btn"
+            /> : (
+              is_status_paused === 'PAUSED' ?
+                (<IconPlay.react
                   tag="div"
                   className="icon-white logo-alignment-style"
                 />
-              ))}
-        </div>
-        <div
-          role="button"
-          className='icon-buttons-style'
-          title='Trigger the job'
-          data-scheduleId={data.name}
-          onClick={e => handleTriggerSchedule(e, data.displayName)}
-        >
-          <IconTrigger.react
-            tag="div"
-            className="icon-white logo-alignment-style"
-          />
-        </div>
+                ) : (
+                  <IconPause.react
+                    tag="div"
+                    className="icon-white logo-alignment-style"
+                  />
+                ))}
+          </div>
+          )
+        }
+        {data.name === triggerLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) : (
+          <div
+            role="button"
+            className='icon-buttons-style'
+            title='Trigger the job'
+            data-scheduleId={data.name}
+            onClick={e => handleTriggerSchedule(e, data.displayName)}
+          >
+            <IconTrigger.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          </div>
+        )
+        }
         {/* {data.jobid === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
@@ -284,7 +309,6 @@ function listVertexScheduler({
         </div>
         {/* )} */}
         {
-          // isPreviewEnabled &&
           (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
