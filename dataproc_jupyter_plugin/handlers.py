@@ -228,7 +228,7 @@ def setup_handlers(web_app):
         "api/vertex/deleteSchedule": vertex.DeleteScheduleController,
         "api/vertex/triggerSchedule": vertex.TriggerScheduleController,
         "api/vertex/updateSchedule": vertex.UpdateScheduleController,
-        "api/vertex/createNewBucket": vertex.CreateNewBucketController,
+        "api/storage/createNewBucket": vertex.CreateBucketController,
         "api/compute/getXpnHost": compute.GetXpnHostController,
         "api/vertex/getSchedule": vertex.GetScheduleController,
         "api/logEntries/listEntries": logEntries.ListEntriesController,
