@@ -568,7 +568,7 @@ function listVertexScheduler({
                 aria-label="Loading Spinner"
                 data-testid="loader"
               />
-              Loading Vertex Schedulers
+              Loading Vertex Schedules
             </div>
           )}
           {!isLoading && (
