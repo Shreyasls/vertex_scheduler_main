@@ -36,13 +36,6 @@ export class VertexServices {
             } else {
                 setMachineTypeList([])
             }
-            // if (formattedResponse.length === 0) {
-            //     setMachineTypeList([])
-            // } else {
-            //     if (formattedResponse) {
-            //         setMachineTypeList(formattedResponse);
-            //     }
-            // }
             setMachineTypeLoading(false)
         } catch (error) {
             setMachineTypeList([])

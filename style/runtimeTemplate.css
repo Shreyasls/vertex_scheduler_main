@@ -2,6 +2,7 @@
   height: 29vh;
   overflow: auto;
 }
+
 .runtime-container {
   margin-left: 15px;
   margin-bottom: 15px;
@@ -32,6 +33,7 @@
   margin-top: 10px;
   outline: none;
 }
+
 .create-container-image-message {
   font-style: normal;
   font-weight: 400;
@@ -41,6 +43,7 @@
   overflow: hidden;
   word-wrap: break-word;
 }
+
 .runtime-message {
   font-style: normal;
   font-weight: 400;
@@ -49,6 +52,7 @@
   padding-top: 13px;
   display: flex;
 }
+
 .create-runtime-sub-message-network {
   font-style: normal;
   font-weight: 400;
@@ -131,9 +135,27 @@
   align-items: center;
   justify-content: center;
 }
+
+/* .custom-add-bucket {
+  display: flex;
+  gap: 5px;
+  font-size: 14px;
+  padding: 6px;
+  background: rgb(25, 118, 210);
+  color: #fff;
+  width: max-content;
+  border-radius: 3px;
+} */
+
+/* .custom-add-bucket svg {
+  width: 18px;
+  height: 18px;
+} */
+
 .create-runtime-radio {
   display: flex;
 }
+
 .create-no-list-message {
   color: var(--jp-ui-font-color0);
   background: var(--jp-layout-color2);
