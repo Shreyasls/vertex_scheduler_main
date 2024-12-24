@@ -136,7 +136,8 @@ function listVertexScheduler({
         setDagList,
         setIsLoading,
         setNextPageFlag,
-        displayName
+        displayName,
+        setResumeLoading
       );
     }
   };
