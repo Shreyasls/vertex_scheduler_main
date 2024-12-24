@@ -136,7 +136,8 @@ function listVertexScheduler({
         setDagList,
         setIsLoading,
         setNextPageFlag,
-        displayName
+        displayName,
+        setResumeLoading
       );
     }
   };
@@ -568,7 +569,7 @@ function listVertexScheduler({
                 aria-label="Loading Spinner"
                 data-testid="loader"
               />
-              Loading Vertex Schedulers
+              Loading Vertex Schedules
             </div>
           )}
           {!isLoading && (

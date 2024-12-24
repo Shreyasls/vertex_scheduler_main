@@ -162,14 +162,17 @@ export class VertexServices {
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
-        displayName: string
+        displayName: string,
+        setResumeLoading: (value: string) => void,
     ) => {
+        setResumeLoading(scheduleId);
         try {
             const serviceURL = 'api/vertex/resumeSchedule';
             const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
                 serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`,
             );
             if (Object.keys(formattedResponse).length === 0) {
+                setResumeLoading('');
                 toast.success(
                     `Schedule ${displayName} updated successfully`,
                     toastifyCustomStyle
@@ -181,10 +184,12 @@ export class VertexServices {
                     setNextPageFlag
                 );
             } else {
+                setResumeLoading('');
                 DataprocLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
                 toast.error('Failed to resume schedule');
             }
         } catch (error) {
+            setResumeLoading('');
             DataprocLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
             toast.error(`Failed to resume schedule : ${error}`, toastifyCustomStyle);
         }
