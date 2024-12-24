@@ -142,14 +142,8 @@ const NotebookSchedulerComponent = ({
                   disabled={editMode}
                 />
               </div>
-              {
-                jobNameSelected === '' && <ErrorMessage message="Name is required" />
-              }
-              {!jobNameValidation && !editMode && (
-                <div className="error-key-parent">
-                  <iconError.react tag="div" className="logo-alignment-style" />
-                  <div className="error-key-missing">Name is required</div>
-                </div>
+              {jobNameSelected === '' && !editMode && (
+                <ErrorMessage message="Job name is required" />
               )}
               {jobNameSpecialValidation && jobNameValidation && !editMode && (
                 <div className="error-key-parent">

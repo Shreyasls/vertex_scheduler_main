@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, CircularProgress } from '@mui/material';
-import { SchedulerService } from '../schedulerServices';
 // import dagTaskSuccessIcon from '../../../style/icons/dag_task_success_icon.svg';
 // import dagTaskFailedIcon from '../../../style/icons/dag_task_failed_icon.svg';
 // import stopIcon from '../../../style/icons/stop_icon.svg';
 import { handleDebounce } from '../../utils/utils';
 import { IconExpandLess, IconExpandMore } from '../../utils/icons';
 import { LogEntriesServices } from '../../Services/LogEntries';
-import { IDagRunList } from './VertexInterfaces';
+import { IDagRunList, ISchedulerData } from './VertexInterfaces';
 
 // const iconDagTaskFailed = new LabIcon({
 //     name: 'launcher:dag-task-failed-icon',
@@ -30,16 +29,20 @@ const VertexJobTaskLogs = ({
     dagRunId,
     jobRunsData,
 }: {
-    composerName: string;
+    composerName: ISchedulerData | undefined;
     dagId: string;
     dagRunId: string;
     jobRunsData: IDagRunList | undefined;
 }): JSX.Element => {
     const [dagTaskInstancesList, setDagTaskInstancesList] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [isLoadingLogs
+        // , setIsLoadingLogs
+    ] = useState(false);
     const [expanded, setExpanded] = useState<string | false>(false);
-    const [loglist, setLogList] = useState('');
+    const [loglist
+        // ,setLogList
+    ] = useState('');
 
     const [height, setHeight] = useState(window.innerHeight - 320);
     console.log(dagRunId)
@@ -80,7 +83,7 @@ const VertexJobTaskLogs = ({
     useEffect(() => {
         if (dagTaskInstancesList.length > 0) {
             setExpanded('0');
-            listDagTaskLogList('0', dagTaskInstancesList[0].tryNumber);
+            // listDagTaskLogList('0', dagTaskInstancesList[0].tryNumber);
         }
     }, [dagTaskInstancesList]);
 
@@ -93,21 +96,21 @@ const VertexJobTaskLogs = ({
             setExpanded(false);
         } else {
             setExpanded(`${index}`);
-            listDagTaskLogList(index, iconIndex);
+            // listDagTaskLogList(index, iconIndex);
         }
     };
 
-    const listDagTaskLogList = async (index: string, iconIndex: number) => {
-        await SchedulerService.listDagTaskLogsListService(
-            composerName,
-            dagId,
-            dagRunId,
-            dagTaskInstancesList[index].taskId,
-            iconIndex,
-            setLogList,
-            setIsLoadingLogs
-        );
-    };
+    // const listDagTaskLogList = async (index: string, iconIndex: number) => {
+    //     await SchedulerService.listDagTaskLogsListService(
+    //         composerName,
+    //         dagId,
+    //         dagRunId,
+    //         dagTaskInstancesList[index].taskId,
+    //         iconIndex,
+    //         setLogList,
+    //         setIsLoadingLogs
+    //     );
+    // };
     return (
         <div>
             {dagTaskInstancesList.length > 0 ? (

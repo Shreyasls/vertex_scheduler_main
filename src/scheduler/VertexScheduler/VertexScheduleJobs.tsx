@@ -24,6 +24,7 @@ import ListVertexScheduler from '../VertexScheduler/ListVertexScheduler';
 // import { scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import VertexExecutionHistory from './VertexExecutionHistory';
+import { ISchedulerData } from './VertexInterfaces';
 
 
 const NotebookJobComponent = ({
@@ -92,7 +93,7 @@ const NotebookJobComponent = ({
 }): React.JSX.Element => {
     const [showExecutionHistory, setShowExecutionHistory] = useState(false);
     const [region, setRegion] = useState<string>('');
-    const [schedulerData, setScheduleData] = useState('');
+    const [schedulerData, setScheduleData] = useState<ISchedulerData>();
     const [bucketName,
         //setBucketName
     ] = useState('');

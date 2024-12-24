@@ -619,6 +619,9 @@ const CreateVertexScheduler = ({
                                 onRegionChange={region => handleRegionChange(region)}
                             />
                         </div>
+                        {
+                            !region && <ErrorMessage message="Region is required" />
+                        }
 
                         <div className="create-scheduler-form-element">
                             <Autocomplete
@@ -852,6 +855,9 @@ const CreateVertexScheduler = ({
                                 )}
                             />
                         </div>
+                        {
+                            !serviceAccountSelected && <ErrorMessage message="Machine type is required" />
+                        }
 
                         <div className="create-job-scheduler-text-para create-job-scheduler-sub-title">
                             Network Configuration
