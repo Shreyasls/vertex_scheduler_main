@@ -34,6 +34,7 @@ dependencies = [
     "aiofiles>=22.1.0,<23",
     "google-cloud-compute",
     "google-cloud-iam",
+    "google-cloud-logging",
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
