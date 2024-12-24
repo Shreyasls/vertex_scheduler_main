@@ -233,6 +233,7 @@ def setup_handlers(web_app):
         "api/vertex/getSchedule": vertex.GetScheduleController,
         "api/logEntries/listEntries": logEntries.ListEntriesController,
         "api/vertex/listNotebookExecutionJobs": vertex.ListNotebookExecutionJobsController,
+        "api/storage/downloadOutput": storage.DownloadOutputController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)
