@@ -47,6 +47,7 @@ const VertexScheduleJobs = ({
     setServiceAccountSelected,
     setPrimaryNetworkSelected,
     setSubNetworkSelected,
+    setSubNetworkList,
     setSharedNetworkSelected,
     setScheduleMode,
     setScheduleValue,
@@ -56,6 +57,10 @@ const VertexScheduleJobs = ({
     setMaxRuns,
     setTimeZoneSelected,
     setEditMode,
+    setJobNameSelected,
+    setServiceAccountList,
+    setPrimaryNetworkList,
+    setNetworkSelected
     // composerSelectedFromCreate,
     // setCreateCompleted,
     // setJobNameSelected,
@@ -103,7 +108,9 @@ const VertexScheduleJobs = ({
     setParameterDetailUpdated: (value: string[]) => void;
     setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void;
     setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void;
+    setPrimaryNetworkList: (value: { name: string; link: string }[]) => void;
     setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+    setSubNetworkList: (value: { name: string; link: string }[]) => void;
     setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void;
     setScheduleMode: (value: scheduleMode) => void;
     setScheduleValue: (value: string) => void;
@@ -113,7 +120,9 @@ const VertexScheduleJobs = ({
     setMaxRuns: (value: string) => void;
     setTimeZoneSelected: (value: string) => void;
     setEditMode: (value: boolean) => void;
-    // setJobNameSelected?: (value: string) => void;
+    setJobNameSelected?: (value: string) => void;
+    setServiceAccountList: (value: { displayName: string; email: string }[]) => void;
+    setNetworkSelected: (value: string) => void;
     // setComposerSelected?: (value: string) => void;
     // setScheduleMode?: (value: scheduleMode) => void;
     // setScheduleValue?: (value: string) => void;
@@ -198,6 +207,7 @@ const VertexScheduleJobs = ({
                         setServiceAccountSelected={setServiceAccountSelected}
                         setPrimaryNetworkSelected={setPrimaryNetworkSelected}
                         setSubNetworkSelected={setSubNetworkSelected}
+                        setSubNetworkList={setSubNetworkList}
                         setSharedNetworkSelected={setSharedNetworkSelected}
                         setScheduleMode={setScheduleMode}
                         setScheduleValue={setScheduleValue}
@@ -207,6 +217,10 @@ const VertexScheduleJobs = ({
                         setMaxRuns={setMaxRuns}
                         setTimeZoneSelected={setTimeZoneSelected}
                         setEditMode={setEditMode}
+                        setJobNameSelected={setJobNameSelected!}
+                        setServiceAccountList={setServiceAccountList}
+                        setPrimaryNetworkList={setPrimaryNetworkList}
+                        setNetworkSelected={setNetworkSelected}
                     />
                 </div>
             )}
@@ -238,53 +252,61 @@ export class NotebookJobs extends DataprocWidget {
                 themeManager={this.themeManager}
                 setExecutionPageFlag={this.setExecutionPageFlag} setCreateCompleted={function (value: boolean): void {
                     throw new Error('Function not implemented.');
-                } } setInputFileSelected={function (value: string): void {
+                }} setInputFileSelected={function (value: string): void {
                     throw new Error('Function not implemented.');
-                } } region={''} setRegion={function (value: string): void {
+                }} region={''} setRegion={function (value: string): void {
                     throw new Error('Function not implemented.');
-                } } setMachineTypeSelected={function (value: string | null): void {
+                }} setMachineTypeSelected={function (value: string | null): void {
                     throw new Error('Function not implemented.');
-                } } setAcceleratedCount={function (value: string | null): void {
+                }} setAcceleratedCount={function (value: string | null): void {
                     throw new Error('Function not implemented.');
-                } } setAcceleratorType={function (value: string | null): void {
+                }} setAcceleratorType={function (value: string | null): void {
                     throw new Error('Function not implemented.');
-                } } setKernelSelected={function (value: string | null): void {
+                }} setKernelSelected={function (value: string | null): void {
                     throw new Error('Function not implemented.');
-                } } setCloudStorage={function (value: string | null): void {
+                }} setCloudStorage={function (value: string | null): void {
                     throw new Error('Function not implemented.');
-                } } setDiskTypeSelected={function (value: string | null): void {
+                }} setDiskTypeSelected={function (value: string | null): void {
                     throw new Error('Function not implemented.');
-                } } setDiskSize={function (value: string): void {
+                }} setDiskSize={function (value: string): void {
                     throw new Error('Function not implemented.');
-                } } setParameterDetail={function (value: string[]): void {
+                }} setParameterDetail={function (value: string[]): void {
                     throw new Error('Function not implemented.');
-                } } setParameterDetailUpdated={function (value: string[]): void {
+                }} setParameterDetailUpdated={function (value: string[]): void {
                     throw new Error('Function not implemented.');
-                } } setServiceAccountSelected={function (value: { displayName: string; email: string; } | null): void {
+                }} setServiceAccountSelected={function (value: { displayName: string; email: string; } | null): void {
                     throw new Error('Function not implemented.');
-                } } setPrimaryNetworkSelected={function (value: { name: string; link: string; } | null): void {
+                }} setNetworkSelected={function (value: string): void {
                     throw new Error('Function not implemented.');
-                } } setSubNetworkSelected={function (value: { name: string; link: string; } | null): void {
+                }}setPrimaryNetworkSelected={function (value: { name: string; link: string; } | null): void {
                     throw new Error('Function not implemented.');
-                } } setSharedNetworkSelected={function (value: { name: string; network: string; subnetwork: string; } | null): void {
+                }} setPrimaryNetworkList={function (value: { name: string; link: string; }[]): void {
                     throw new Error('Function not implemented.');
-                } } setScheduleMode={function (value: scheduleMode): void {
+                }}setSubNetworkSelected={function (value: { name: string; link: string; } | null): void {
                     throw new Error('Function not implemented.');
-                } } setScheduleValue={function (value: string): void {
+                }} setSubNetworkList={function (value: { name: string; link: string; }[]): void {
                     throw new Error('Function not implemented.');
-                } } setScheduleField={function (value: string): void {
+                }}setSharedNetworkSelected={function (value: { name: string; network: string; subnetwork: string; } | null): void {
                     throw new Error('Function not implemented.');
-                } } setStartDate={function (value: Date | null): void {
+                }} setScheduleMode={function (value: scheduleMode): void {
                     throw new Error('Function not implemented.');
-                } } setEndDate={function (value: Date | null): void {
+                }} setScheduleValue={function (value: string): void {
                     throw new Error('Function not implemented.');
-                } } setMaxRuns={function (value: string): void {
+                }} setScheduleField={function (value: string): void {
                     throw new Error('Function not implemented.');
-                } } setTimeZoneSelected={function (value: string): void {
+                }} setStartDate={function (value: Date | null): void {
                     throw new Error('Function not implemented.');
-                } } setEditMode={function (value: boolean): void {
+                }} setEndDate={function (value: Date | null): void {
                     throw new Error('Function not implemented.');
-                } }            />
+                }} setMaxRuns={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                }} setTimeZoneSelected={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                }} setEditMode={function (value: boolean): void {
+                    throw new Error('Function not implemented.');
+                }} setServiceAccountList={function (value: { displayName: string; email: string }[]): void {
+                    throw new Error('Function not implemented.');
+                }}/>
         );
     }
 }

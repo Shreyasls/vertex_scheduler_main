@@ -126,8 +126,10 @@ export class VertexServices {
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
-        displayName: string
+        displayName: string,
+        setResumeLoading: (value: string) => void,
     ) => {
+        setResumeLoading(scheduleId);
         try {
             const serviceURL = 'api/vertex/pauseSchedule';
             const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
@@ -144,11 +146,14 @@ export class VertexServices {
                     setIsLoading,
                     setNextPageFlag
                 );
+                setResumeLoading('');
             } else {
+                setResumeLoading('');
                 DataprocLoggingService.log('Error in pause schedule', LOG_LEVEL.ERROR);
                 toast.error('Failed to pause schedule');
             }
         } catch (error) {
+            setResumeLoading('');
             DataprocLoggingService.log('Error in pause schedule', LOG_LEVEL.ERROR);
             toast.error(`Failed to pause schedule : ${error}`, toastifyCustomStyle);
         }
@@ -160,8 +165,10 @@ export class VertexServices {
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
         setNextPageFlag: (value: string) => void,
-        displayName: string
+        displayName: string,
+        setResumeLoading: (value: string) => void,
     ) => {
+        setResumeLoading(scheduleId);
         try {
             const serviceURL = 'api/vertex/resumeSchedule';
             const formattedResponse: IUpdateSchedulerAPIResponse = await requestAPI(
@@ -178,11 +185,14 @@ export class VertexServices {
                     setIsLoading,
                     setNextPageFlag
                 );
+                setResumeLoading('');
             } else {
+                setResumeLoading('');
                 DataprocLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
                 toast.error('Failed to resume schedule');
             }
         } catch (error) {
+            setResumeLoading('');
             DataprocLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
             toast.error(`Failed to resume schedule : ${error}`, toastifyCustomStyle);
         }
@@ -191,23 +201,28 @@ export class VertexServices {
     static triggerSchedule = async (
         region: string,
         scheduleId: string,
-        displayName: string
+        displayName: string,
+        setTriggerLoading:  (value: string) => void,
     ) => {
+        setTriggerLoading(scheduleId);
         try {
             const serviceURL = 'api/vertex/triggerSchedule';
             const data: ITriggerSchedule = await requestAPI(
                 serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
             );
             if (data.name) {
+                setTriggerLoading('');
                 toast.success(`${displayName} triggered successfully `, toastifyCustomStyle);
             }
             else {
+                setTriggerLoading('');
                 toast.error(
                     `Failed to Trigger ${displayName}`,
                     toastifyCustomStyle
                 );
             }
         } catch (reason) {
+            setTriggerLoading('');
             toast.error(
                 `Failed to Trigger ${displayName} : ${reason}`,
                 toastifyCustomStyle
@@ -300,7 +315,9 @@ export class VertexServices {
         setParameterDetailUpdated: (value: string[]) => void,
         setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void,
         setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void,
+        setPrimaryNetworkList: (value: { name: string; link: string }[]) => void,
         setSubNetworkSelected: (value: { name: string; link: string } | null) => void,
+        setSubNetworkList: (value: { name: string; link: string }[]) => void,
         setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void,
         setScheduleMode: (value: scheduleMode) => void,
         setScheduleValue: (value: string) => void,
@@ -310,6 +327,9 @@ export class VertexServices {
         setMaxRuns: (value: string) => void,
         setTimeZoneSelected: (value: string) => void,
         setEditMode: (value: boolean) => void,
+        setJobNameSelected: (value: string) => void,
+        setServiceAccountList: (value: { displayName: string; email: string }[]) => void,
+        setNetworkSelected: (value: string) => void
     ) => {
         setEditDagLoading(jobId);
         try {
@@ -317,33 +337,51 @@ export class VertexServices {
             const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${jobId}`
             );
             if (formattedResponse && Object.keys(formattedResponse).length > 0) {
-                console.log(formattedResponse)
-                // setInputNotebookFilePath()
-                setCreateCompleted(false)
-                setRegion(region)
-                setInputFileSelected(formattedResponse.displayName)
-                // setRegion()
+                const inputFileName = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri.split('/');
+                setInputFileSelected(inputFileName[inputFileName.length - 1]);
+                setCreateCompleted(false);
+                setRegion(region);
+                setJobNameSelected(formattedResponse.displayName);
                 setMachineTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.machineType)
                 setAcceleratedCount(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorCount)
                 setAcceleratorType(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorType)
                 setKernelSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.kernelName)
-                // setCloudStorage()
+                setCloudStorage( formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsOutputUri.replace('gs://', ''))
                 setDiskTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskType)
                 setDiskSize(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskSizeGb)
-                // setParameterDetail()
-                // setParameterDetailUpdated()
-                setServiceAccountSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.serviceAccount)
-                // setPrimaryNetworkSelected()
-                // setSubNetworkSelected()
+
+                const parameterList = Object.keys(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels).map((key) => key +":"+ formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels[key])
+                setParameterDetail(parameterList);
+                setParameterDetailUpdated(parameterList);
+                setServiceAccountSelected({ displayName: '', email: formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.serviceAccount });
+
+                const primaryNetwork = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.networkSpec.network.split('/');
+                setPrimaryNetworkSelected({ name: primaryNetwork[primaryNetwork.length - 1], link: primaryNetwork[primaryNetwork.length - 1] });
+                setPrimaryNetworkList([{ name: primaryNetwork[primaryNetwork.length - 1], link: primaryNetwork[primaryNetwork.length - 1] }]);
+
+                const subnetwork = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.networkSpec.subnetwork.split('/');
+                setSubNetworkSelected({ name: subnetwork[subnetwork.length - 1], link: subnetwork[subnetwork.length - 1] })
+                setSubNetworkList([{ name: subnetwork[subnetwork.length - 1], link: subnetwork[subnetwork.length - 1] }])
+                console.log('schedule mode data', formattedResponse.cron,formattedResponse.maxRunCount )
+                if(formattedResponse.cron === '* * * * *' && formattedResponse.maxRunCount === '1') {
+                    console.log('inside schedule mode run now')
+                    setScheduleMode('runNow');
+                } else {
+                    console.log('inside schedule mode run on schedule')
+                    setScheduleMode('runSchedule');
+                }
                 // setSharedNetworkSelected()
-                // setScheduleMode()
-                // setScheduleValue()
-                // setScheduleField()
-                // setStartDate()
+                // 
+                
+                setScheduleField(formattedResponse.cron);
+                // const dateFormat = ((formattedResponse.startTime.getMonth() > 8) ? (formattedResponse.startTime.getMonth() + 1) : ('0' + (formattedResponse.startTime.getMonth() + 1))) + '/' + ((formattedResponse.startTime.getDate() > 9) ? formattedResponse.startTime.getDate() : ('0' + formattedResponse.startTime.getDate())) + '/' + formattedResponse.startTime.getFullYear();
+                // console.log('date added', new Date(dateFormat));
+                // setStartDate(new Date(dateFormat));
                 // setEndDate()
-                setMaxRuns(formattedResponse['maxRunCount'])
+                // setScheduleValue()
+                setMaxRuns(formattedResponse.maxRunCount);
                 // setTimeZoneSelected()
-                setEditMode(true)
+                setEditMode(true);
             } else {
                 setEditDagLoading('');
                 toast.error(

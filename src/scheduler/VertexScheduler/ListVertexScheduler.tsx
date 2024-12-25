@@ -56,6 +56,7 @@ function ListVertexScheduler({
   setServiceAccountSelected,
   setPrimaryNetworkSelected,
   setSubNetworkSelected,
+  setSubNetworkList,
   setSharedNetworkSelected,
   setScheduleMode,
   setScheduleValue,
@@ -65,6 +66,10 @@ function ListVertexScheduler({
   setMaxRuns,
   setTimeZoneSelected,
   setEditMode,
+  setJobNameSelected,
+  setServiceAccountList,
+  setPrimaryNetworkList,
+  setNetworkSelected
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -85,7 +90,9 @@ function ListVertexScheduler({
   setParameterDetailUpdated: (value: string[]) => void;
   setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void;
   setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setPrimaryNetworkList: (value: { name: string; link: string }[]) => void;
   setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setSubNetworkList: (value: { name: string; link: string }[]) => void;
   setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void;
   setScheduleMode: (value: scheduleMode) => void;
   setScheduleValue: (value: string) => void;
@@ -95,12 +102,17 @@ function ListVertexScheduler({
   setMaxRuns: (value: string) => void;
   setTimeZoneSelected: (value: string) => void;
   setEditMode: (value: boolean) => void;
+  setJobNameSelected: (value: string) => void;
+  setServiceAccountList: (value: { displayName: string; email: string }[]) => void;
+  setNetworkSelected: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
   const [editDagLoading, setEditDagLoading] = useState('');
+  const [triggerLoading, setTriggerLoading] = useState('');
+  const [resumeLoading, setResumeLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
   const [editNotebookLoading, setEditNotebookLoading] = useState<string>('');
   const [deletingSchedule, setDeletingSchedule] = useState<boolean>(false);
@@ -168,7 +180,8 @@ function ListVertexScheduler({
         setDagList,
         setIsLoading,
         setNextPageFlag,
-        displayName
+        displayName,
+        setResumeLoading
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
@@ -177,7 +190,8 @@ function ListVertexScheduler({
         setDagList,
         setIsLoading,
         setNextPageFlag,
-        displayName
+        displayName,
+        setResumeLoading
       );
     }
   };
@@ -189,7 +203,7 @@ function ListVertexScheduler({
   const handleTriggerSchedule = async (event: React.MouseEvent, displayName: string) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
-      await VertexServices.triggerSchedule(region, scheduleId, displayName);
+      await VertexServices.triggerSchedule(region, scheduleId, displayName, setTriggerLoading);
     }
   };
 
@@ -272,7 +286,9 @@ function ListVertexScheduler({
         setParameterDetailUpdated,
         setServiceAccountSelected,
         setPrimaryNetworkSelected,
+        setPrimaryNetworkList,
         setSubNetworkSelected,
+        setSubNetworkList,
         setSharedNetworkSelected,
         setScheduleMode,
         setScheduleValue,
@@ -281,7 +297,10 @@ function ListVertexScheduler({
         setEndDate,
         setMaxRuns,
         setTimeZoneSelected,
-        setEditMode
+        setEditMode,
+        setJobNameSelected,
+        setServiceAccountList,
+        setNetworkSelected
       );
     }
   };
@@ -306,46 +325,65 @@ function ListVertexScheduler({
   );
 
   const renderActions = (data: any) => {
-    console.log(data)
     const is_status_paused = data.status;
     return (
       <div className="actions-icon">
-        <div
-          role="button"
-          className="icon-buttons-style"
-          title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
-          onClick={e => {
-            is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
-          }}
-        >
-          {is_status_paused === 'COMPLETED' ? <IconPlay.react
-            tag="div"
-            className="icon-buttons-style-disable disable-complete-btn"
-          /> : (
-            is_status_paused === 'PAUSED' ?
-              (<IconPlay.react
-                tag="div"
-                className="icon-white logo-alignment-style"
-              />
-              ) : (
-                <IconPause.react
+        {data.name === resumeLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) :
+          <div
+            role="button"
+            className="icon-buttons-style"
+            title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
+            onClick={e => {
+              is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
+            }}
+          >
+            {is_status_paused === 'COMPLETED' ? <IconPlay.react
+              tag="div"
+              className="icon-buttons-style-disable disable-complete-btn"
+            /> : (
+              is_status_paused === 'PAUSED' ?
+                (<IconPlay.react
                   tag="div"
                   className="icon-white logo-alignment-style"
                 />
-              ))}
-        </div>
-        <div
-          role="button"
-          className='icon-buttons-style'
-          title='Trigger the job'
-          data-scheduleId={data.name}
-          onClick={e => handleTriggerSchedule(e, data.displayName)}
-        >
-          <IconTrigger.react
-            tag="div"
-            className="icon-white logo-alignment-style"
-          />
-        </div>
+                ) : (
+                  <IconPause.react
+                    tag="div"
+                    className="icon-white logo-alignment-style"
+                  />
+                ))}
+          </div>
+        }
+        {data.name === triggerLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) :
+          (<div
+            role="button"
+            className='icon-buttons-style'
+            title='Trigger the job'
+            data-scheduleId={data.name}
+            onClick={e => handleTriggerSchedule(e, data.displayName)}
+          >
+            <IconTrigger.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          </div>)
+        }
         {data.name === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
@@ -631,7 +669,7 @@ function ListVertexScheduler({
                 aria-label="Loading Spinner"
                 data-testid="loader"
               />
-              Loading Vertex Schedulers
+              Loading Vertex Schedules
             </div>
           )}
           {!isLoading && (

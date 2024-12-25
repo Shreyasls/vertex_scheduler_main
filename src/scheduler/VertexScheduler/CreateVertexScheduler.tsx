@@ -100,7 +100,7 @@ const CreateVertexScheduler = ({
     const [machineTypeSelected, setMachineTypeSelected] = useState<string | null>(null);
     const [acceleratorType, setAcceleratorType] = useState<string | null>(null);
     const [acceleratedCount, setAcceleratedCount] = useState<string | null>(null);
-    const [networkSelected, setNetworkSelected] = useState('networkInThisProject');
+    const [networkSelected, setNetworkSelected] = useState<string>('networkInThisProject');
     const [cloudStorageList, setCloudStorageList] = useState<string[]>([]);
     const [cloudStorage, setCloudStorage] = useState<string | null>(null);
     const [diskTypeSelected, setDiskTypeSelected] = useState<string | null>(DISK_TYPE_VALUE[0]);
@@ -425,8 +425,6 @@ const CreateVertexScheduler = ({
     };
 
     const selectedMachineType = machineTypeList && machineTypeList.find((item) => item.machineType === machineTypeSelected);
-    console.log(primaryNetworkList)
-    console.log(subNetworkList)
     /**
     * Disable the create button when the mandatory fields are not filled and the validations is not proper.
     */
@@ -487,7 +485,6 @@ const CreateVertexScheduler = ({
             disk_type: diskTypeSelected,
             disk_size: diskSize
         }
-        console.log(payload)
         await VertexServices.createVertexSchedulerService(
             payload,
             app,
@@ -513,12 +510,6 @@ const CreateVertexScheduler = ({
     useEffect(() => {
         setServiceAccountSelected(serviceAccountList[0])
     }, [serviceAccountList.length > 0]);
-
-    // useEffect(() => {
-    //     if (!createCompleted && region !== '') {
-    //         machineTypeAPI()
-    //     }
-    // }, [region]);
 
     useEffect(() => {
         if (!createCompleted) {
@@ -546,7 +537,7 @@ const CreateVertexScheduler = ({
             .catch((error) => {
                 console.error(error);
             });
-    }, [projectId]);
+    }, [projectId, createCompleted]);
 
     return (
         <>
@@ -573,6 +564,7 @@ const CreateVertexScheduler = ({
                         setServiceAccountSelected={setServiceAccountSelected}
                         setPrimaryNetworkSelected={setPrimaryNetworkSelected}
                         setSubNetworkSelected={setSubNetworkSelected}
+                        setSubNetworkList={setSubNetworkList}
                         setSharedNetworkSelected={setSharedNetworkSelected}
                         setScheduleMode={setScheduleMode}
                         setScheduleValue={setScheduleValue}
@@ -582,6 +574,10 @@ const CreateVertexScheduler = ({
                         setMaxRuns={setMaxRuns}
                         setTimeZoneSelected={setTimeZoneSelected}
                         setEditMode={setEditMode}
+                        setJobNameSelected={setJobNameSelected}
+                        setServiceAccountList={setServiceAccountList}
+                        setPrimaryNetworkList={setPrimaryNetworkList}
+                        setNetworkSelected={setNetworkSelected}
                     />
                     :
                     <div className='submit-job-container'>
@@ -612,8 +608,8 @@ const CreateVertexScheduler = ({
                         }
 
                         {
-                            machineTypeList && machineTypeList.map((item) => {
-                                if ("acceleratorConfigs" in item && item.machineType === machineTypeSelected && item.acceleratorConfigs !== null) {
+                            machineTypeList.length > 0 && machineTypeList.map((item) => {
+                                if (("acceleratorConfigs" in item && item.machineType === machineTypeSelected && item.acceleratorConfigs !== null) || ("acceleratorConfigs" in item && machineTypeSelected && item.machineType.split(' ')[0] === machineTypeSelected && item.acceleratorConfigs !== null)) {
                                     return (
                                         <div className="execution-history-main-wrapper">
                                             <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
@@ -748,9 +744,11 @@ const CreateVertexScheduler = ({
                                 options={serviceAccountList}
                                 getOptionLabel={option => option.displayName}
                                 value={
-                                    serviceAccountList.find(
+                                    !editMode ? serviceAccountList.find(
                                         option => option.displayName === serviceAccountSelected?.displayName
-                                    ) || null
+                                    ) || null : serviceAccountList.find(
+                                        option => option.email === serviceAccountSelected?.email
+                                    ) || null 
                                 }
                                 clearIcon={false}
                                 loading={serviceAccountLoading}
