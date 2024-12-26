@@ -80,4 +80,29 @@ export class StorageServices {
             // );
         }
     };
+    static downloadJobAPIService = async (
+        gcsUrl: string | undefined,
+        setJobDownloadLoading: (value: boolean) => void,
+    ) => {
+        try {
+            setJobDownloadLoading(true)
+            const formattedResponse: any = await requestAPI(`api/storage/downloadOutput?output_uri${gcsUrl}`);
+            console.log(formattedResponse)
+            setJobDownloadLoading(false)
+            toast.success(
+                `Job history downloaded successfully`,
+                toastifyCustomStyle
+            );
+        } catch (error) {
+            setJobDownloadLoading(false)
+            DataprocLoggingService.log(
+                'Error in downloading the job history',
+                LOG_LEVEL.ERROR
+            );
+            toast.success(
+                `Error in downloading the job history`,
+                toastifyCustomStyle
+            );
+        }
+    };
 }

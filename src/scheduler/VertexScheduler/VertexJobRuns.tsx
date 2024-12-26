@@ -25,6 +25,7 @@ import { CircularProgress } from '@mui/material';
 import { IconDownload } from '../../utils/icons';
 import { VertexServices } from '../../Services/Vertex';
 import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { StorageServices } from '../../Services/Storage';
 
 const VertexJobRuns = ({
     region,
@@ -71,8 +72,8 @@ const VertexJobRuns = ({
     dagRunsList: IDagRunList[];
     setDagRunsList: (value: IDagRunList[]) => void;
 }): JSX.Element => {
-    // const [dagRunsCurrentDateList, setDagRunsCurrentDateList] = useState([]);
-    const [downloadOutputDagRunId] = useState('');
+    const [jobDownloadLoading, setJobDownloadLoading] = useState(false);
+    const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState<string | undefined>('');
     const [listDagRunHeight, setListDagRunHeight] = useState(
         window.innerHeight - 485
     );
@@ -230,22 +231,19 @@ const VertexJobRuns = ({
         }
     };
 
-    const handleDownloadOutput = async (event: React.MouseEvent) => {
-        const dagRunId = event.currentTarget.getAttribute('data-dag-run-id')!;
-        console.log(dagRunId)
-        // await SchedulerService.handleDownloadOutputNotebookAPIService(
-        //     schedulerData,
-        //     dagRunId,
-        //     bucketName,
-        //     dagId,
-        //     setDownloadOutputDagRunId
-        // );
+    const handleDownloadOutput = async (data: { id?: string; status?: string; dagRunId?: string; state?: string; gcsUrl?: string; }) => {
+        console.log(data.gcsUrl)
+        setDownloadOutputDagRunId(data.dagRunId)
+        await StorageServices.downloadJobAPIService(
+            data.gcsUrl,
+            setJobDownloadLoading
+        );
     };
 
     const renderActions = (data: { id?: string; status?: string; dagRunId?: string; state?: string; }) => {
         return (
             <div className="actions-icon">
-                {data.dagRunId === downloadOutputDagRunId ? (
+                {jobDownloadLoading && data.dagRunId === downloadOutputDagRunId ? (
                     <div className="icon-buttons-style">
                         <CircularProgress
                             size={18}
@@ -262,10 +260,10 @@ const VertexJobRuns = ({
                                 : 'icon-buttons-style-disable'
                         }
                         title="Download Output"
-                        data-dag-run-id={data.dagRunId}
+                        data-dag-run-id={data}
                         onClick={
                             data.state === 'succeeded'
-                                ? e => handleDownloadOutput(e)
+                                ? e => handleDownloadOutput(data)
                                 : undefined
                         }
                     >
