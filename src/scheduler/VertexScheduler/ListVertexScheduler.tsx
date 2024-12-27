@@ -35,11 +35,13 @@ import { authApi } from '../../utils/utils';
 import { IconActive, IconDelete, IconEditDag, IconEditNotebook, IconFailed, IconListComplete, IconListPause, IconPause, IconPlay, IconSuccess, IconTrigger } from '../../utils/icons';
 import { VertexServices } from '../../Services/Vertex';
 import { IDagList } from './VertexInterfaces';
+import dayjs from 'dayjs';
 
 function ListVertexScheduler({
   region,
   setRegion,
   app,
+  setJobId,
   settingRegistry,
   handleDagIdSelection,
   setCreateCompleted,
@@ -74,6 +76,7 @@ function ListVertexScheduler({
   region: string;
   setRegion: (value: string) => void;
   app: JupyterFrontEnd;
+  setJobId: (value: string) => void;
   settingRegistry: ISettingRegistry;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
   // handleDagIdSelection: (dagId: any) => void;
@@ -97,8 +100,8 @@ function ListVertexScheduler({
   setScheduleMode: (value: scheduleMode) => void;
   setScheduleValue: (value: string) => void;
   setScheduleField: (value: string) => void;
-  setStartDate: (value: Date | null) => void;
-  setEndDate: (value: Date | null) => void;
+  setStartDate: (value: dayjs.Dayjs | null) => void;
+  setEndDate: (value: dayjs.Dayjs | null) => void;
   setMaxRuns: (value: string) => void;
   setTimeZoneSelected: (value: string) => void;
   setEditMode: (value: boolean) => void;
@@ -220,7 +223,6 @@ function ListVertexScheduler({
 
   /**
   * Cancel delete pop up
-  * @param {}
   */
   const handleCancelDelete = () => {
     setDeletePopupOpen(false);
@@ -228,7 +230,6 @@ function ListVertexScheduler({
 
   /**
   * Delete a schedule
-  * @param {}
   */
   const handleDeleteScheduler = async () => {
     setDeletingSchedule(true);
@@ -265,10 +266,14 @@ function ListVertexScheduler({
   * @param {}
   */
   const handleEditJob = async (event: React.MouseEvent, displayName: string) => {
-    const jobId = event.currentTarget.getAttribute('data-jobid');
-    if (jobId !== null) {
+    const job_id = event.currentTarget.getAttribute('data-jobid');
+    console.log(job_id)
+    if (job_id) {
+      setJobId(job_id)
+    }
+    if (job_id !== null) {
       await VertexServices.editVertexSJobService(
-        jobId,
+        job_id,
         region,
         setInputNotebookFilePath,
         setEditDagLoading,

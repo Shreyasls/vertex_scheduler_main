@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { JupyterLab } from "@jupyterlab/application";
 import { toast } from "react-toastify";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { requestAPI } from "../handler/handler";
 import { DataprocLoggingService, LOG_LEVEL } from "../utils/loggingService";
 import { toastifyCustomStyle } from "../utils/utils";
@@ -55,10 +54,8 @@ export class VertexServices {
     };
     static createVertexSchedulerService = async (
         payload: ICreatePayload,
-        app: JupyterLab,
         setCreateCompleted: (value: boolean) => void,
         setCreatingVertexScheduler: (value: boolean) => void,
-        editMode: boolean
     ) => {
         setCreatingVertexScheduler(true);
         try {
@@ -70,17 +67,42 @@ export class VertexServices {
                 toast.error(data.error, toastifyCustomStyle);
                 setCreatingVertexScheduler(false);
             } else {
-                if (editMode) {
-                    toast.success(
-                        `Job ${payload.display_name} successfully updated`,
-                        toastifyCustomStyle
-                    );
-                } else {
-                    toast.success(
-                        `Job ${payload.display_name} successfully created`,
-                        toastifyCustomStyle
-                    );
-                }
+                toast.success(
+                    `Job ${payload.display_name} successfully created`,
+                    toastifyCustomStyle
+                );
+                setCreatingVertexScheduler(false);
+                setCreateCompleted(true);
+            }
+        } catch (reason) {
+            setCreatingVertexScheduler(false);
+            toast.error(
+                `Error on POST {dataToSend}.\n${reason}`,
+                toastifyCustomStyle
+            );
+        }
+    };
+    static editVertexJobSchedulerService = async (
+        jobId: string,
+        region: string,
+        payload: ICreatePayload,
+        setCreateCompleted: (value: boolean) => void,
+        setCreatingVertexScheduler: (value: boolean) => void,
+    ) => {
+        setCreatingVertexScheduler(true);
+        try {
+            const data: any = await requestAPI(`api/vertex/updateSchedule?region_id=${region}&schedule_id=${jobId}`, {
+                body: JSON.stringify(payload),
+                method: 'POST'
+            });
+            if (data.error) {
+                toast.error(data.error, toastifyCustomStyle);
+                setCreatingVertexScheduler(false);
+            } else {
+                toast.success(
+                    `Job ${payload.display_name} successfully updated`,
+                    toastifyCustomStyle
+                );
                 setCreatingVertexScheduler(false);
                 setCreateCompleted(true);
             }
@@ -202,7 +224,7 @@ export class VertexServices {
         region: string,
         scheduleId: string,
         displayName: string,
-        setTriggerLoading:  (value: string) => void,
+        setTriggerLoading: (value: string) => void,
     ) => {
         setTriggerLoading(scheduleId);
         try {
@@ -297,7 +319,7 @@ export class VertexServices {
     };
 
     static editVertexSJobService = async (
-        jobId: string,
+        job_id: string,
         region: string,
         setInputNotebookFilePath: (value: string) => void,
         setEditDagLoading: (value: string) => void,
@@ -322,8 +344,8 @@ export class VertexServices {
         setScheduleMode: (value: scheduleMode) => void,
         setScheduleValue: (value: string) => void,
         setScheduleField: (value: string) => void,
-        setStartDate: (value: Date | null) => void,
-        setEndDate: (value: Date | null) => void,
+        setStartDate: (value: dayjs.Dayjs | null) => void,
+        setEndDate: (value: dayjs.Dayjs | null) => void,
         setMaxRuns: (value: string) => void,
         setTimeZoneSelected: (value: string) => void,
         setEditMode: (value: boolean) => void,
@@ -331,10 +353,10 @@ export class VertexServices {
         setServiceAccountList: (value: { displayName: string; email: string }[]) => void,
         setNetworkSelected: (value: string) => void
     ) => {
-        setEditDagLoading(jobId);
+        setEditDagLoading(job_id);
         try {
             const serviceURL = `api/vertex/getSchedule`;
-            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${jobId}`
+            const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${job_id}`
             );
             if (formattedResponse && Object.keys(formattedResponse).length > 0) {
                 const inputFileName = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri.split('/');
@@ -346,11 +368,12 @@ export class VertexServices {
                 setAcceleratedCount(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorCount)
                 setAcceleratorType(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorType)
                 setKernelSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.kernelName)
-                setCloudStorage( formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsOutputUri.replace('gs://', ''))
+                setCloudStorage(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsOutputUri.replace('gs://', ''))
                 setDiskTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskType)
                 setDiskSize(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskSizeGb)
 
-                const parameterList = Object.keys(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels).map((key) => key +":"+ formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels[key])
+                const parameterList = Object.keys(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels).map((key) => key + ":" + formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels[key])
+                console.log(parameterList)
                 setParameterDetail(parameterList);
                 setParameterDetailUpdated(parameterList);
                 setServiceAccountSelected({ displayName: '', email: formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.serviceAccount });
@@ -362,22 +385,17 @@ export class VertexServices {
                 const subnetwork = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.networkSpec.subnetwork.split('/');
                 setSubNetworkSelected({ name: subnetwork[subnetwork.length - 1], link: subnetwork[subnetwork.length - 1] })
                 setSubNetworkList([{ name: subnetwork[subnetwork.length - 1], link: subnetwork[subnetwork.length - 1] }])
-                console.log('schedule mode data', formattedResponse.cron,formattedResponse.maxRunCount )
-                if(formattedResponse.cron === '* * * * *' && formattedResponse.maxRunCount === '1') {
-                    console.log('inside schedule mode run now')
+                if (formattedResponse.cron === '* * * * *' && formattedResponse.maxRunCount === '1') {
                     setScheduleMode('runNow');
                 } else {
-                    console.log('inside schedule mode run on schedule')
                     setScheduleMode('runSchedule');
                 }
                 // setSharedNetworkSelected()
-                // 
-                
                 setScheduleField(formattedResponse.cron);
-                // const dateFormat = ((formattedResponse.startTime.getMonth() > 8) ? (formattedResponse.startTime.getMonth() + 1) : ('0' + (formattedResponse.startTime.getMonth() + 1))) + '/' + ((formattedResponse.startTime.getDate() > 9) ? formattedResponse.startTime.getDate() : ('0' + formattedResponse.startTime.getDate())) + '/' + formattedResponse.startTime.getFullYear();
-                // console.log('date added', new Date(dateFormat));
-                // setStartDate(new Date(dateFormat));
-                // setEndDate()
+                const start_time = formattedResponse.startTime;
+                const end_time = formattedResponse.endTime;
+                setStartDate(start_time ? dayjs(start_time) : null);
+                setEndDate(end_time ? dayjs(end_time) : null)
                 // setScheduleValue()
                 setMaxRuns(formattedResponse.maxRunCount);
                 // setTimeZoneSelected()

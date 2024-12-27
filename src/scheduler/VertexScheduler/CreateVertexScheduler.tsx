@@ -78,8 +78,8 @@ const CreateVertexScheduler = ({
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
     setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const [parameterDetail, setParameterDetail] = useState(['']);
-    const [parameterDetailUpdated, setParameterDetailUpdated] = useState(['']);
+    const [parameterDetail, setParameterDetail] = useState<string[]>([]);
+    const [parameterDetailUpdated, setParameterDetailUpdated] = useState<string[]>([]);
     const [keyValidation, setKeyValidation] = useState(-1);
     const [valueValidation, setValueValidation] = useState(-1);
     const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
@@ -92,6 +92,7 @@ const CreateVertexScheduler = ({
     const [subNetworkLoading, setSubNetworkLoading] = useState<boolean>(false)
     const [sharedNetworkLoading, setSharedNetworkLoading] = useState<boolean>(false)
 
+    const [jobId, setJobId] = useState<string>('');
     const [hostProject, setHostProject] = useState<string>('');
     const [region, setRegion] = useState<string>('');
     const [projectId, setProjectId] = useState<string>('');
@@ -122,8 +123,8 @@ const CreateVertexScheduler = ({
         Intl.DateTimeFormat().resolvedOptions().timeZone
     );
     const timezones = Object.keys(tzdata.zones).sort();
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(dayjs());
+    const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(dayjs());
     const [endDateError, setEndDateError] = useState<boolean>(false)
 
     /**
@@ -286,7 +287,6 @@ const CreateVertexScheduler = ({
     * @param {{ target: { value: React.SetStateAction<string>; }; }} eventValue network selected
     */
     const handleNetworkSelection = (eventValue: { target: { value: React.SetStateAction<string>; }; }) => {
-        // console.log('network', eventValue);
         if (networkSelected === 'networkInThisProject') {
             setSharedNetworkSelected(null)
         } if (networkSelected === 'networkShared') {
@@ -301,7 +301,8 @@ const CreateVertexScheduler = ({
     * @param {string | null | any} val Start date selected
     */
     const handleStartDate = (val: string | null | any) => {
-        setStartDate(val.$d)
+        const startDateValue = dayjs(val.$d); // Ensure it's a dayjs object
+        setStartDate(startDateValue);
         if (val && endDate && dayjs(endDate).isBefore(dayjs(val))) {
             setEndDateError(true);
         } else {
@@ -314,12 +315,14 @@ const CreateVertexScheduler = ({
     * @param {string | null | any} val End date selected
     */
     const handleEndDate = (val: string | null | any) => {
+        const endDateValue = dayjs(val.$d);
+        setStartDate(endDateValue);
         if (startDate && (dayjs(val).isBefore(dayjs(startDate)) || dayjs(val).isSame(dayjs(startDate), 'minute'))) {
             setEndDateError(true);
         } else {
             setEndDateError(false);
         }
-        setEndDate(val.$d)
+        setEndDate(endDateValue)
     }
 
     /**
@@ -485,16 +488,25 @@ const CreateVertexScheduler = ({
             disk_type: diskTypeSelected,
             disk_size: diskSize
         }
-        await VertexServices.createVertexSchedulerService(
-            payload,
-            app,
-            setCreateCompleted,
-            setCreatingVertexScheduler,
-            editMode
-        );
-        // setEditMode(false);
+        console.log(payload)
+        if (editMode) {
+            await VertexServices.editVertexJobSchedulerService(
+                jobId,
+                region,
+                payload,
+                setCreateCompleted,
+                setCreatingVertexScheduler,
+            );
+        } else {
+            await VertexServices.createVertexSchedulerService(
+                payload,
+                setCreateCompleted,
+                setCreatingVertexScheduler,
+            );
+        }
+        setEditMode(false);
     }
-
+    console.log(jobId)
     /**
     * Cancel a job schedule
     */
@@ -512,21 +524,23 @@ const CreateVertexScheduler = ({
     }, [serviceAccountList.length > 0]);
 
     useEffect(() => {
-        if (!createCompleted) {
-            if (region !== '') {
-                machineTypeAPI()
-            }
-            if (serviceAccountList.length > 0) {
-                setServiceAccountSelected(serviceAccountList[0])
-            }
-            if (Object.keys(hostProject).length > 0) {
-                sharedNetworkAPI()
-            }
-            hostProjectAPI()
-            cloudStorageAPI()
-            serviceAccountAPI()
-            primaryNetworkAPI()
+        if (parameterDetail.length > 0) {
+            setParameterDetail(prevDetails => [...prevDetails, ...parameterDetail]);
+            setParameterDetailUpdated(prevDetails => [...prevDetails, ...parameterDetailUpdated]);
         }
+    }, [createCompleted]);
+
+    useEffect(() => {
+        if (region !== '') {
+            machineTypeAPI()
+        }
+        if (Object.keys(hostProject).length > 0) {
+            sharedNetworkAPI()
+        }
+        hostProjectAPI()
+        cloudStorageAPI()
+        serviceAccountAPI()
+        primaryNetworkAPI()
         authApi()
             .then((credentials) => {
                 if (credentials && credentials?.region_id && credentials.project_id) {
@@ -537,7 +551,16 @@ const CreateVertexScheduler = ({
             .catch((error) => {
                 console.error(error);
             });
-    }, [projectId, createCompleted]);
+    }, [projectId]);
+
+    useEffect(() => {
+        if (editMode && machineTypeSelected) {
+            const matchedMachine = machineTypeList.find(item => item.machineType.includes(machineTypeSelected))
+            if (matchedMachine) {
+                setMachineTypeSelected(matchedMachine.machineType);
+            }
+        }
+    }, [editMode]);
 
     return (
         <>
@@ -547,6 +570,7 @@ const CreateVertexScheduler = ({
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
+                        setJobId={setJobId}
                         setExecutionPageFlag={setExecutionPageFlag}
                         setCreateCompleted={setCreateCompleted}
                         setInputFileSelected={setInputFileSelected}
@@ -719,24 +743,22 @@ const CreateVertexScheduler = ({
                                 />
                             </div>
                         </div>
-                        <>
-                            <div className="create-job-scheduler-title sub-title-heading ">
-                                Parameters
-                            </div>
-                            <LabelProperties
-                                labelDetail={parameterDetail}
-                                setLabelDetail={setParameterDetail}
-                                labelDetailUpdated={parameterDetailUpdated}
-                                setLabelDetailUpdated={setParameterDetailUpdated}
-                                buttonText="ADD PARAMETER"
-                                keyValidation={keyValidation}
-                                setKeyValidation={setKeyValidation}
-                                valueValidation={valueValidation}
-                                setValueValidation={setValueValidation}
-                                duplicateKeyError={duplicateKeyError}
-                                setDuplicateKeyError={setDuplicateKeyError}
-                            />
-                        </>
+                        <div className="create-job-scheduler-title sub-title-heading ">
+                            Parameters
+                        </div>
+                        <LabelProperties
+                            labelDetail={parameterDetail}
+                            setLabelDetail={setParameterDetail}
+                            labelDetailUpdated={parameterDetailUpdated}
+                            setLabelDetailUpdated={setParameterDetailUpdated}
+                            buttonText="ADD PARAMETER"
+                            keyValidation={keyValidation}
+                            setKeyValidation={setKeyValidation}
+                            valueValidation={valueValidation}
+                            setValueValidation={setValueValidation}
+                            duplicateKeyError={duplicateKeyError}
+                            setDuplicateKeyError={setDuplicateKeyError}
+                        />
 
                         <div className="create-scheduler-form-element panel-margin">
                             <Autocomplete
@@ -748,7 +770,7 @@ const CreateVertexScheduler = ({
                                         option => option.displayName === serviceAccountSelected?.displayName
                                     ) || null : serviceAccountList.find(
                                         option => option.email === serviceAccountSelected?.email
-                                    ) || null 
+                                    ) || null
                                 }
                                 clearIcon={false}
                                 loading={serviceAccountLoading}
