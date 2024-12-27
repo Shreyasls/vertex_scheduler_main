@@ -25,9 +25,8 @@ from dataproc_jupyter_plugin.commons.constants import (
 from dataproc_jupyter_plugin.models.models import (
     DescribeVertexJob,
     DescribeUpdateVertexJob,
-    DescribeBucketName
+    DescribeBucketName,
 )
-
 
 
 class Client:
@@ -227,7 +226,6 @@ class Client:
         except Exception as e:
             return {"error": str(e)}
 
-
     async def list_schedules(self, region_id, next_page_token=None):
         try:
             result = {}
@@ -257,12 +255,19 @@ class Client:
                                 schedule_value = "run once"
                             else:
                                 schedule_value = get_description(cron)
+
                             formatted_schedule = {
                                 "name": schedule.get("name"),
                                 "displayName": schedule.get("displayName"),
                                 "schedule": schedule_value,
                                 "status": schedule.get("state"),
                                 "createTime": schedule.get("createTime"),
+                                "gcsNotebookSourceUri": schedule.get(
+                                    "createNotebookExecutionJobRequest"
+                                )
+                                .get("notebookExecutionJob")
+                                .get("gcsNotebookSource")
+                                .get("uri"),
                                 "lastScheduledRunResponse": schedule.get(
                                     "lastScheduledRunResponse"
                                 ),
@@ -476,7 +481,6 @@ class Client:
             self.log.exception(f"Error updating schedule: {str(e)}")
             return {"Error updating schedule": str(e)}
 
-
     async def create_new_bucket(self, input_data):
         try:
             data = DescribeBucketName(**input_data)
@@ -484,7 +488,6 @@ class Client:
             return res
         except Exception as e:
             return {"error": str(e)}
-
 
     async def list_notebook_execution_jobs(self, region_id, schedule_id, start_date):
         try:
@@ -502,7 +505,10 @@ class Client:
                     else:
                         jobs = resp.get("notebookExecutionJobs")
                         for job in jobs:
-                            if start_date.rsplit('-',1)[0] == job.get('createTime').rsplit('-',1)[0]:
+                            if (
+                                start_date.rsplit("-", 1)[0]
+                                == job.get("createTime").rsplit("-", 1)[0]
+                            ):
                                 execution_jobs.append(job)
                         return execution_jobs
                 else:
@@ -511,5 +517,7 @@ class Client:
                         f"Error fetching notebook execution jobs: {response.reason} {await response.text()}"
                     )
         except Exception as e:
-            self.log.exception(f"Error fetching list of notebook execution jobs: {str(e)}")
+            self.log.exception(
+                f"Error fetching list of notebook execution jobs: {str(e)}"
+            )
             return {"Error fetching list of notebook execution jobs": str(e)}
