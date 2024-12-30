@@ -79,7 +79,6 @@ function ListVertexScheduler({
   setJobId: (value: string) => void;
   settingRegistry: ISettingRegistry;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
-  // handleDagIdSelection: (dagId: any) => void;
   setCreateCompleted: (value: boolean) => void;
   setInputFileSelected: (value: string) => void;
   setMachineTypeSelected: (value: string | null) => void;
@@ -123,11 +122,9 @@ function ListVertexScheduler({
   console.log(isPreviewEnabled)
   const [nextPageFlag, setNextPageFlag] = useState<string>('');
   console.log(nextPageFlag);
-  // const [region, setRegion] = useState<string>('');
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
-  // const [vertexSelectedList, setVertexSelectedList] = useState('');
 
   const columns = React.useMemo(
     () => [
@@ -402,7 +399,6 @@ function ListVertexScheduler({
             role="button"
             className="icon-buttons-style"
             title="Edit Schedule"
-            // data-jobid={data.jobid}
             data-jobid={data.name}
             onClick={e => handleEditJob(e, data.displayName)}
           >
@@ -413,7 +409,6 @@ function ListVertexScheduler({
           </div>
         )}
         {
-          // isPreviewEnabled &&
           (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
@@ -464,16 +459,12 @@ function ListVertexScheduler({
           {...cell.getCellProps()}
           className="clusters-table-data"
           onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
-        // onClick={() => handleDagIdSelection(vertexSelectedList, cell.value)}
         >
           {cell.value}
         </td>
       );
     } else {
-      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED'
-        // to do  
-        // && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK'
-        ;
+      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED';
 
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
@@ -601,31 +592,7 @@ function ListVertexScheduler({
           </Button>
         </div>
       </div>
-
-      {/*
-        {importErrorEntries > 0 && (
-          <div className="import-error-parent">
-            <div
-              className="accordion-button"
-              role="button"
-              aria-label="Show Import Errors"
-              title="Show Import Errors"
-              onClick={handleImportErrorPopup}
-            >
-              Show Schedule Errors ({importErrorEntries})
-            </div>
-            {importErrorPopupOpen && (
-              <ImportErrorPopup
-                importErrorData={importErrorData}
-                importErrorEntries={importErrorEntries}
-                importErrorPopupOpen={importErrorPopupOpen}
-                onClose={handleImportErrorClosed}
-                onDelete={(dagId: string) => handleDeleteImportError(dagId)}
-              />
-            )}
-          </div>
-        )}
-      </div> */}
+      
       {dagList.length > 0 ? (
         <>
           <div className="notebook-templates-list-table-parent">

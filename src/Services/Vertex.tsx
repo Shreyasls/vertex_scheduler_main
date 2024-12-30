@@ -358,32 +358,39 @@ export class VertexServices {
             const serviceURL = `api/vertex/getSchedule`;
             const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${job_id}`
             );
+
             if (formattedResponse && Object.keys(formattedResponse).length > 0) {
                 const inputFileName = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri.split('/');
                 setInputFileSelected(inputFileName[inputFileName.length - 1]);
                 setCreateCompleted(false);
                 setRegion(region);
                 setJobNameSelected(formattedResponse.displayName);
+
+                // Machine type selection
                 setMachineTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.machineType)
                 setAcceleratedCount(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorCount)
                 setAcceleratorType(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.machineSpec.acceleratorType)
+
                 setKernelSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.kernelName)
                 setCloudStorage(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsOutputUri.replace('gs://', ''))
                 setDiskTypeSelected(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskType)
                 setDiskSize(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.persistentDiskSpec.diskSizeGb)
 
-                const parameterList = Object.keys(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels).map((key) => key + ":" + formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels[key])
-                console.log(parameterList)
-                setParameterDetail(parameterList);
-                setParameterDetailUpdated(parameterList);
+                // Parameters
+                if(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty('labels')) {
+                    const parameterList = Object.keys(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels).map((key) => key + ":" + formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.labels[key])
+                    setParameterDetail(parameterList);
+                    setParameterDetailUpdated(parameterList);
+                }
+                
                 setServiceAccountSelected({ displayName: '', email: formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.serviceAccount });
 
+                // Network
                 const primaryNetwork = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.networkSpec.network.split('/');
                 setPrimaryNetworkSelected({ name: primaryNetwork[primaryNetwork.length - 1], link: primaryNetwork[primaryNetwork.length - 1] });
-                setPrimaryNetworkList([{ name: primaryNetwork[primaryNetwork.length - 1], link: primaryNetwork[primaryNetwork.length - 1] }]);
-
                 const subnetwork = formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.customEnvironmentSpec.networkSpec.subnetwork.split('/');
                 setSubNetworkSelected({ name: subnetwork[subnetwork.length - 1], link: subnetwork[subnetwork.length - 1] })
+
                 setSubNetworkList([{ name: subnetwork[subnetwork.length - 1], link: subnetwork[subnetwork.length - 1] }])
                 if (formattedResponse.cron === '* * * * *' && formattedResponse.maxRunCount === '1') {
                     setScheduleMode('runNow');
@@ -521,7 +528,6 @@ export class VertexServices {
             setRedListDates(redList);
             setGreenListDates(greenList);
             setDarkGreenListDates(darkGreenList);
-            console.log(transformDagRunListDataCurrent.length)
             setDagRunsList(transformDagRunListDataCurrent)
         } catch (error) {
             toast.error(

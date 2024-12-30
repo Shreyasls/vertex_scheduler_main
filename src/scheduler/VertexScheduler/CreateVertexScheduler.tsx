@@ -446,7 +446,7 @@ const CreateVertexScheduler = ({
             (networkSelected === 'networkInThisProject' && (primaryNetworkSelected === null || subNetworkSelected === null)) ||
             (networkSelected === 'networkShared' && (sharedNetworkSelected === null)) ||
             ((scheduleMode === 'runSchedule' && internalScheduleMode === 'cronFormat') && (scheduleField === '')) ||
-            inputFileSelected === ''
+            inputFileSelected === '' || endDateError
         );
     };
 
@@ -998,6 +998,9 @@ const CreateVertexScheduler = ({
                                                     tabs: {
                                                         hidden: true,
                                                     },
+                                                    textField: {
+                                                        error: false,
+                                                    },
                                                 }}
                                                 disablePast
                                                 closeOnSelect={true}
@@ -1019,6 +1022,9 @@ const CreateVertexScheduler = ({
                                                     field: { clearable: true },
                                                     tabs: {
                                                         hidden: true,
+                                                    },
+                                                    textField: {
+                                                        error: false,
                                                     },
                                                 }}
                                                 disablePast
