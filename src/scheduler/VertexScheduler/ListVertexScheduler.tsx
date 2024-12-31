@@ -28,35 +28,91 @@ import {
   Button
 } from '@mui/material';
 import DeletePopup from '../../utils/deletePopup';
-import { PLUGIN_ID } from '../../utils/const';
+import { PLUGIN_ID, scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/utils';
 import { IconActive, IconDelete, IconEditDag, IconEditNotebook, IconFailed, IconListComplete, IconListPause, IconPause, IconPlay, IconSuccess, IconTrigger } from '../../utils/icons';
 import { VertexServices } from '../../Services/Vertex';
 import { IDagList } from './VertexInterfaces';
+import dayjs from 'dayjs';
 
-function listVertexScheduler({
+function ListVertexScheduler({
   region,
   setRegion,
   app,
+  setJobId,
   settingRegistry,
-  handleDagIdSelection
+  handleDagIdSelection,
+  setCreateCompleted,
+  setInputFileSelected,
+  setMachineTypeSelected,
+  setAcceleratedCount,
+  setAcceleratorType,
+  setKernelSelected,
+  setCloudStorage,
+  setDiskTypeSelected,
+  setDiskSize,
+  setParameterDetail,
+  setParameterDetailUpdated,
+  setServiceAccountSelected,
+  setPrimaryNetworkSelected,
+  setSubNetworkSelected,
+  setSubNetworkList,
+  setSharedNetworkSelected,
+  setScheduleMode,
+  setScheduleValue,
+  setScheduleField,
+  setStartDate,
+  setEndDate,
+  setMaxRuns,
+  setTimeZoneSelected,
+  setEditMode,
+  setJobNameSelected,
+  setServiceAccountList,
+  setPrimaryNetworkList,
+  setNetworkSelected
 }: {
   region: string;
   setRegion: (value: string) => void;
   app: JupyterFrontEnd;
+  setJobId: (value: string) => void;
   settingRegistry: ISettingRegistry;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
-  // handleDagIdSelection: (dagId: any) => void;
+  setCreateCompleted: (value: boolean) => void;
+  setInputFileSelected: (value: string) => void;
+  setMachineTypeSelected: (value: string | null) => void;
+  setAcceleratedCount: (value: string | null) => void;
+  setAcceleratorType: (value: string | null) => void;
+  setKernelSelected: (value: string | null) => void;
+  setCloudStorage: (value: string | null) => void;
+  setDiskTypeSelected: (value: string | null) => void;
+  setDiskSize: (value: string) => void;
+  setParameterDetail: (value: string[]) => void;
+  setParameterDetailUpdated: (value: string[]) => void;
+  setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void;
+  setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setPrimaryNetworkList: (value: { name: string; link: string }[]) => void;
+  setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setSubNetworkList: (value: { name: string; link: string }[]) => void;
+  setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void;
+  setScheduleMode: (value: scheduleMode) => void;
+  setScheduleValue: (value: string) => void;
+  setScheduleField: (value: string) => void;
+  setStartDate: (value: dayjs.Dayjs | null) => void;
+  setEndDate: (value: dayjs.Dayjs | null) => void;
+  setMaxRuns: (value: string) => void;
+  setTimeZoneSelected: (value: string) => void;
+  setEditMode: (value: boolean) => void;
+  setJobNameSelected: (value: string) => void;
+  setServiceAccountList: (value: { displayName: string; email: string }[]) => void;
+  setNetworkSelected: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
-  // const [editDagLoading,
-  //   //setEditDagLoading
-  // ] = useState('');
+  const [editDagLoading, setEditDagLoading] = useState('');
   const [triggerLoading, setTriggerLoading] = useState('');
   const [resumeLoading, setResumeLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
@@ -66,11 +122,9 @@ function listVertexScheduler({
   console.log(isPreviewEnabled)
   const [nextPageFlag, setNextPageFlag] = useState<string>('');
   console.log(nextPageFlag);
-  // const [region, setRegion] = useState<string>('');
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
-  // const [vertexSelectedList, setVertexSelectedList] = useState('');
 
   const columns = React.useMemo(
     () => [
@@ -166,7 +220,6 @@ function listVertexScheduler({
 
   /**
   * Cancel delete pop up
-  * @param {}
   */
   const handleCancelDelete = () => {
     setDeletePopupOpen(false);
@@ -174,7 +227,6 @@ function listVertexScheduler({
 
   /**
   * Delete a schedule
-  * @param {}
   */
   const handleDeleteScheduler = async () => {
     setDeletingSchedule(true);
@@ -194,7 +246,7 @@ function listVertexScheduler({
   * Edit schedule
   * @param {}
   */
-  const handleEditVertex = async (event: React.MouseEvent, displayName: string) => {
+  const handleEditVertex = async (event: React.MouseEvent) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
       await VertexServices.editVertexSchedulerService(
@@ -202,6 +254,55 @@ function listVertexScheduler({
         region,
         setInputNotebookFilePath,
         setEditNotebookLoading,
+      );
+    }
+  };
+
+  /**
+  * Edit job
+  * @param {}
+  */
+  const handleEditJob = async (event: React.MouseEvent, displayName: string) => {
+    const job_id = event.currentTarget.getAttribute('data-jobid');
+    console.log(job_id)
+    if (job_id) {
+      setJobId(job_id)
+    }
+    if (job_id !== null) {
+      await VertexServices.editVertexSJobService(
+        job_id,
+        region,
+        setInputNotebookFilePath,
+        setEditDagLoading,
+        setCreateCompleted,
+        setInputFileSelected,
+        setRegion,
+        setMachineTypeSelected,
+        setAcceleratedCount,
+        setAcceleratorType,
+        setKernelSelected,
+        setCloudStorage,
+        setDiskTypeSelected,
+        setDiskSize,
+        setParameterDetail,
+        setParameterDetailUpdated,
+        setServiceAccountSelected,
+        setPrimaryNetworkSelected,
+        setPrimaryNetworkList,
+        setSubNetworkSelected,
+        setSubNetworkList,
+        setSharedNetworkSelected,
+        setScheduleMode,
+        setScheduleValue,
+        setScheduleField,
+        setStartDate,
+        setEndDate,
+        setMaxRuns,
+        setTimeZoneSelected,
+        setEditMode,
+        setJobNameSelected,
+        setServiceAccountList,
+        setNetworkSelected
       );
     }
   };
@@ -237,7 +338,7 @@ function listVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) : (
+        ) :
           <div
             role="button"
             className="icon-buttons-style"
@@ -262,7 +363,6 @@ function listVertexScheduler({
                   />
                 ))}
           </div>
-          )
         }
         {data.name === triggerLoading ? (
           <div className="icon-buttons-style">
@@ -272,8 +372,8 @@ function listVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) : (
-          <div
+        ) :
+          (<div
             role="button"
             className='icon-buttons-style'
             title='Trigger the job'
@@ -284,10 +384,9 @@ function listVertexScheduler({
               tag="div"
               className="icon-white logo-alignment-style"
             />
-          </div>
-        )
+          </div>)
         }
-        {/* {data.jobid === editDagLoading ? (
+        {data.name === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -295,20 +394,20 @@ function listVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) : ( */}
-        <div
-          role="button"
-          className="icon-buttons-style"
-          title="Edit Schedule"
-          data-jobid={data.jobid}
-        //onClick={e => handleEditDags(e)}
-        >
-          <IconEditNotebook.react
-            tag="div"
-            className="icon-white logo-alignment-style"
-          />
-        </div>
-        {/* )} */}
+        ) : (
+          <div
+            role="button"
+            className="icon-buttons-style"
+            title="Edit Schedule"
+            data-jobid={data.name}
+            onClick={e => handleEditJob(e, data.displayName)}
+          >
+            <IconEditNotebook.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          </div>
+        )}
         {
           (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
@@ -324,7 +423,7 @@ function listVertexScheduler({
               className="icon-buttons-style"
               title="Edit Notebook"
               data-scheduleId={data.name}
-              onClick={e => handleEditVertex(e, data.displayName)}
+              onClick={e => handleEditVertex(e)}
             >
               <IconEditDag.react
                 tag="div"
@@ -360,15 +459,12 @@ function listVertexScheduler({
           {...cell.getCellProps()}
           className="clusters-table-data"
           onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
-        // onClick={() => handleDagIdSelection(vertexSelectedList, cell.value)}
         >
           {cell.value}
         </td>
       );
     } else {
       const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED';
-      // to do
-      //  && cell.row.original.lastScheduledRunResponse.runResponse !== 'OK';
 
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
@@ -496,31 +592,7 @@ function listVertexScheduler({
           </Button>
         </div>
       </div>
-
-      {/*
-        {importErrorEntries > 0 && (
-          <div className="import-error-parent">
-            <div
-              className="accordion-button"
-              role="button"
-              aria-label="Show Import Errors"
-              title="Show Import Errors"
-              onClick={handleImportErrorPopup}
-            >
-              Show Schedule Errors ({importErrorEntries})
-            </div>
-            {importErrorPopupOpen && (
-              <ImportErrorPopup
-                importErrorData={importErrorData}
-                importErrorEntries={importErrorEntries}
-                importErrorPopupOpen={importErrorPopupOpen}
-                onClose={handleImportErrorClosed}
-                onDelete={(dagId: string) => handleDeleteImportError(dagId)}
-              />
-            )}
-          </div>
-        )}
-      </div> */}
+      
       {dagList.length > 0 ? (
         <>
           <div className="notebook-templates-list-table-parent">
@@ -580,4 +652,4 @@ function listVertexScheduler({
     </div>
   );
 }
-export default listVertexScheduler;
+export default ListVertexScheduler;
