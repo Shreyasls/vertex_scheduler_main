@@ -366,7 +366,6 @@ const CreateVertexScheduler = ({
     */
     const handleEndDate = (val: string | null | any) => {
         const endDateValue = dayjs(val.$d);
-        setStartDate(endDateValue);
         if (startDate && (dayjs(val).isBefore(dayjs(startDate)) || dayjs(val).isSame(dayjs(startDate), 'minute'))) {
             setEndDateError(true);
         } else {
