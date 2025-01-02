@@ -84,13 +84,15 @@ export class VertexServices {
         jobId: string,
         region: string,
         payload: ICreatePayload,
+        gcsUrl: string,
         setCreateCompleted: (value: boolean) => void,
         setCreatingVertexScheduler: (value: boolean) => void,
     ) => {
         setCreatingVertexScheduler(true);
         try {
+            const payloadData = {...payload, gcs_notebook_source: gcsUrl};
             const data: any = await requestAPI(`api/vertex/updateSchedule?region_id=${region}&schedule_id=${jobId}`, {
-                body: JSON.stringify(payload),
+                body: JSON.stringify(payloadData),
                 method: 'POST'
             });
             if (data.error) {
@@ -350,7 +352,8 @@ export class VertexServices {
         setEditMode: (value: boolean) => void,
         setJobNameSelected: (value: string) => void,
         setServiceAccountList: (value: { displayName: string; email: string }[]) => void,
-        setNetworkSelected: (value: string) => void
+        setNetworkSelected: (value: string) => void,
+        setGcsUrl: (value: string) => void
     ) => {
         setEditDagLoading(job_id);
         try {
@@ -402,10 +405,13 @@ export class VertexServices {
                 const end_time = formattedResponse.endTime;
                 setStartDate(start_time ? dayjs(start_time) : null);
                 setEndDate(end_time ? dayjs(end_time) : null)
+
+                setGcsUrl(formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.gcsNotebookSource.uri)
                 // setScheduleValue()
                 setMaxRuns(formattedResponse.maxRunCount);
                 // setTimeZoneSelected()
                 setEditMode(true);
+                
             } else {
                 setEditDagLoading('');
                 toast.error(
