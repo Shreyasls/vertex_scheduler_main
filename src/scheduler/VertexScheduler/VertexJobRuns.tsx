@@ -115,7 +115,7 @@ const VertexJobRuns = ({
         }
     }, [filteredData, setJobRunsData]);
 
-    console.log(jobRunsData)
+    // console.log(jobRunsData)
     const columns = React.useMemo(
         () => [
             {
@@ -232,10 +232,11 @@ const VertexJobRuns = ({
     };
 
     const handleDownloadOutput = async (data: { id?: string; status?: string; dagRunId?: string; state?: string; gcsUrl?: string; }) => {
-        console.log(data.gcsUrl)
+        console.log(data)
         setDownloadOutputDagRunId(data.dagRunId)
         await StorageServices.downloadJobAPIService(
             data.gcsUrl,
+            '',
             setJobDownloadLoading
         );
     };
