@@ -266,8 +266,7 @@ class Client:
                                     "createNotebookExecutionJobRequest"
                                 )
                                 .get("notebookExecutionJob")
-                                .get("gcsNotebookSource")
-                                .get("uri"),
+                                .get("gcsNotebookSource"),
                                 "lastScheduledRunResponse": schedule.get(
                                     "lastScheduledRunResponse"
                                 ),

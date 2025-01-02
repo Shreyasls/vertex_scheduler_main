@@ -19,7 +19,7 @@ import aiofiles
 
 
 class Client:
-    def __init__(self, credentials, log, client_session):
+    def __init__(self, credentials, log):
         self.log = log
         if not (
             ("access_token" in credentials)
@@ -31,12 +31,12 @@ class Client:
         self._access_token = credentials["access_token"]
         self.project_id = credentials["project_id"]
         self.region_id = credentials["region_id"]
-        self.client_session = client_session
 
     async def list_bucket(self):
         try:
             cloud_storage_buckets = []
-            storage_client = storage.Client()
+            credentials = oauth2.Credentials(token=self._access_token)
+            storage_client = storage.Client(credentials=credentials)
             buckets = storage_client.list_buckets()
             for bucket in buckets:
                 cloud_storage_buckets.append(bucket.name)
