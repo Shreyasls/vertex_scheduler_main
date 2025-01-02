@@ -129,7 +129,8 @@ const CreateVertexScheduler = ({
     const timezones = Object.keys(tzdata.zones).sort();
     const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(dayjs());
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(dayjs());
-    const [endDateError, setEndDateError] = useState<boolean>(false)
+    const [endDateError, setEndDateError] = useState<boolean>(false);
+    const [gcsUrl, setGcsUrl] = useState<string>('');
 
     /**
     * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
@@ -550,6 +551,7 @@ const CreateVertexScheduler = ({
                 jobId,
                 region,
                 payload,
+                gcsUrl,
                 setCreateCompleted,
                 setCreatingVertexScheduler,
             );
@@ -666,6 +668,7 @@ const CreateVertexScheduler = ({
                         setServiceAccountList={setServiceAccountList}
                         setPrimaryNetworkList={setPrimaryNetworkList}
                         setNetworkSelected={setNetworkSelected}
+                        setGcsUrl={setGcsUrl}
                     />
                     :
                     <div className='submit-job-container'>

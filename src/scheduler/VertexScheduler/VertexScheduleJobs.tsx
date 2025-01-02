@@ -63,7 +63,8 @@ const VertexScheduleJobs = ({
     setJobNameSelected,
     setServiceAccountList,
     setPrimaryNetworkList,
-    setNetworkSelected
+    setNetworkSelected,
+    setGcsUrl
     // composerSelectedFromCreate,
     // setCreateCompleted,
     // setJobNameSelected,
@@ -127,6 +128,7 @@ const VertexScheduleJobs = ({
     setJobNameSelected?: (value: string) => void;
     setServiceAccountList: (value: { displayName: string; email: string }[]) => void;
     setNetworkSelected: (value: string) => void;
+    setGcsUrl: (value: string) => void;
     // setComposerSelected?: (value: string) => void;
     // setScheduleMode?: (value: scheduleMode) => void;
     // setScheduleValue?: (value: string) => void;
@@ -226,6 +228,7 @@ const VertexScheduleJobs = ({
                         setServiceAccountList={setServiceAccountList}
                         setPrimaryNetworkList={setPrimaryNetworkList}
                         setNetworkSelected={setNetworkSelected}
+                        setGcsUrl={setGcsUrl}
                     />
                 </div>
             )}
@@ -312,6 +315,8 @@ export class NotebookJobs extends DataprocWidget {
                 } } setServiceAccountList={function (value: { displayName: string; email: string; }[]): void {
                     throw new Error('Function not implemented.');
                 } } setJobId={function (value: string): void {
+                    throw new Error('Function not implemented.');
+                } }setGcsUrl={function (value: string): void {
                     throw new Error('Function not implemented.');
                 } }/>
         );

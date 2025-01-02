@@ -71,7 +71,8 @@ function ListVertexScheduler({
   setJobNameSelected,
   setServiceAccountList,
   setPrimaryNetworkList,
-  setNetworkSelected
+  setNetworkSelected,
+  setGcsUrl
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -107,6 +108,7 @@ function ListVertexScheduler({
   setJobNameSelected: (value: string) => void;
   setServiceAccountList: (value: { displayName: string; email: string }[]) => void;
   setNetworkSelected: (value: string) => void;
+  setGcsUrl: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -302,7 +304,8 @@ function ListVertexScheduler({
         setEditMode,
         setJobNameSelected,
         setServiceAccountList,
-        setNetworkSelected
+        setNetworkSelected,
+        setGcsUrl
       );
     }
   };
