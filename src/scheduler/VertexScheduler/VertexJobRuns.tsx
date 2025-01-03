@@ -104,7 +104,7 @@ const VertexJobRuns = ({
                 return new Date(dagRun.date).toDateString() === selectedDateString;
             });
         }
-        return dagRunsList;
+        return [];
     }, [dagRunsList, selectedDate]);
 
     // Sync filtered data with the parent component's state
@@ -231,12 +231,12 @@ const VertexJobRuns = ({
         }
     };
 
-    const handleDownloadOutput = async (data: { id?: string; status?: string; dagRunId?: string; state?: string; gcsUrl?: string; }) => {
+    const handleDownloadOutput = async (data: { id?: string; status?: string; dagRunId?: string; state?: string; gcsUrl?: string; fileName?: string; }) => {
         console.log(data)
         setDownloadOutputDagRunId(data.dagRunId)
         await StorageServices.downloadJobAPIService(
             data.gcsUrl,
-            '',
+            data.fileName,
             setJobDownloadLoading
         );
     };

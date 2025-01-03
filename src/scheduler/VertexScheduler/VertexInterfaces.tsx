@@ -24,6 +24,7 @@ export interface IDagRunList {
     state: string;
     date: Date;
     time: string;
+    fileName: string;
 }
 
 export interface ICreatePayload {

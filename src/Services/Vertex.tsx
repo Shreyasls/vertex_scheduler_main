@@ -474,6 +474,7 @@ export class VertexServices {
                         gcsUrl: dagRun.gcsOutputUri,
                         state: dagRun.jobState.split('_')[2].toLowerCase(),
                         date: new Date(dagRun.createTime).toDateString(),
+                        fileName: dagRun.gcsNotebookSource.uri.split('/').pop(),
                         time: `${minutes} min ${seconds} sec`
                     };
                 });

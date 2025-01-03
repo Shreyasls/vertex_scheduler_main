@@ -36,6 +36,7 @@ import { IconActive, IconDelete, IconEditDag, IconEditNotebook, IconFailed, Icon
 import { VertexServices } from '../../Services/Vertex';
 import { IDagList } from './VertexInterfaces';
 import dayjs from 'dayjs';
+import ErrorMessage from '../common/ErrorMessage';
 
 function ListVertexScheduler({
   region,
@@ -582,6 +583,9 @@ function ListVertexScheduler({
             region={region}
             onRegionChange={region => setRegion(region)}
           />
+          {
+            !isLoading && !region && <ErrorMessage message="Region is required" />
+          }
         </div>
         <div className="btn-refresh">
           <Button
@@ -595,7 +599,7 @@ function ListVertexScheduler({
           </Button>
         </div>
       </div>
-      
+
       {dagList.length > 0 ? (
         <>
           <div className="notebook-templates-list-table-parent">

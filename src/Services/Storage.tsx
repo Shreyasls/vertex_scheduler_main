@@ -88,7 +88,9 @@ export class StorageServices {
         try {
             console.log(gcsUrl)
             setJobDownloadLoading(true)
-            const formattedResponse: any = await requestAPI(`api/storage/downloadOutput?output_uri=${gcsUrl}&file_name=${fileName}`);
+            const formattedResponse: any = await requestAPI(`api/storage/downloadOutput?output_uri=${gcsUrl}&file_name=${fileName}`, {
+                method: 'POST'
+            });
             console.log(formattedResponse)
             setJobDownloadLoading(false)
             toast.success(
