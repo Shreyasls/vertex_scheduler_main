@@ -438,3 +438,7 @@
 .icon-size-status {
   width: 12px;
 }
+
+.icon-completed {
+  padding-top: 4px;
+}

@@ -390,7 +390,10 @@ function ListVertexScheduler({
             />
           </div>)
         }
-        {data.name === editDagLoading ? (
+        {is_status_paused === "COMPLETED" ? <IconEditNotebook.react
+          tag="div"
+          className="icon-buttons-style-disable"
+        /> : data.name === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -480,7 +483,7 @@ function ListVertexScheduler({
                     <IconSuccess.react
                       tag="div"
                       title='Done !'
-                      className="icon-white logo-alignment-style success_icon icon-size"
+                      className="icon-white logo-alignment-style success_icon icon-size icon-completed"
                     />
                   </div> :
                     <div>
