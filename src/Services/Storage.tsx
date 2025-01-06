@@ -83,20 +83,32 @@ export class StorageServices {
     static downloadJobAPIService = async (
         gcsUrl: string | undefined,
         fileName: string | undefined,
+        jobRunId: string | undefined,
         setJobDownloadLoading: (value: boolean) => void,
     ) => {
         try {
-            console.log(gcsUrl)
+            const bucketName = gcsUrl?.split('//')[1];
             setJobDownloadLoading(true)
-            const formattedResponse: any = await requestAPI(`api/storage/downloadOutput?output_uri=${gcsUrl}&file_name=${fileName}`, {
+            const formattedResponse: any = await requestAPI(`api/storage/downloadOutput?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`, {
                 method: 'POST'
             });
-            console.log(formattedResponse)
-            setJobDownloadLoading(false)
-            toast.success(
-                `Job history downloaded successfully`,
-                toastifyCustomStyle
-            );
+            if (formattedResponse.status === 0) {
+                setJobDownloadLoading(false)
+                toast.success(
+                    `Job history downloaded successfully`,
+                    toastifyCustomStyle
+                );
+            } else {
+                setJobDownloadLoading(false)
+                DataprocLoggingService.log(
+                    'Error in downloading the job history',
+                    LOG_LEVEL.ERROR
+                );
+                toast.success(
+                    `Error in downloading the job history`,
+                    toastifyCustomStyle
+                );
+            }
         } catch (error) {
             setJobDownloadLoading(false)
             DataprocLoggingService.log(

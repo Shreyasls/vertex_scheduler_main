@@ -17,7 +17,7 @@ export interface IDagList {
 }
 
 export interface IDagRunList {
-    dagRunId: string;
+    jobRunId: string;
     startDate: string;
     endDate: string;
     gcsUrl: string;

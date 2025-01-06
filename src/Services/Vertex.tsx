@@ -468,7 +468,7 @@ export class VertexServices {
                     const minutes = Math.floor(totalSeconds / 60);
                     const seconds = totalSeconds % 60;
                     return {
-                        dagRunId: dagRun.name.split('/').pop(),
+                        jobRunId: dagRun.name.split('/').pop(),
                         startDate: dagRun.createTime,
                         endDate: dagRun.updateTime,
                         gcsUrl: dagRun.gcsOutputUri,
