@@ -34,7 +34,7 @@ const VertexJobRuns = ({
     // startDate,
     // endDate,
     setJobRunsData,
-    setDagRunId,
+    setJobRunId,
     selectedMonth,
     selectedDate,
     setBlueListDates,
@@ -56,7 +56,7 @@ const VertexJobRuns = ({
     // startDate: string;
     // endDate: string;
     setJobRunsData: React.Dispatch<React.SetStateAction<IDagRunList | undefined>>;
-    setDagRunId: (value: string) => void;
+    setJobRunId: (value: string) => void;
     selectedMonth: Dayjs | null;
     selectedDate: Dayjs | null;
     setBlueListDates: (value: string[]) => void;
@@ -104,14 +104,14 @@ const VertexJobRuns = ({
                 return new Date(dagRun.date).toDateString() === selectedDateString;
             });
         }
-        return dagRunsList;
+        return [];
     }, [dagRunsList, selectedDate]);
 
     // Sync filtered data with the parent component's state
     useEffect(() => {
         if (filteredData.length > 0) {
             setJobRunsData(filteredData[0]);
-            setDagRunId(filteredData[0].dagRunId)
+            setJobRunId(filteredData[0].jobRunId)
         }
     }, [filteredData, setJobRunsData]);
 
@@ -225,26 +225,26 @@ const VertexJobRuns = ({
         );
     };
 
-    const handleDagRunStateClick = (data: { id?: string; status?: string; dagRunId?: string; }) => {
-        if (data.dagRunId) {
-            setDagRunId(data.dagRunId);
+    const handleDagRunStateClick = (data: { id?: string; status?: string; jobRunId?: string; }) => {
+        if (data.jobRunId) {
+            setJobRunId(data.jobRunId);
         }
     };
 
-    const handleDownloadOutput = async (data: { id?: string; status?: string; dagRunId?: string; state?: string; gcsUrl?: string; }) => {
-        console.log(data)
-        setDownloadOutputDagRunId(data.dagRunId)
+    const handleDownloadOutput = async (data: { id?: string; status?: string; jobRunId?: string; state?: string; gcsUrl?: string; fileName?: string; }) => {
+        setDownloadOutputDagRunId(data.jobRunId)
         await StorageServices.downloadJobAPIService(
             data.gcsUrl,
-            '',
+            data.fileName,
+            data.jobRunId,
             setJobDownloadLoading
         );
     };
 
-    const renderActions = (data: { id?: string; status?: string; dagRunId?: string; state?: string; }) => {
+    const renderActions = (data: { id?: string; status?: string; jobRunId?: string; state?: string; }) => {
         return (
             <div className="actions-icon">
-                {jobDownloadLoading && data.dagRunId === downloadOutputDagRunId ? (
+                {jobDownloadLoading && data.jobRunId === downloadOutputDagRunId ? (
                     <div className="icon-buttons-style">
                         <CircularProgress
                             size={18}

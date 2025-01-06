@@ -26,12 +26,12 @@ import { IDagRunList, ISchedulerData } from './VertexInterfaces';
 const VertexJobTaskLogs = ({
     composerName,
     dagId,
-    dagRunId,
+    jobRunId,
     jobRunsData,
 }: {
     composerName: ISchedulerData | undefined;
     dagId: string;
-    dagRunId: string;
+    jobRunId: string;
     jobRunsData: IDagRunList | undefined;
 }): JSX.Element => {
     const [dagTaskInstancesList, setDagTaskInstancesList] = useState<any>([]);
@@ -45,7 +45,7 @@ const VertexJobTaskLogs = ({
     ] = useState('');
 
     const [height, setHeight] = useState(window.innerHeight - 320);
-    console.log(dagRunId)
+    console.log(jobRunId)
     function handleUpdateHeight() {
         let updateHeight = window.innerHeight - 320;
         setHeight(updateHeight);
@@ -66,7 +66,7 @@ const VertexJobTaskLogs = ({
 
     const listDagTaskInstancesRunsList = async () => {
         await LogEntriesServices.vertexJobTaskLogsListService(
-            dagRunId,
+            jobRunId,
             jobRunsData,
             setDagTaskInstancesList,
             setIsLoading
@@ -74,11 +74,11 @@ const VertexJobTaskLogs = ({
     };
 
     useEffect(() => {
-        if (dagRunId && jobRunsData) {
+        if (jobRunId && jobRunsData) {
             listDagTaskInstancesRunsList();
             setExpanded(false);
         }
-    }, [dagRunId, jobRunsData]);
+    }, [jobRunId, jobRunsData]);
 
     useEffect(() => {
         if (dagTaskInstancesList.length > 0) {
