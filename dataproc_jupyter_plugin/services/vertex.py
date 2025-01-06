@@ -398,17 +398,6 @@ class Client:
             self.log.exception(f"Error triggering schedule: {str(e)}")
             return {"Error triggering schedule": str(e)}
 
-    def get_keys(self, data, parent_key):
-        keys = []
-        for key, value in data.items():
-            full_key = f"{parent_key}.{key}" if parent_key else key
-            if isinstance(value, dict):
-                keys.extend(self.get_keys(value, full_key))
-            else:
-                keys.append(full_key)
-        # print(f"1. keys {keys}")
-        return keys
-
     async def update_schedule(self, region_id, schedule_id, input_data):
         try:
             data = DescribeUpdateVertexJob(**input_data)
@@ -416,6 +405,11 @@ class Client:
             notebook_execution_job = {"displayName": data.display_name, "gcsNotebookSource": {"uri": data.gcs_notebook_source}, "customEnvironmentSpec": custom_environment_spec}
             schedule_value = (
                 "* * * * *" if data.schedule_value == "" else data.schedule_value
+            )
+            cron = (
+                schedule_value
+                if data.time_zone == "UTC"
+                else f"TZ={data.time_zone} {schedule_value}"
             )
             print(f"0. data {data}")
 
@@ -447,7 +441,7 @@ class Client:
             payload = {
                 "displayName": data.display_name,
                 "maxConcurrentRunCount": "1",
-                "cron": f"TZ={data.time_zone} {schedule_value}",
+                "cron": cron,
                 "createNotebookExecutionJobRequest": {
                     "parent": f"projects/{self.project_id}/locations/{region_id}",
                     "notebookExecutionJob": notebook_execution_job,
@@ -460,9 +454,9 @@ class Client:
                 payload["endTime"] = data.end_time
 
             print(f"1. payload {payload}")
-            keys = self.get_keys(payload, "")
+            keys = payload.keys()
             print(f"2. keys {keys}")
-            keys_to_filter = ["displayName", "maxConcurrentRunCount", "parent", "gcsNotebookSource"]
+            keys_to_filter = ["displayName", "maxConcurrentRunCount"]
             filtered_keys = [item for item in keys if not any(key in item for key in keys_to_filter)]
             update_mask = ",".join(filtered_keys)
             print(f"3. update mask {update_mask}")
