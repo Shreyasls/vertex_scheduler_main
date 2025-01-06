@@ -406,15 +406,18 @@ class Client:
                 keys.extend(self.get_keys(value, full_key))
             else:
                 keys.append(full_key)
+        # print(f"1. keys {keys}")
         return keys
 
     async def update_schedule(self, region_id, schedule_id, input_data):
         try:
             data = DescribeUpdateVertexJob(**input_data)
-            notebook_execution_job = {"displayName": data.display_name, "gcsNotebookSource": {"uri": data.gcs_notebook_source}}
+            custom_environment_spec = {}
+            notebook_execution_job = {"displayName": data.display_name, "gcsNotebookSource": {"uri": data.gcs_notebook_source}, "customEnvironmentSpec": custom_environment_spec}
             schedule_value = (
                 "* * * * *" if data.schedule_value == "" else data.schedule_value
             )
+            print(f"0. data {data}")
 
             if data.kernel_name:
                 notebook_execution_job["kernelName"] = data.kernel_name
@@ -425,24 +428,20 @@ class Client:
             if data.parameters:
                 notebook_execution_job["labels"] = data.parameters
             if data.machine_type:
-                notebook_execution_job["customEnvironmentSpec"] = {
-                    "machineSpec": {
-                        "machineType": data.machine_type,
-                        "acceleratorType": data.accelerator_type,
-                        "acceleratorCount": data.accelerator_count,
-                    }
+                custom_environment_spec["machineSpec"] = {
+                    "machineType": data.machine_type.split(" ", 1)[0],
+                    "acceleratorType": data.accelerator_type,
+                    "acceleratorCount": data.accelerator_count,
                 }
-            if data.network:
-                notebook_execution_job["customEnvironmentSpec"] = {
-                    "networkSpec": {
-                        "network": data.network,
-                    }
+            if data.network or data.subnetwork:
+                custom_environment_spec["networkSpec"] = {
+                    "network": data.network,
+                    "subnetwork": data.subnetwork,
                 }
-            if data.subnetwork:
-                notebook_execution_job["customEnvironmentSpec"] = {
-                    "networkSpec": {
-                        "subnetwork": data.subnetwork,
-                    }
+            if data.disk_size or data.disk_type:
+                custom_environment_spec["persistentDiskSpec"] = {
+                    "diskSizeGb": data.disk_size,
+                    "diskType": data.disk_type.split(" ", 1)[0],
                 }
 
             payload = {
@@ -460,9 +459,13 @@ class Client:
             if data.end_time:
                 payload["endTime"] = data.end_time
 
+            print(f"1. payload {payload}")
             keys = self.get_keys(payload, "")
-            filtered_keys = [item for item in keys if "displayName" not in item]
-            update_mask = ", ".join(filtered_keys)
+            print(f"2. keys {keys}")
+            keys_to_filter = ["displayName", "maxConcurrentRunCount", "parent", "gcsNotebookSource"]
+            filtered_keys = [item for item in keys if not any(key in item for key in keys_to_filter)]
+            update_mask = ",".join(filtered_keys)
+            print(f"3. update mask {update_mask}")
             api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/{schedule_id}?updateMask={update_mask}"
 
             headers = self.create_headers()
