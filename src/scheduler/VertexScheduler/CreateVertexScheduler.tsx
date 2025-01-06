@@ -884,9 +884,7 @@ const CreateVertexScheduler = ({
                                 options={serviceAccountList}
                                 getOptionLabel={option => option.displayName}
                                 value={
-                                    !editMode ? serviceAccountList.find(
-                                        option => option.displayName === serviceAccountSelected?.displayName
-                                    ) || null : serviceAccountList.find(
+                                     serviceAccountList.find(
                                         option => option.email === serviceAccountSelected?.email
                                     ) || null
                                 }
