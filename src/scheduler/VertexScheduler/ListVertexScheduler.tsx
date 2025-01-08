@@ -156,13 +156,15 @@ function ListVertexScheduler({
   * @param {}
   */
   const listDagInfoAPI = async () => {
-    setIsLoading(true);
-    await VertexServices.listVertexSchedules(
-      setDagList,
-      region,
-      setIsLoading,
-      setNextPageFlag
-    );
+    setTimeout(async () => {
+      setIsLoading(true);
+      await VertexServices.listVertexSchedules(
+        setDagList,
+        region,
+        setIsLoading,
+        setNextPageFlag
+      );
+    }, 5000)
   };
 
   /**
