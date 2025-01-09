@@ -335,7 +335,7 @@ function ListVertexScheduler({
   const renderActions = (data: any) => {
     const is_status_paused = data.status;
     return (
-      <div className="actions-icon">
+      <div className="actions-icon-btn">
         {data.name === resumeLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress

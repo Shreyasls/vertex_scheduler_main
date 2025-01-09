@@ -340,3 +340,7 @@
 .error-view-message {
   margin-left: 30px;
 }
+
+.actions-icon-btn {
+  display: flex;
+}
