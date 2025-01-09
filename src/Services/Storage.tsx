@@ -95,7 +95,7 @@ export class StorageServices {
             if (formattedResponse.status === 0) {
                 setJobDownloadLoading(false)
                 toast.success(
-                    `Job history downloaded successfully`,
+                    `${fileName} job history downloaded successfully`,
                     toastifyCustomStyle
                 );
             } else {
