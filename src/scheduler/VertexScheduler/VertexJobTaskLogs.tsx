@@ -16,31 +16,30 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Typography, CircularProgress } from '@mui/material';
-import { SchedulerService } from '../schedulerServices';
 import { handleDebounce } from '../../utils/utils';
 import { IconExpandLess, IconExpandMore } from '../../utils/icons';
-import { IDagRunList } from './VertexInterfaces';
+import { IDagRunList, ISchedulerData } from './VertexInterfaces';
 import { LogEntriesServices } from '../../Services/LogEntries';
 
 const VertexJobTaskLogs = ({
     composerName,
     dagId,
-    dagRunId,
+    jobRunId,
     jobRunsData,
 }: {
-    composerName: string;
+    composerName: ISchedulerData | undefined;
     dagId: string;
-    dagRunId: string;
+    jobRunId: string;
     jobRunsData: IDagRunList | undefined;
 }): JSX.Element => {
     const [dagTaskInstancesList, setDagTaskInstancesList] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [isLoadingLogs] = useState(false);
     const [expanded, setExpanded] = useState<string | false>(false);
-    const [loglist, setLogList] = useState('');
+    const [loglist] = useState('');
 
     const [height, setHeight] = useState(window.innerHeight - 320);
-    console.log(dagTaskInstancesList)
+
     function handleUpdateHeight() {
         let updateHeight = window.innerHeight - 320;
         setHeight(updateHeight);
@@ -59,9 +58,12 @@ const VertexJobTaskLogs = ({
         };
     }, []);
 
+    /** 
+     * Fetches and lists the task instances for a specific job run.
+     */
     const listDagTaskInstancesRunsList = async () => {
         await LogEntriesServices.vertexJobTaskLogsListService(
-            dagRunId,
+            jobRunId,
             jobRunsData,
             setDagTaskInstancesList,
             setIsLoading
@@ -69,11 +71,11 @@ const VertexJobTaskLogs = ({
     };
 
     useEffect(() => {
-        if (dagRunId && jobRunsData) {
+        if (jobRunId && jobRunsData) {
             listDagTaskInstancesRunsList();
             setExpanded(false);
         }
-    }, [dagRunId, jobRunsData]);
+    }, [jobRunId, jobRunsData]);
 
     useEffect(() => {
         if (dagTaskInstancesList.length > 0) {
@@ -96,16 +98,10 @@ const VertexJobTaskLogs = ({
     };
 
     const listDagTaskLogList = async (index: string, iconIndex: number) => {
-        await SchedulerService.listDagTaskLogsListService(
-            composerName,
-            dagId,
-            dagRunId,
-            dagTaskInstancesList[index].taskId,
-            iconIndex,
-            setLogList,
-            setIsLoadingLogs
-        );
+        // To do
+        console.debug(index, iconIndex)
     };
+
     return (
         <div>
             {dagTaskInstancesList.length > 0 ? (
