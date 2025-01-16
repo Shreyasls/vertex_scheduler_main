@@ -473,7 +473,15 @@ function ListVertexScheduler({
     } else {
       const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED';
 
-      const pauseTitle = (cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse) ? cell.row.original.lastScheduledRunResponse.runResponse === "OK" ? "PAUSED" : cell.row.original.lastScheduledRunResponse.runResponse : '';
+      let pauseTitle = '';
+
+      if(cell.row.original.status === 'ACTIVE' && cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse === "OK") {
+        pauseTitle =  "ACTIVE";
+      }
+
+      if(cell.row.original.status === 'PAUSED' && cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse === "OK") {
+        pauseTitle =  "PAUSED";
+      }
 
       return (
         <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
@@ -484,7 +492,7 @@ function ListVertexScheduler({
                   {cell.row.original.lastScheduledRunResponse === null ? 
                     <IconActive.react
                         tag="div"
-                        title=''
+                        title='ACTIVE'
                         className="icon-white logo-alignment-style success_icon icon-size-status"
                       /> 
                   : 
@@ -505,7 +513,7 @@ function ListVertexScheduler({
                     : (cell.row.original.status === 'ACTIVE' ?
                       <IconActive.react
                         tag="div"
-                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
+                        title={pauseTitle}
                         className="icon-white logo-alignment-style success_icon icon-size-status"
                       /> :
                       <IconListPause.react
