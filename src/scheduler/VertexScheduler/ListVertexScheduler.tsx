@@ -122,9 +122,6 @@ function ListVertexScheduler({
   const [editNotebookLoading, setEditNotebookLoading] = useState<string>('');
   const [deletingSchedule, setDeletingSchedule] = useState<boolean>(false);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState<boolean>(false);
-  console.log(isPreviewEnabled)
-  const [nextPageFlag, setNextPageFlag] = useState<string>('');
-  console.log(nextPageFlag);
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
@@ -160,8 +157,7 @@ function ListVertexScheduler({
       await VertexServices.listVertexSchedules(
         setDagList,
         region,
-        setIsLoading,
-        setNextPageFlag
+        setIsLoading
       );
   };
 
@@ -182,7 +178,6 @@ function ListVertexScheduler({
         region,
         setDagList,
         setIsLoading,
-        setNextPageFlag,
         displayName,
         setResumeLoading
       );
@@ -192,7 +187,6 @@ function ListVertexScheduler({
         region,
         setDagList,
         setIsLoading,
-        setNextPageFlag,
         displayName,
         setResumeLoading
       );
@@ -239,7 +233,6 @@ function ListVertexScheduler({
       scheduleDisplayName,
       setDagList,
       setIsLoading,
-      setNextPageFlag,
     );
     setDeletePopupOpen(false);
     setDeletingSchedule(false);
@@ -416,7 +409,7 @@ function ListVertexScheduler({
           </div>
         )}
         {
-          (data.name === editNotebookLoading ? (
+          (isPreviewEnabled && data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
                 size={18}

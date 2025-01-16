@@ -118,7 +118,6 @@ export class VertexServices {
         setDagList: (value: IDagList[]) => void,
         region: string,
         setIsLoading: (value: boolean) => void,
-        setNextPageFlag: (value: string) => void,
     ) => {
         try {
             const serviceURL = 'api/vertex/listSchedules';
@@ -127,7 +126,6 @@ export class VertexServices {
                 if (formattedResponse.schedules.length > 0) {
                     setDagList(formattedResponse.schedules);
                     setIsLoading(false);
-                    setNextPageFlag(formattedResponse?.nextPageToken)
                 }
             } else {
                 setDagList([]);
@@ -147,7 +145,6 @@ export class VertexServices {
         region: string,
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
-        setNextPageFlag: (value: string) => void,
         displayName: string,
         setResumeLoading: (value: string) => void,
     ) => {
@@ -165,8 +162,7 @@ export class VertexServices {
                 await VertexServices.listVertexSchedules(
                     setDagList,
                     region,
-                    setIsLoading,
-                    setNextPageFlag
+                    setIsLoading
                 );
                 setResumeLoading('');
             } else {
@@ -186,7 +182,6 @@ export class VertexServices {
         region: string,
         setDagList: (value: IDagList[]) => void,
         setIsLoading: (value: boolean) => void,
-        setNextPageFlag: (value: string) => void,
         displayName: string,
         setResumeLoading: (value: string) => void,
     ) => {
@@ -205,8 +200,7 @@ export class VertexServices {
                 await VertexServices.listVertexSchedules(
                     setDagList,
                     region,
-                    setIsLoading,
-                    setNextPageFlag
+                    setIsLoading
                 );
                 setResumeLoading('');
             } else {
@@ -258,8 +252,7 @@ export class VertexServices {
         scheduleId: string,
         displayName: string,
         setDagList: (value: IDagList[]) => void,
-        setIsLoading: (value: boolean) => void,
-        setNextPageFlag: (value: string) => void,
+        setIsLoading: (value: boolean) => void
     ) => {
         try {
             const serviceURL = `api/vertex/deleteSchedule`;
@@ -270,8 +263,7 @@ export class VertexServices {
                 await VertexServices.listVertexSchedules(
                     setDagList,
                     region,
-                    setIsLoading,
-                    setNextPageFlag
+                    setIsLoading
                 );
                 toast.success(
                     `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
