@@ -411,6 +411,9 @@ class Client:
                 if data.time_zone == "UTC"
                 else f"TZ={data.time_zone} {schedule_value}"
             )
+            labels = {
+                param.split(":")[0]: param.split(":")[1] for param in data.parameters
+            }
             print(f"0. data {data}")
 
             if data.kernel_name:
@@ -420,7 +423,7 @@ class Client:
             if data.cloud_storage_bucket:
                 notebook_execution_job["gcsOutputUri"] = data.cloud_storage_bucket
             if data.parameters:
-                notebook_execution_job["labels"] = data.parameters
+                notebook_execution_job["labels"] = labels
             if data.machine_type:
                 custom_environment_spec["machineSpec"] = {
                     "machineType": data.machine_type.split(" ", 1)[0],
