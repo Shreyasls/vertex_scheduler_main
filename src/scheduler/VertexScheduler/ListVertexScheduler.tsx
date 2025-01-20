@@ -486,13 +486,13 @@ function ListVertexScheduler({
                    (cell.row.original.status === 'ACTIVE' ? 
                     <IconActive.react
                         tag="div"
-                        title=''
+                        title='ACTIVE'
                         className="icon-white logo-alignment-style success_icon icon-size-status"
                       />  
                       :
                       <IconListPause.react
                         tag="div"
-                        title={pauseTitle}
+                        title='PAUSED'
                         className="icon-white logo-alignment-style success_icon icon-size"
                       />
                     )
