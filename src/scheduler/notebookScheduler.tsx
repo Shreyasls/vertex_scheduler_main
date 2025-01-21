@@ -220,7 +220,6 @@ const NotebookSchedulerComponent = ({
             setInputFileSelected={setInputFileSelected}
             editMode={editMode}
             setEditMode={setEditMode}
-            setExecutionPageFlag={setExecutionPageFlag}
           />
       }
     </div>

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 import { toast } from "react-toastify";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { requestAPI } from "../handler/handler";
 import { DataprocLoggingService, LOG_LEVEL } from "../utils/loggingService";
 import { toastifyCustomStyle } from "../utils/utils";
-import { ICreatePayload, IDagList, IDagRunList, IDeleteSchedulerAPIResponse, IMachineType, ITriggerSchedule, IUpdateSchedulerAPIResponse, ISchedulerData } from "../scheduler/VertexScheduler/VertexInterfaces";
+import { ICreatePayload, IDagList, IDeleteSchedulerAPIResponse, IMachineType, ITriggerSchedule, IUpdateSchedulerAPIResponse } from "../scheduler/VertexScheduler/VertexInterfaces";
 import { scheduleMode } from "../utils/const";
 
 export class VertexServices {
@@ -409,112 +409,5 @@ export class VertexServices {
                 toastifyCustomStyle
             );
         }
-    };
-
-    static executionHistoryServiceList = async (
-        region: string,
-        schedulerData: ISchedulerData | undefined,
-        selectedMonth: Dayjs | null,
-        setIsLoading: (value: boolean) => void,
-        setDagRunsList: (value: IDagRunList[]) => void,
-        setBlueListDates: (value: string[]) => void,
-        setGreyListDates: (value: string[]) => void,
-        setOrangeListDates: (value: string[]) => void,
-        setRedListDates: (value: string[]) => void,
-        setGreenListDates: (value: string[]) => void,
-        setDarkGreenListDates: (value: string[]) => void,
-    ) => {
-        setIsLoading(true)
-        let selected_month = selectedMonth && selectedMonth.toISOString()
-        let schedule_id = schedulerData?.name.split('/').pop()
-        const serviceURL = `api/vertex/listNotebookExecutionJobs`;
-        const formattedResponse: any = await requestAPI(serviceURL + `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}`
-        );
-        try {
-            let transformDagRunListDataCurrent = [];
-            if (formattedResponse && formattedResponse.length > 0) {
-                transformDagRunListDataCurrent = formattedResponse.map((jobRun: any) => {
-                    const createTime = new Date(jobRun.createTime);
-                    const updateTime = new Date(jobRun.updateTime);
-                    const timeDifferenceMilliseconds = updateTime.getTime() - createTime.getTime(); // Difference in milliseconds
-                    const totalSeconds = Math.floor(timeDifferenceMilliseconds / 1000); // Convert to seconds
-                    const minutes = Math.floor(totalSeconds / 60);
-                    const seconds = totalSeconds % 60;
-                    return {
-                        jobRunId: jobRun.name.split('/').pop(),
-                        startDate: jobRun.createTime,
-                        endDate: jobRun.updateTime,
-                        gcsUrl: jobRun.gcsOutputUri,
-                        state: jobRun.jobState.split('_')[2].toLowerCase(),
-                        date: new Date(jobRun.createTime).toDateString(),
-                        fileName: jobRun.gcsNotebookSource.uri.split('/').pop(),
-                        time: `${minutes} min ${seconds} sec`
-                    };
-                });
-            }
-            // Group data by date and state
-            const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce((result: any, item: any) => {
-                const date = item.date; // Group by date
-                const status = item.state; // Group by state
-
-                if (!result[date]) {
-                    result[date] = {};
-                }
-
-                if (!result[date][status]) {
-                    result[date][status] = [];
-                }
-
-                result[date][status].push(item);
-
-                return result;
-            }, {});
-
-            // Initialize grouping lists
-            let blueList: string[] = [];
-            let greyList: string[] = [];
-            let orangeList: string[] = [];
-            let redList: string[] = [];
-            let greenList: string[] = [];
-            let darkGreenList: string[] = [];
-
-            // Process grouped data
-            Object.keys(groupedDataByDateStatus).forEach((dateValue) => {
-                if (groupedDataByDateStatus[dateValue].running) {
-                    blueList.push(dateValue);
-                } else if (groupedDataByDateStatus[dateValue].queued) {
-                    greyList.push(dateValue);
-                } else if (
-                    groupedDataByDateStatus[dateValue].failed &&
-                    groupedDataByDateStatus[dateValue].succeeded
-                ) {
-                    orangeList.push(dateValue);
-                } else if (groupedDataByDateStatus[dateValue].failed) {
-                    redList.push(dateValue);
-                } else if (
-                    groupedDataByDateStatus[dateValue].succeeded &&
-                    groupedDataByDateStatus[dateValue].succeeded.length === 1
-                ) {
-                    greenList.push(dateValue);
-                } else {
-                    darkGreenList.push(dateValue);
-                }
-            });
-            
-            // Update state lists with their respective transformations
-            setBlueListDates(blueList);
-            setGreyListDates(greyList);
-            setOrangeListDates(orangeList);
-            setRedListDates(redList);
-            setGreenListDates(greenList);
-            setDarkGreenListDates(darkGreenList);
-            setDagRunsList(transformDagRunListDataCurrent)
-        } catch (error) {
-            toast.error(
-                `Error in fetching the execution history`,
-                toastifyCustomStyle
-            );
-        }
-        setIsLoading(false)
     };
 }

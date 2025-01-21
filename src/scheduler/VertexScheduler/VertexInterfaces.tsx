@@ -16,17 +16,6 @@ export interface IDagList {
     status: string;
 }
 
-export interface IDagRunList {
-    jobRunId: string;
-    startDate: string;
-    endDate: string;
-    gcsUrl: string;
-    state: string;
-    date: Date;
-    time: string;
-    fileName: string;
-}
-
 export interface ICreatePayload {
     input_filename: string;
     display_name: string;

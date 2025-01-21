@@ -44,7 +44,6 @@ function ListVertexScheduler({
   app,
   setJobId,
   settingRegistry,
-  handleDagIdSelection,
   setCreateCompleted,
   setInputFileSelected,
   setMachineTypeSelected,
@@ -75,7 +74,6 @@ function ListVertexScheduler({
   app: JupyterFrontEnd;
   setJobId: (value: string) => void;
   settingRegistry: ISettingRegistry;
-  handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
   setCreateCompleted: (value: boolean) => void;
   setInputFileSelected: (value: string) => void;
   setMachineTypeSelected: (value: string | null) => void;
@@ -439,7 +437,6 @@ function ListVertexScheduler({
         <td
           {...cell.getCellProps()}
           className="clusters-table-data"
-          onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
         >
           {cell.value}
         </td>

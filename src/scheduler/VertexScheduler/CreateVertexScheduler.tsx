@@ -64,8 +64,7 @@ const CreateVertexScheduler = ({
     inputFileSelected,
     setInputFileSelected,
     editMode,
-    setEditMode,
-    setExecutionPageFlag
+    setEditMode
 }: {
     themeManager: IThemeManager;
     app: JupyterLab;
@@ -78,7 +77,6 @@ const CreateVertexScheduler = ({
     setInputFileSelected: React.Dispatch<React.SetStateAction<string>>;
     editMode: boolean;
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
-    setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [parameterDetail, setParameterDetail] = useState<string[]>([]);
     const [parameterDetailUpdated, setParameterDetailUpdated] = useState<string[]>([]);
@@ -546,8 +544,8 @@ const CreateVertexScheduler = ({
             cloud_storage_bucket: `gs://${cloudStorage}`,
             parameters: parameterDetailUpdated,
             service_account: serviceAccountSelected?.email,
-            network: networkSelected === "networkInThisProject" ? (editMode? primaryNetworkSelected?.link : primaryNetworkSelected?.link.split('/v1/')[1]) : sharedNetworkSelected?.network.split('/v1/')[1],
-            subnetwork: networkSelected === "networkInThisProject" ? (editMode ? subNetworkSelected?.link : subNetworkSelected?.link.split('/v1/')[1]) : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
+            network: networkSelected === "networkInThisProject" ? primaryNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.network.split('/v1/')[1],
+            subnetwork: networkSelected === "networkInThisProject" ? subNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
             start_time: startDate,
             end_time: endDate,
             disk_type: diskTypeSelected,
@@ -644,7 +642,6 @@ const CreateVertexScheduler = ({
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
                         setJobId={setJobId}
-                        setExecutionPageFlag={setExecutionPageFlag}
                         setCreateCompleted={setCreateCompleted}
                         setInputFileSelected={setInputFileSelected}
                         region={region}
