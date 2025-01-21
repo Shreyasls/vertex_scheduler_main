@@ -60,12 +60,7 @@ const CreateVertexScheduler = ({
     createCompleted,
     setCreateCompleted,
     jobNameSelected,
-    setJobNameSelected,
     inputFileSelected,
-    setInputFileSelected,
-    editMode,
-    setEditMode,
-    setExecutionPageFlag
 }: {
     themeManager: IThemeManager;
     app: JupyterLab;
@@ -73,12 +68,7 @@ const CreateVertexScheduler = ({
     createCompleted: boolean;
     setCreateCompleted: React.Dispatch<React.SetStateAction<boolean>>;
     jobNameSelected: string;
-    setJobNameSelected: React.Dispatch<React.SetStateAction<string>>;
     inputFileSelected: string;
-    setInputFileSelected: React.Dispatch<React.SetStateAction<string>>;
-    editMode: boolean;
-    setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
-    setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [parameterDetail, setParameterDetail] = useState<string[]>([]);
     const [parameterDetailUpdated, setParameterDetailUpdated] = useState<string[]>([]);
@@ -87,14 +77,12 @@ const CreateVertexScheduler = ({
     const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
     const [creatingVertexScheduler, setCreatingVertexScheduler] = useState<boolean>(false);
 
-    const [machineTypeLoading, setMachineTypeLoading] = useState<boolean>(false)
-    const [cloudStorageLoading, setCloudStorageLoading] = useState<boolean>(false)
-    const [serviceAccountLoading, setServiceAccountLoading] = useState<boolean>(false)
-    const [primaryNetworkLoading, setPrimaryNetworkLoading] = useState<boolean>(false)
-    const [subNetworkLoading, setSubNetworkLoading] = useState<boolean>(false)
-    const [sharedNetworkLoading, setSharedNetworkLoading] = useState<boolean>(false)
-
-    const [jobId, setJobId] = useState<string>('');
+    const [machineTypeLoading, setMachineTypeLoading] = useState<boolean>(false);
+    const [cloudStorageLoading, setCloudStorageLoading] = useState<boolean>(false);
+    const [serviceAccountLoading, setServiceAccountLoading] = useState<boolean>(false);
+    const [primaryNetworkLoading, setPrimaryNetworkLoading] = useState<boolean>(false);
+    const [subNetworkLoading, setSubNetworkLoading] = useState<boolean>(false);
+    const [sharedNetworkLoading, setSharedNetworkLoading] = useState<boolean>(false);
     const [hostProject, setHostProject] = useState<string>('');
     const [region, setRegion] = useState<string>('');
     const [projectId, setProjectId] = useState<string>('');
@@ -131,7 +119,6 @@ const CreateVertexScheduler = ({
     const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(dayjs());
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(dayjs());
     const [endDateError, setEndDateError] = useState<boolean>(false);
-    const [gcsPath, setGcsPath] = useState('');
 
     /**
     * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
@@ -546,43 +533,26 @@ const CreateVertexScheduler = ({
             cloud_storage_bucket: `gs://${cloudStorage}`,
             parameters: parameterDetailUpdated,
             service_account: serviceAccountSelected?.email,
-            network: networkSelected === "networkInThisProject" ? (editMode? primaryNetworkSelected?.link : primaryNetworkSelected?.link.split('/v1/')[1]) : sharedNetworkSelected?.network.split('/v1/')[1],
-            subnetwork: networkSelected === "networkInThisProject" ? (editMode ? subNetworkSelected?.link : subNetworkSelected?.link.split('/v1/')[1]) : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
+            network: networkSelected === "networkInThisProject" ? primaryNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.network.split('/v1/')[1],
+            subnetwork: networkSelected === "networkInThisProject" ? subNetworkSelected?.link.split('/v1/')[1] : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
             start_time: startDate,
             end_time: endDate,
             disk_type: diskTypeSelected,
             disk_size: diskSize
         }
 
-        if (editMode) {
-            await VertexServices.editVertexJobSchedulerService(
-                jobId,
-                region,
-                payload,
-                setCreateCompleted,
-                setCreatingVertexScheduler,
-                gcsPath
-            );
-        } else {
-            await VertexServices.createVertexSchedulerService(
-                payload,
-                setCreateCompleted,
-                setCreatingVertexScheduler,
-            );
-        }
-        setEditMode(false);
+        await VertexServices.createVertexSchedulerService(
+            payload,
+            setCreateCompleted,
+            setCreatingVertexScheduler,
+        );
     }
 
     /**
     * Cancel a job schedule
     */
     const handleCancel = async () => {
-        if (!editMode) {
-            setCreateCompleted(false);
-            app.shell.activeWidget?.close();
-        } else {
-            setCreateCompleted(true);
-        }
+        setCreateCompleted(true);
     };
 
     useEffect(() => {
@@ -620,20 +590,9 @@ const CreateVertexScheduler = ({
     }, [projectId]);
 
     useEffect(() => {
-        if (editMode && machineTypeSelected) {
-            const matchedMachine = machineTypeList.find(item => item.machineType.includes(machineTypeSelected))
-            if (matchedMachine) {
-                setMachineTypeSelected(matchedMachine.machineType);
-            }
-        }
-    }, [editMode]);
-
-    useEffect(() => {
-        if(!editMode) {
-            setStartDate(null);
-            setEndDate(null);
-        }
-    },[])
+        setStartDate(null);
+        setEndDate(null);
+    }, [])
 
     return (
         <>
@@ -643,34 +602,8 @@ const CreateVertexScheduler = ({
                         app={app}
                         themeManager={themeManager}
                         settingRegistry={settingRegistry}
-                        setJobId={setJobId}
-                        setExecutionPageFlag={setExecutionPageFlag}
-                        setCreateCompleted={setCreateCompleted}
-                        setInputFileSelected={setInputFileSelected}
                         region={region}
                         setRegion={setRegion}
-                        setMachineTypeSelected={setMachineTypeSelected}
-                        setAcceleratedCount={setAcceleratedCount}
-                        setAcceleratorType={setAcceleratorType}
-                        setKernelSelected={setKernelSelected}
-                        setCloudStorage={setCloudStorage}
-                        setDiskTypeSelected={setDiskTypeSelected}
-                        setDiskSize={setDiskSize}
-                        setParameterDetail={setParameterDetail}
-                        setParameterDetailUpdated={setParameterDetailUpdated}
-                        setServiceAccountSelected={setServiceAccountSelected}
-                        setPrimaryNetworkSelected={setPrimaryNetworkSelected}
-                        setSubNetworkSelected={setSubNetworkSelected}
-                        setSubNetworkList={setSubNetworkList}
-                        setSharedNetworkSelected={setSharedNetworkSelected}
-                        setScheduleMode={setScheduleMode}
-                        setScheduleField={setScheduleField}
-                        setStartDate={setStartDate}
-                        setEndDate={setEndDate}
-                        setMaxRuns={setMaxRuns}
-                        setEditMode={setEditMode}
-                        setJobNameSelected={setJobNameSelected}
-                        setGcsPath = {setGcsPath}
                     />
                     :
                     <div className='submit-job-container'>
@@ -1208,16 +1141,12 @@ const CreateVertexScheduler = ({
                                 onClick={() => handleCreateJobScheduler()}
                                 variant="contained"
                                 disabled={isSaveDisabled()}
-                                aria-label={editMode ? ' Update Schedule' : 'Create Schedule'}
+                                aria-label={'Create Schedule'}
                             >
                                 <div>
-                                    {editMode
-                                        ? creatingVertexScheduler
-                                            ? 'UPDATING'
-                                            : 'UPDATE'
-                                        : creatingVertexScheduler
-                                            ? 'CREATING'
-                                            : 'CREATE'}
+                                    {creatingVertexScheduler
+                                        ? 'CREATING'
+                                        : 'CREATE'}
                                 </div>
                             </Button>
                             <Button

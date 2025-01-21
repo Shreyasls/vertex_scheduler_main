@@ -28,84 +28,29 @@ import {
   Button
 } from '@mui/material';
 import DeletePopup from '../../utils/deletePopup';
-import { scheduleMode } from '../../utils/const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/utils';
 import { IconActive, IconDelete, IconEditDag, IconEditNotebook, IconFailed, IconListComplete, IconListPause, IconPause, IconPlay, IconSuccess, IconTrigger } from '../../utils/icons';
 import { VertexServices } from '../../Services/Vertex';
 import { IDagList } from './VertexInterfaces';
-import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
 
 function ListVertexScheduler({
   region,
   setRegion,
   app,
-  setJobId,
   settingRegistry,
-  handleDagIdSelection,
-  setCreateCompleted,
-  setInputFileSelected,
-  setMachineTypeSelected,
-  setAcceleratedCount,
-  setAcceleratorType,
-  setKernelSelected,
-  setCloudStorage,
-  setDiskTypeSelected,
-  setDiskSize,
-  setParameterDetail,
-  setParameterDetailUpdated,
-  setServiceAccountSelected,
-  setPrimaryNetworkSelected,
-  setSubNetworkSelected,
-  setSubNetworkList,
-  setSharedNetworkSelected,
-  setScheduleMode,
-  setScheduleField,
-  setStartDate,
-  setEndDate,
-  setMaxRuns,
-  setEditMode,
-  setJobNameSelected,
-  setGcsPath
 }: {
   region: string;
   setRegion: (value: string) => void;
   app: JupyterFrontEnd;
-  setJobId: (value: string) => void;
   settingRegistry: ISettingRegistry;
-  handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
-  setCreateCompleted: (value: boolean) => void;
-  setInputFileSelected: (value: string) => void;
-  setMachineTypeSelected: (value: string | null) => void;
-  setAcceleratedCount: (value: string | null) => void;
-  setAcceleratorType: (value: string | null) => void;
-  setKernelSelected: (value: string | null) => void;
-  setCloudStorage: (value: string | null) => void;
-  setDiskTypeSelected: (value: string | null) => void;
-  setDiskSize: (value: string) => void;
-  setParameterDetail: (value: string[]) => void;
-  setParameterDetailUpdated: (value: string[]) => void;
-  setServiceAccountSelected: (value: { displayName: string; email: string } | null) => void;
-  setPrimaryNetworkSelected: (value: { name: string; link: string } | null) => void;
-  setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
-  setSubNetworkList: (value: { name: string; link: string }[]) => void;
-  setSharedNetworkSelected: (value: { name: string; network: string, subnetwork: string } | null) => void;
-  setScheduleMode: (value: scheduleMode) => void;
-  setScheduleField: (value: string) => void;
-  setStartDate: (value: dayjs.Dayjs | null) => void;
-  setEndDate: (value: dayjs.Dayjs | null) => void;
-  setMaxRuns: (value: string) => void;
-  setEditMode: (value: boolean) => void;
-  setJobNameSelected: (value: string) => void;
-  setGcsPath: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
-  const [editDagLoading, setEditDagLoading] = useState('');
   const [triggerLoading, setTriggerLoading] = useState('');
   const [resumeLoading, setResumeLoading] = useState('');
   const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
@@ -243,48 +188,6 @@ function ListVertexScheduler({
     }
   };
 
-  /**
-  * Edit job
-  * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the edit job button.
-  */
-  const handleEditJob = async (event: React.MouseEvent, displayName: string) => {
-    const job_id = event.currentTarget.getAttribute('data-jobid');
-    if (job_id) {
-      setJobId(job_id)
-    }
-    if (job_id !== null) {
-      await VertexServices.editVertexSJobService(
-        job_id,
-        region,
-        setEditDagLoading,
-        setCreateCompleted,
-        setInputFileSelected,
-        setRegion,
-        setMachineTypeSelected,
-        setAcceleratedCount,
-        setAcceleratorType,
-        setKernelSelected,
-        setCloudStorage,
-        setDiskTypeSelected,
-        setDiskSize,
-        setParameterDetail,
-        setParameterDetailUpdated,
-        setServiceAccountSelected,
-        setPrimaryNetworkSelected,
-        setSubNetworkSelected,
-        setSubNetworkList,
-        setScheduleMode,
-        setScheduleField,
-        setStartDate,
-        setEndDate,
-        setMaxRuns,
-        setEditMode,
-        setJobNameSelected,
-        setGcsPath
-      );
-    }
-  };
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -364,31 +267,19 @@ function ListVertexScheduler({
             />
           </div>)
         }
-        {is_status_paused === "COMPLETED" ? <IconEditNotebook.react
-          tag="div"
-          className="icon-buttons-style-disable"
-        /> : (data.name === editDagLoading ? (
-          <div className="icon-buttons-style">
-            <CircularProgress
-              size={18}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
-          </div>
-        ) : (
+        {
           <div
             role="button"
             className="icon-buttons-style"
             title="Edit Schedule"
             data-jobid={data.name}
-            onClick={e => handleEditJob(e, data.displayName)}
           >
             <IconEditNotebook.react
               tag="div"
               className="icon-white logo-alignment-style"
             />
           </div>
-        ))}
+        }
         {
           (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
@@ -439,7 +330,6 @@ function ListVertexScheduler({
         <td
           {...cell.getCellProps()}
           className="clusters-table-data"
-          onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
         >
           {cell.value}
         </td>

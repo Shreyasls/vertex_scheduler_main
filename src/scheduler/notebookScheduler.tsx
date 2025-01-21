@@ -215,12 +215,7 @@ const NotebookSchedulerComponent = ({
             createCompleted={createCompleted}
             setCreateCompleted={setCreateCompleted}
             jobNameSelected={jobNameSelected}
-            setJobNameSelected={setJobNameSelected}
             inputFileSelected={inputFileSelected}
-            setInputFileSelected={setInputFileSelected}
-            editMode={editMode}
-            setEditMode={setEditMode}
-            setExecutionPageFlag={setExecutionPageFlag}
           />
       }
     </div>
