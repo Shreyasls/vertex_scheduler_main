@@ -21,6 +21,8 @@ import {
 } from '@mui/material';
 import { IDagRunList } from './VertexInterfaces';
 import { LogEntriesServices } from '../../Services/LogEntries';
+import { authApi } from '../../utils/utils';
+import { toast } from 'react-toastify';
 
 const VertexJobTaskLogs = ({
   jobRunId,
@@ -30,7 +32,8 @@ const VertexJobTaskLogs = ({
   jobRunsData: IDagRunList | undefined;
 }): JSX.Element => {
   const [dagTaskInstancesList, setDagTaskInstancesList] = useState<any>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [projectId, setProjectId] = useState<string>('');
 
   /** 
    * Fetches and lists the task instances for a specific job run.
@@ -50,6 +53,22 @@ const VertexJobTaskLogs = ({
     }
   }, [jobRunId, jobRunsData]);
 
+  const handleLogs = async () => {
+    window.open(`https://pantheon.corp.google.com/logs/query;query=SEARCH${jobRunId};cursorTimestamp=${jobRunsData?.startDate};duration=PT1H?hl=en&mods=metastore_prod_env&project=${projectId}`);
+  }
+
+  useEffect(() => {
+    authApi()
+      .then((credentials) => {
+        if (credentials && credentials?.region_id && credentials.project_id) {
+          setProjectId(credentials.project_id);
+        }
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  }, [projectId])
+
   return (
     <div>
       <div className="btn-refresh log-btn">
@@ -58,6 +77,7 @@ const VertexJobTaskLogs = ({
           className="btn-refresh-text"
           variant="outlined"
           aria-label="cancel Batch"
+          onClick={handleLogs}
         >
           <div>LOGS</div>
         </Button>
