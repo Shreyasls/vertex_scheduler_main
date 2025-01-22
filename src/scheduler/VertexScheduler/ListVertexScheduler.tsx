@@ -27,6 +27,7 @@ import {
   CircularProgress,
   Button
 } from '@mui/material';
+import { PLUGIN_ID } from '../../utils/const';
 import DeletePopup from '../../utils/deletePopup';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
@@ -59,6 +60,7 @@ function ListVertexScheduler({
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
+  const [isPreviewEnabled, setIsPreviewEnabled] = useState<boolean>(false);
 
   const columns = React.useMemo(
     () => [
@@ -281,7 +283,7 @@ function ListVertexScheduler({
           </div>
         }
         {
-          (data.name === editNotebookLoading ? (
+          isPreviewEnabled && (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
                 size={18}
@@ -415,6 +417,17 @@ function ListVertexScheduler({
     }
   };
 
+  /**
+  * Hides edit notebook icon on vertex
+  */
+  const checkPreviewEnabled = async () => {
+    const settings = await settingRegistry.load(PLUGIN_ID);
+
+    // The current value of whether or not preview features are enabled.
+    let previewEnabled = settings.get('previewEnabled').composite as boolean;
+    setIsPreviewEnabled(previewEnabled);
+  };
+
    /**
   * Opens edit notebook
   */
@@ -436,6 +449,7 @@ function ListVertexScheduler({
   }, [inputNotebookFilePath]);
 
   useEffect(() => {
+    checkPreviewEnabled();
     window.scrollTo(0, 0)
   }, [])
 
