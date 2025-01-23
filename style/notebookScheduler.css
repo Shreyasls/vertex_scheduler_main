@@ -436,9 +436,10 @@
 }
 
 .log-btn {
-  display: flex;
   justify-content: flex-end;
-  padding: 15px;
+  display: flex;
+  padding-right: 10px;
+  cursor: pointer;
 }
 
 .icon-size-status {
@@ -447,4 +448,8 @@
 
 .text-icon {
   line-height: 2;
+}
+
+.log-icon {
+  padding-top: 8px;
 }

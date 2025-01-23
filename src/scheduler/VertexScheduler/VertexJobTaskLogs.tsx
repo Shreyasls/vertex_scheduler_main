@@ -16,13 +16,19 @@
  */
 import React, { useEffect, useState } from 'react';
 import {
-  CircularProgress,
-  Button
+  CircularProgress
 } from '@mui/material';
 import { IDagRunList } from './VertexInterfaces';
 import { LogEntriesServices } from '../../Services/LogEntries';
 import { authApi } from '../../utils/utils';
 import { toast } from 'react-toastify';
+import createClusterIcon from '../../../style/icons/create_cluster_icon.svg';
+import { LabIcon } from '@jupyterlab/ui-components';
+
+const iconCreateCluster = new LabIcon({
+  name: 'launcher:create-cluster-icon',
+  svgstr: createClusterIcon
+});
 
 const VertexJobTaskLogs = ({
   jobRunId,
@@ -70,18 +76,25 @@ const VertexJobTaskLogs = ({
   }, [projectId])
 
   return (
+    console.log("dagTaskInstancesList", dagTaskInstancesList),
     <div>
-      <div className="btn-refresh log-btn">
-        <Button
-          disabled={isLoading}
-          className="btn-refresh-text"
-          variant="outlined"
-          aria-label="cancel Batch"
+      {
+        dagTaskInstancesList.length > 0 && dagTaskInstancesList.map((taskInstance: { severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; date: string; time: string; textPayload: string; tryNumber: number; }, index: string) => taskInstance.severity === 'ERROR' || taskInstance.severity === "WARNING") &&
+        <div
+          role="button"
+          className="log-btn"
           onClick={handleLogs}
         >
-          <div>LOGS</div>
-        </Button>
-      </div>
+          <div className="create-icon log-icon">
+            <iconCreateCluster.react
+              tag="div"
+              className="logo-alignment-style"
+            />
+          </div>
+          <div className="create-text">CLOUD LOGS</div>
+        </div>
+      }
+
       {dagTaskInstancesList.length > 0 ? (
         <div>
           <div className="accordion-vertex-row-parent-header">
@@ -94,7 +107,7 @@ const VertexJobTaskLogs = ({
             dagTaskInstancesList.map((taskInstance: { severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; date: string; time: string; textPayload: string; tryNumber: number; }, index: string) => (
               <div>
                 {
-                  taskInstance.severity === 'ERROR' || taskInstance.severity === "WARNING" &&
+                  (taskInstance.severity === 'ERROR' || taskInstance.severity === "WARNING") &&
                   <div className="accordion-vertex-row-parent">
                     <div className="accordion-vertex-row-data">
                       {taskInstance.severity}
