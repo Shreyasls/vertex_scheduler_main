@@ -91,7 +91,7 @@ const VertexJobTaskLogs = ({
               className="logo-alignment-style"
             />
           </div>
-          <div className="create-text">CLOUD LOGS</div>
+          <div className="create-text">VIEW CLOUD LOGS</div>
         </div>
       }
 
