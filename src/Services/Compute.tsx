@@ -27,7 +27,7 @@ export class ComputeServices {
             const formattedResponse: any = await requestAPI(`api/compute/getXpnHost`);
             if (formattedResponse.length > 0) {
                 if (formattedResponse) {
-                    setHostProject(formattedResponse);
+                    setHostProject(formattedResponse.name);
                 }
             } else {
                 setHostProject('')

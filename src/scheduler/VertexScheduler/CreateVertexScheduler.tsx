@@ -941,7 +941,7 @@ const CreateVertexScheduler = ({
                                         className="create-scheduler-label-style"
                                         control={<Radio size="small" />}
                                         label={
-                                            <Typography sx={{ fontSize: 13 }}>Network shared from host project {`${Object.keys(hostProject).length !== 0 ? `"${hostProject}"` : ''}`}</Typography>
+                                            <Typography sx={{ fontSize: 13 }}>Network shared from host project {`${hostProject !== '' ? `"${hostProject}"` : ''}`}</Typography>
                                         }
                                     />
                                     <span className="sub-para tab-text-sub-cl">Choose a shared VPC network from the project that is different from the clusters project</span>
