@@ -23,6 +23,13 @@ import { IDagRunList } from './VertexInterfaces';
 import { LogEntriesServices } from '../../Services/LogEntries';
 import { authApi } from '../../utils/utils';
 import { toast } from 'react-toastify';
+import createClusterIcon from '../../../style/icons/create_cluster_icon.svg';
+import { LabIcon } from '@jupyterlab/ui-components';
+
+const iconCreateCluster = new LabIcon({
+  name: 'launcher:create-cluster-icon',
+  svgstr: createClusterIcon
+});
 
 const VertexJobTaskLogs = ({
   jobRunId,
@@ -53,9 +60,17 @@ const VertexJobTaskLogs = ({
     }
   }, [jobRunId, jobRunsData]);
 
+  /** 
+   *  Redirect to pantheon cloud logs
+   */
   const handleLogs = async () => {
     window.open(`https://pantheon.corp.google.com/logs/query;query=SEARCH${jobRunId};cursorTimestamp=${jobRunsData?.startDate};duration=PT1H?hl=en&mods=metastore_prod_env&project=${projectId}`);
   }
+
+  /** 
+   *  Check whether list contains severity value as ERROR or WARNING
+   */
+  const logsFiltered = dagTaskInstancesList.some((taskInstance: { severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; date: string; time: string; textPayload: string; tryNumber: number; }, index: string) => taskInstance.severity === 'ERROR' || taskInstance.severity === "WARNING");
 
   useEffect(() => {
     authApi()
@@ -71,30 +86,32 @@ const VertexJobTaskLogs = ({
 
   return (
     <div>
-      <div className="btn-refresh log-btn">
-        <Button
-          disabled={isLoading}
-          className="btn-refresh-text"
-          variant="outlined"
-          aria-label="cancel Batch"
-          onClick={handleLogs}
-        >
-          <div>LOGS</div>
-        </Button>
-      </div>
-      {dagTaskInstancesList.length > 0 ? (
-        <div>
-          <div className="accordion-vertex-row-parent-header">
-            <div className="accordion-vertex-row-data">Severity</div>
-            <div className="accordion-vertex-row-data">Time Stamp</div>
-            <div className="accordion-vertex-row-data">Summary</div>
-            <div className="accordion-row-data-expand-logo"></div>
+      {dagTaskInstancesList.length > 0 && logsFiltered ? (
+        <>
+          <div
+            role="button"
+            className="log-btn"
+            onClick={handleLogs}
+          >
+            <div className="create-icon log-icon">
+              <iconCreateCluster.react
+                tag="div"
+                className="logo-alignment-style"
+              />
+            </div>
+            <div className="create-text">VIEW CLOUD LOGS</div>
           </div>
-          {dagTaskInstancesList.length > 0 &&
-            dagTaskInstancesList.map((taskInstance: { severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; date: string; time: string; textPayload: string; tryNumber: number; }, index: string) => (
-              <div>
-                {
-                  taskInstance.severity === 'ERROR' || taskInstance.severity === "WARNING" &&
+          <div>
+            <div className="accordion-vertex-row-parent-header">
+              <div className="accordion-vertex-row-data">Severity</div>
+              <div className="accordion-vertex-row-data">Time Stamp</div>
+              <div className="accordion-vertex-row-data">Summary</div>
+              <div className="accordion-row-data-expand-logo"></div>
+            </div>
+            {
+              dagTaskInstancesList.map((taskInstance: { severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; date: string; time: string; textPayload: string; tryNumber: number; }, index: string) => (
+                (taskInstance.severity === 'ERROR' || taskInstance.severity === "WARNING") &&
+                <div>
                   <div className="accordion-vertex-row-parent">
                     <div className="accordion-vertex-row-data">
                       {taskInstance.severity}
@@ -106,10 +123,11 @@ const VertexJobTaskLogs = ({
                       {taskInstance.textPayload.split(']')[1]}
                     </div>
                   </div>
-                }
-              </div>
-            ))}
-        </div>
+                </div>
+              ))}
+          </div>
+        </>
+
       ) : (
         <div>
           {isLoading ? (
